@@ -1,3 +1,4 @@
+import defaultInteractionsJson from "@/data/scene-interactions-default.json";
 import {
   hasModalContent,
   type InteractionHoverHintPlacement,
@@ -5,6 +6,13 @@ import {
   type SceneInteractionButton,
   type SceneInteractionsMap,
 } from "@/types/interactions";
+
+/**
+ * Carte des boutons d’interaction **versionnée** (build / prod).
+ * Remplis ce fichier avec le JSON exporté depuis l’éditeur (« Télécharger JSON » sur /visite),
+ * puis commit + rebuild : les boutons seront présents pour tous les visiteurs.
+ * Le localStorage reste une couche optionnelle par navigateur (fusion : le local écrase par id).
+ */
 
 const COLOR_KEYS = [
   "bgColor",
@@ -318,15 +326,43 @@ function migrateMap(parsed: unknown): SceneInteractionsMap {
   return out;
 }
 
+/** Fusion : pour chaque scène, les boutons du même `id` dans `overlay` remplacent ceux de `base`. */
+function mergeInteractionMaps(
+  base: SceneInteractionsMap,
+  overlay: SceneInteractionsMap,
+): SceneInteractionsMap {
+  const sceneIds = new Set([
+    ...Object.keys(base),
+    ...Object.keys(overlay),
+  ]);
+  const out: SceneInteractionsMap = {};
+  for (const sid of sceneIds) {
+    const baseList = base[sid] ?? [];
+    const overList = overlay[sid] ?? [];
+    const byId = new Map<string, SceneInteractionButton>();
+    for (const b of baseList) byId.set(b.id, b);
+    for (const b of overList) byId.set(b.id, b);
+    const merged = [...byId.values()];
+    if (merged.length > 0) out[sid] = merged;
+  }
+  return out;
+}
+
+/** Données par défaut embarquées dans le build (fichier JSON). */
+export function getDefaultInteractions(): SceneInteractionsMap {
+  return migrateMap(defaultInteractionsJson as unknown);
+}
+
 export function loadInteractions(): SceneInteractionsMap {
-  if (typeof window === "undefined") return {};
+  const defaults = getDefaultInteractions();
+  if (typeof window === "undefined") return defaults;
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return {};
-    const parsed = JSON.parse(raw) as unknown;
-    return migrateMap(parsed);
+    if (!raw) return defaults;
+    const parsed = migrateMap(JSON.parse(raw) as unknown);
+    return mergeInteractionMaps(defaults, parsed);
   } catch {
-    return {};
+    return defaults;
   }
 }
 

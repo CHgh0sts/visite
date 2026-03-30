@@ -20,6 +20,7 @@ import { sceneNavbarBottomReservePaddingClass } from "@/constants/sceneNavbarLay
 import { loadKrpanoScene } from "@/lib/krpanoNavigation";
 import {
   exportInteractionsJson,
+  getDefaultInteractions,
   loadInteractions,
   saveInteractions,
 } from "@/lib/sceneInteractionsStorage";
@@ -2310,7 +2311,9 @@ export function VisiteShell() {
   const [scenePanoReady, setScenePanoReady] = useState(false);
   /** true après le premier onblendcomplete — permet d’ignorer onnewscene initial et le timeout de secours pendant une transition. */
   const hasCompletedFirstBlendRef = useRef(false);
-  const [map, setMap] = useState<SceneInteractionsMap>({});
+  const [map, setMap] = useState<SceneInteractionsMap>(() =>
+    getDefaultInteractions(),
+  );
   const [hydrated, setHydrated] = useState(false);
   const [krpano, setKrpano] = useState<KrpanoViewer | null>(null);
   const [viewerContainerId, setViewerContainerId] = useState<string | null>(

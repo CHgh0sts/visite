@@ -7,6 +7,11 @@ export type SceneNavItem = {
   id?: string;
   /** Identifiant de scène dans le tour (ex. `scene_micronique_1`). */
   sceneId: string;
+  /**
+   * Scènes « associées » : même style « zone actuelle » que `sceneId`, mais le clic
+   * charge toujours `sceneId` (utile pour plusieurs hotspots d’une même zone).
+   */
+  otherSceneId?: string[];
   /** Libellé sous l’icône. */
   label: string;
   /**

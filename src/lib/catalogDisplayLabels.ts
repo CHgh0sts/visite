@@ -39,17 +39,27 @@ function applyTextReplacements(s: string): string {
   return out;
 }
 
+/** Échappe pour une RegExp littérale (remplacements insensibles à la casse). */
+function escapeRegExpChars(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 /** Dictionnaire du menu équipements : zones + lignes machines (`equipment-menu-replacements.json`). */
 function applyEquipmentMenuReplacements(s: string): string {
   let out = s;
-  for (const r of equipmentMenuConfig.replacements ?? []) {
+  const raw = equipmentMenuConfig.replacements ?? [];
+  const list = [...raw].sort(
+    (a, b) => (b.from?.length ?? 0) - (a.from?.length ?? 0),
+  );
+  for (const r of list) {
     const from = r.from;
     if (from == null || from === "") continue;
     const to = r.to ?? "";
     if (r.exact === true) {
-      if (out.trim() === from.trim()) out = to;
+      if (out.trim().toLowerCase() === from.trim().toLowerCase()) out = to;
     } else {
-      out = out.split(from).join(to);
+      const re = new RegExp(escapeRegExpChars(from), "gi");
+      out = out.replace(re, to);
     }
   }
   return out;

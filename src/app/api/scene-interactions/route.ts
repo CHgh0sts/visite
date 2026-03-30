@@ -24,18 +24,6 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const secret = process.env.SCENE_INTERACTIONS_WRITE_SECRET;
-  if (!secret?.trim()) {
-    return NextResponse.json(
-      { error: "Écriture non configurée (SCENE_INTERACTIONS_WRITE_SECRET)" },
-      { status: 503 },
-    );
-  }
-  const headerSecret = req.headers.get("x-scene-interactions-secret")?.trim();
-  if (!headerSecret || headerSecret !== secret) {
-    return NextResponse.json({ error: "Secret invalide" }, { status: 401 });
-  }
-
   let body: unknown;
   try {
     body = await req.json();

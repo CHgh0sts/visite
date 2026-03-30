@@ -120,6 +120,15 @@ function readTargetSceneId(o: Record<string, unknown>): {
   return {};
 }
 
+function readPreserveCurrentViewOnSceneChange(o: Record<string, unknown>): {
+  preserveCurrentViewOnSceneChange?: boolean;
+} {
+  if (o.preserveCurrentViewOnSceneChange === true) {
+    return { preserveCurrentViewOnSceneChange: true };
+  }
+  return {};
+}
+
 function readTargetSceneLookAt(o: Record<string, unknown>): {
   targetSceneLookAt?: {
     hlookat: number;
@@ -231,6 +240,7 @@ function migrateButton(raw: unknown): SceneInteractionButton {
   const targetSceneFields = {
     ...readTargetSceneId(o),
     ...readTargetSceneLookAt(o),
+    ...readPreserveCurrentViewOnSceneChange(o),
   };
   const sceneBtnFields = readSceneBtnFields(o);
   const equipmentField = readIsEquipment(o);

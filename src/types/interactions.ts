@@ -99,6 +99,11 @@ export type SceneInteractionButtonBase = {
     fov?: number;
   };
   /**
+   * Si `true`, au clic on conserve l’orientation actuelle (h/v/fov) sur la scène de destination.
+   * `targetSceneLookAt` est alors ignoré au moment du chargement.
+   */
+  preserveCurrentViewOnSceneChange?: boolean;
+  /**
    * Échelle du bouton sur la scène (1 = taille de base du composant).
    */
   sceneBtnScale?: number;
@@ -243,8 +248,14 @@ export function interactionSummary(b: SceneInteractionButton): string {
             : ""
         }`
       : "";
+  const preserve =
+    b.preserveCurrentViewOnSceneChange === true
+      ? " — garder la vue actuelle"
+      : "";
   const sceneNav = b.targetSceneId?.trim()
-    ? `scène → ${b.targetSceneId.trim()}${lookStr ? ` (${lookStr})` : ""}`
+    ? `scène → ${b.targetSceneId.trim()}${preserve}${
+        !b.preserveCurrentViewOnSceneChange && lookStr ? ` (${lookStr})` : ""
+      }`
     : "";
   const sceneLook: string[] = [];
   if (

@@ -73,6 +73,30 @@ function setPendingReactLookAt(next: PendingReactLookAt | null): void {
 }
 
 /**
+ * Vue à appliquer après `loadscene` : soit celle du bouton, soit la vue actuelle si
+ * `preserveCurrentViewOnSceneChange` est activé.
+ */
+export function lookAtForSceneNavigationButton(
+  krpano: KrpanoViewer,
+  b: {
+    preserveCurrentViewOnSceneChange?: boolean;
+    targetSceneLookAt?: KrpanoSceneLookAt;
+  },
+): KrpanoSceneLookAt | undefined {
+  if (b.preserveCurrentViewOnSceneChange) {
+    const snap = getKrpanoViewSnapshot(krpano);
+    if (snap) {
+      return {
+        hlookat: snap.hlookat,
+        vlookat: snap.vlookat,
+        fov: snap.fov,
+      };
+    }
+  }
+  return b.targetSceneLookAt;
+}
+
+/**
  * Charge une scène du tour (même logique que les hotspots `loadscene` du XML).
  * Avec `lookAt` : orientation appliquée sur `onloadcomplete` (voir tour.xml + `onReactPanoLoadComplete`),
  * comme le skin après `skin_loadscene`, et non après un délai arbitraire (évite un saut visible après le blend).

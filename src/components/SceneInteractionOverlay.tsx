@@ -9,6 +9,7 @@ import {
   getKrpanoViewSnapshot,
   hideKrpanoTourChrome,
   loadKrpanoScene,
+  lookAtForSceneNavigationButton,
   tweenKrpanoViewToAnchor,
   tweenKrpanoViewToSnapshot,
 } from "@/lib/krpanoNavigation";
@@ -349,7 +350,13 @@ export function SceneInteractionOverlay({
     (b: SceneInteractionButton) => {
       const goScene = b.targetSceneId?.trim();
       if (goScene) {
-        if (krpano) loadKrpanoScene(krpano, goScene, b.targetSceneLookAt);
+        if (krpano) {
+          loadKrpanoScene(
+            krpano,
+            goScene,
+            lookAtForSceneNavigationButton(krpano, b),
+          );
+        }
         return;
       }
       if (hasModalContent(b.modal)) {

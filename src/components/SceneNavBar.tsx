@@ -66,7 +66,14 @@ export function SceneNavBar({ krpano, currentSceneId }: SceneNavBarProps) {
         role="toolbar"
       >
         {items.map((item, index) => {
-          const active = currentSceneId.trim() === item.sceneId.trim();
+          const cur = currentSceneId.trim();
+          const target = item.sceneId.trim();
+          const isOnTarget = cur === target;
+          const aliasIds =
+            item.otherSceneId?.map((id) => id.trim()).filter(Boolean) ?? [];
+          const isOnAlias = aliasIds.length > 0 && aliasIds.includes(cur);
+          /** Style « actif » : scène cible ou une des scènes listées dans `otherSceneId`. */
+          const looksActive = isOnTarget || isOnAlias;
           const src = item.iconUrl.trim();
           const rowKey = item.id?.trim() ?? `nav-${index}`;
           return (
@@ -74,16 +81,16 @@ export function SceneNavBar({ krpano, currentSceneId }: SceneNavBarProps) {
               key={rowKey}
               type="button"
               onClick={() => {
-                if (!krpano || active) return;
-                loadKrpanoScene(krpano, item.sceneId.trim());
+                if (!krpano || isOnTarget) return;
+                loadKrpanoScene(krpano, target);
               }}
               disabled={!krpano}
               className={
-                active
+                looksActive
                   ? `${navBtnBase} z-10 scale-[1.14] text-white [background-color:var(--site-nav-accent)] shadow-lg`
                   : `${navBtnBase} scale-100 bg-transparent [color:var(--site-nav-accent)] hover:z-[1] hover:scale-[1.06] hover:bg-white/55`
               }
-              aria-current={active ? "true" : undefined}
+              aria-current={looksActive ? "true" : undefined}
             >
               <span className="flex min-h-0 flex-1 flex-col items-center justify-center px-0.5 pt-0.5" aria-hidden>
                 <img
@@ -92,7 +99,7 @@ export function SceneNavBar({ krpano, currentSceneId }: SceneNavBarProps) {
                   width={16}
                   height={16}
                   className={
-                    active
+                    looksActive
                       ? "h-4 w-4 object-contain brightness-0 invert"
                       : "h-4 w-4 object-contain"
                   }

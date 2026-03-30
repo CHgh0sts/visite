@@ -7,6 +7,38 @@
     {
       "from": "Micronique 19",
       "to": "MAGAZIN"
+    },
+    {
+      "from": "Micronique 2",
+      "to": "CMS SERIES"
+    },
+    {
+      "from": "Micronique 4",
+      "to": "CMS SERIES"
+    },
+    {
+      "from": "Micronique 5",
+      "to": "CMS SERIES"
+    },
+    {
+      "from": "Micronique 6",
+      "to": "CMS SERIES"
+    },
+    {
+      "from": "Micronique 32",
+      "to": "CMS SERIES"
+    },
+    {
+      "from": "Micronique 33",
+      "to": "CONTROLE - REPARATION"
+    },
+    {
+      "from": "Micronique 26",
+      "to": "CONTROLE - REPARATION"
+    },
+    {
+      "from": "Micronique 34",
+      "to": "CMS ILOT PROTOTYPES"
     }
   ]
 }

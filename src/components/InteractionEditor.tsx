@@ -18,6 +18,7 @@ import { SceneInteractionOverlay } from "@/components/SceneInteractionOverlay";
 import { KRPANO_START_SCENE } from "@/constants/krpano";
 import { sceneNavbarBottomReservePaddingClass } from "@/constants/sceneNavbarLayout";
 import { loadKrpanoScene } from "@/lib/krpanoNavigation";
+import { postSceneInteractionsToServer } from "@/lib/sceneInteractionsApi";
 import {
   exportInteractionsJson,
   getDefaultInteractions,
@@ -294,8 +295,9 @@ function mergeTargetSceneNav(args: {
   targetSceneLookAtH: string;
   targetSceneLookAtV: string;
   targetSceneLookAtFov: string;
+  preserveCurrentViewOnSceneChange: boolean;
 }):
-  | { ok: true; extras: { targetSceneId?: string; targetSceneLookAt?: { hlookat: number; vlookat: number; fov?: number } } }
+  | { ok: true; extras: { targetSceneId?: string; targetSceneLookAt?: { hlookat: number; vlookat: number; fov?: number }; preserveCurrentViewOnSceneChange?: true } }
   | { ok: false; error: string } {
   const sceneTrim = args.targetSceneId.trim();
   const hStr = args.targetSceneLookAtH.trim();
@@ -310,6 +312,15 @@ function mergeTargetSceneNav(args: {
       };
     }
     return { ok: true, extras: {} };
+  }
+  if (args.preserveCurrentViewOnSceneChange) {
+    return {
+      ok: true,
+      extras: {
+        targetSceneId: sceneTrim,
+        preserveCurrentViewOnSceneChange: true,
+      },
+    };
   }
   const h = parseFloat(hStr.replace(",", "."));
   const v = parseFloat(vStr.replace(",", "."));
@@ -363,6 +374,7 @@ function buildInteractionButton(
     targetSceneLookAtH: string;
     targetSceneLookAtV: string;
     targetSceneLookAtFov: string;
+    preserveCurrentViewOnSceneChange: boolean;
     sceneBtnScale: number;
     sceneBtnRotateXDeg: number;
     sceneBtnRotateYDeg: number;
@@ -388,6 +400,7 @@ function buildInteractionButton(
     targetSceneLookAtH: args.targetSceneLookAtH,
     targetSceneLookAtV: args.targetSceneLookAtV,
     targetSceneLookAtFov: args.targetSceneLookAtFov,
+    preserveCurrentViewOnSceneChange: args.preserveCurrentViewOnSceneChange,
   });
   if (!nav.ok) return { error: nav.error };
   const sceneExtras = nav.extras;
@@ -548,6 +561,8 @@ export function InteractionEditor({
   const [targetSceneLookAtH, setTargetSceneLookAtH] = useState("");
   const [targetSceneLookAtV, setTargetSceneLookAtV] = useState("");
   const [targetSceneLookAtFov, setTargetSceneLookAtFov] = useState("");
+  const [preserveCurrentViewOnSceneChange, setPreserveCurrentViewOnSceneChange] =
+    useState(false);
   const [sceneBtnScale, setSceneBtnScale] = useState(1);
   const [sceneBtnRotateXDeg, setSceneBtnRotateXDeg] = useState(0);
   const [sceneBtnRotateYDeg, setSceneBtnRotateYDeg] = useState(0);
@@ -565,8 +580,6 @@ export function InteractionEditor({
   const [editingId, setEditingId] = useState<string | null>(null);
   /** Onglet du panneau : création (nouveau bouton) ou édition (liste + formulaire si modification). */
   const [panelTab, setPanelTab] = useState<"create" | "edit">("create");
-  const [publishOpen, setPublishOpen] = useState(false);
-  const [publishSecret, setPublishSecret] = useState("");
   const [publishBusy, setPublishBusy] = useState(false);
   const [publishFeedback, setPublishFeedback] = useState<string | null>(null);
 
@@ -618,6 +631,7 @@ export function InteractionEditor({
     setTargetSceneLookAtH("");
     setTargetSceneLookAtV("");
     setTargetSceneLookAtFov("");
+    setPreserveCurrentViewOnSceneChange(false);
     setSceneBtnScale(1);
     setSceneBtnRotateXDeg(0);
     setSceneBtnRotateYDeg(0);
@@ -675,17 +689,25 @@ export function InteractionEditor({
     setHoverHint(b.hoverHint?.trim() ?? "");
     setHoverHintPlacement(b.hoverHintPlacement ?? "top");
     setTargetSceneId(b.targetSceneId?.trim() ?? "");
-    const la = b.targetSceneLookAt;
-    if (
-      la &&
-      Number.isFinite(la.hlookat) &&
-      Number.isFinite(la.vlookat)
-    ) {
-      setTargetSceneLookAtH(String(la.hlookat));
-      setTargetSceneLookAtV(String(la.vlookat));
-      setTargetSceneLookAtFov(
-        la.fov != null && Number.isFinite(la.fov) ? String(la.fov) : "",
-      );
+    const preserve = b.preserveCurrentViewOnSceneChange === true;
+    setPreserveCurrentViewOnSceneChange(preserve);
+    if (!preserve) {
+      const la = b.targetSceneLookAt;
+      if (
+        la &&
+        Number.isFinite(la.hlookat) &&
+        Number.isFinite(la.vlookat)
+      ) {
+        setTargetSceneLookAtH(String(la.hlookat));
+        setTargetSceneLookAtV(String(la.vlookat));
+        setTargetSceneLookAtFov(
+          la.fov != null && Number.isFinite(la.fov) ? String(la.fov) : "",
+        );
+      } else {
+        setTargetSceneLookAtH("");
+        setTargetSceneLookAtV("");
+        setTargetSceneLookAtFov("");
+      }
     } else {
       setTargetSceneLookAtH("");
       setTargetSceneLookAtV("");
@@ -891,6 +913,7 @@ export function InteractionEditor({
         targetSceneLookAtH,
         targetSceneLookAtV,
         targetSceneLookAtFov,
+        preserveCurrentViewOnSceneChange,
         sceneBtnScale,
         sceneBtnRotateXDeg,
         sceneBtnRotateYDeg,
@@ -940,6 +963,7 @@ export function InteractionEditor({
       targetSceneLookAtH,
       targetSceneLookAtV,
       targetSceneLookAtFov,
+      preserveCurrentViewOnSceneChange,
       sceneBtnScale,
       sceneBtnRotateXDeg,
       sceneBtnRotateYDeg,
@@ -985,6 +1009,7 @@ export function InteractionEditor({
       targetSceneLookAtH,
       targetSceneLookAtV,
       targetSceneLookAtFov,
+      preserveCurrentViewOnSceneChange,
       sceneBtnScale,
       sceneBtnRotateXDeg,
       sceneBtnRotateYDeg,
@@ -1022,6 +1047,7 @@ export function InteractionEditor({
     targetSceneLookAtH,
     targetSceneLookAtV,
     targetSceneLookAtFov,
+    preserveCurrentViewOnSceneChange,
     sceneBtnScale,
     sceneBtnRotateXDeg,
     sceneBtnRotateYDeg,
@@ -1086,28 +1112,14 @@ export function InteractionEditor({
   }, [map]);
 
   const publishToDb = useCallback(async () => {
-    if (!publishSecret.trim()) {
-      setPublishFeedback("Indiquez le secret serveur (SCENE_INTERACTIONS_WRITE_SECRET).");
-      return;
-    }
     setPublishBusy(true);
     setPublishFeedback(null);
     try {
-      const res = await fetch("/api/scene-interactions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-scene-interactions-secret": publishSecret.trim(),
-        },
-        body: JSON.stringify({ map }),
-      });
-      const data = (await res.json()) as { error?: string };
-      if (!res.ok) {
-        throw new Error(data.error ?? `HTTP ${res.status}`);
+      const result = await postSceneInteractionsToServer(map);
+      if (!result.ok) {
+        throw new Error(result.error);
       }
       setPublishFeedback(null);
-      setPublishOpen(false);
-      setPublishSecret("");
     } catch (e) {
       setPublishFeedback(
         e instanceof Error ? e.message : "Échec de l’enregistrement",
@@ -1115,7 +1127,7 @@ export function InteractionEditor({
     } finally {
       setPublishBusy(false);
     }
-  }, [map, publishSecret]);
+  }, [map]);
 
   return (
     <>
@@ -2028,6 +2040,7 @@ export function InteractionEditor({
                     setTargetSceneLookAtH("");
                     setTargetSceneLookAtV("");
                     setTargetSceneLookAtFov("");
+                    setPreserveCurrentViewOnSceneChange(false);
                   }
                   setFormError(null);
                 }}
@@ -2078,6 +2091,7 @@ export function InteractionEditor({
                         setTargetSceneLookAtH(e.target.value);
                         setFormError(null);
                       }}
+                      disabled={preserveCurrentViewOnSceneChange}
                       className={`min-w-0 font-mono tabular-nums sm:col-start-1 sm:row-start-2 ${fieldClass}`}
                       placeholder="ex. −120"
                       inputMode="decimal"
@@ -2095,6 +2109,7 @@ export function InteractionEditor({
                         setTargetSceneLookAtV(e.target.value);
                         setFormError(null);
                       }}
+                      disabled={preserveCurrentViewOnSceneChange}
                       className={`min-w-0 font-mono tabular-nums sm:col-start-2 sm:row-start-2 ${fieldClass}`}
                       placeholder="ex. 5"
                       inputMode="decimal"
@@ -2116,11 +2131,27 @@ export function InteractionEditor({
                         setTargetSceneLookAtFov(e.target.value);
                         setFormError(null);
                       }}
+                      disabled={preserveCurrentViewOnSceneChange}
                       className={`min-w-0 font-mono tabular-nums sm:col-start-3 sm:row-start-2 ${fieldClass}`}
                       placeholder="vide"
                       inputMode="decimal"
                     />
                   </div>
+                  <label className="mt-3 flex cursor-pointer items-start gap-2 text-[11px] leading-snug text-zinc-400">
+                    <input
+                      type="checkbox"
+                      className="mt-0.5 size-3.5 shrink-0 rounded border-zinc-600 bg-zinc-900 accent-sky-500"
+                      checked={preserveCurrentViewOnSceneChange}
+                      onChange={(e) => {
+                        setPreserveCurrentViewOnSceneChange(e.target.checked);
+                        setFormError(null);
+                      }}
+                    />
+                    <span>
+                      Conserver l’angle de vue actuel (h / v / zoom) sur la scène de
+                      destination — les champs ci-dessus sont ignorés.
+                    </span>
+                  </label>
                 </div>
               ) : null}
             </EditorSection>
@@ -2245,13 +2276,11 @@ export function InteractionEditor({
             </button>
             <button
               type="button"
-              onClick={() => {
-                setPublishFeedback(null);
-                setPublishOpen(true);
-              }}
-              className="rounded-lg border border-emerald-800/60 bg-emerald-950/40 px-3 py-1.5 text-xs text-emerald-200 hover:bg-emerald-950/60"
+              disabled={publishBusy}
+              onClick={() => void publishToDb()}
+              className="rounded-lg border border-emerald-800/60 bg-emerald-950/40 px-3 py-1.5 text-xs text-emerald-200 hover:bg-emerald-950/60 disabled:opacity-50"
             >
-              Publier dans la base (toutes les scènes)
+              {publishBusy ? "Enregistrement…" : "Publier dans la base (toutes les scènes)"}
             </button>
             <button
               type="button"
@@ -2269,10 +2298,13 @@ export function InteractionEditor({
             </button>
           </div>
 
+          {publishFeedback ? (
+            <p className="text-[10px] leading-snug text-red-400">{publishFeedback}</p>
+          ) : null}
           <p className="text-[10px] leading-snug text-zinc-500">
             Les visiteurs chargent la carte depuis PostgreSQL (fusion avec le JSON
-            par défaut dans le build). « Publier » envoie l’état actuel du panneau
-            (toutes les scènes) sur le serveur — secret requis.
+            par défaut dans le build). Chaque modification est enregistrée
+            automatiquement ; « Publier » force une synchro immédiate si besoin.
           </p>
           </div>
         </div>
@@ -2289,68 +2321,6 @@ export function InteractionEditor({
         />
       )}
 
-      {publishOpen && (
-        <div className="pointer-events-auto fixed inset-0 z-125 flex items-center justify-center p-4">
-          <button
-            type="button"
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            aria-label="Fermer la fenêtre de publication"
-            disabled={publishBusy}
-            onClick={() => !publishBusy && setPublishOpen(false)}
-          />
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="publish-dialog-title"
-            className="relative z-10 w-full max-w-sm rounded-2xl border border-zinc-700 bg-zinc-950 p-4 shadow-2xl"
-          >
-            <h2
-              id="publish-dialog-title"
-              className="text-sm font-semibold text-zinc-100"
-            >
-              Publier sur PostgreSQL
-            </h2>
-            <p className="mt-2 text-xs leading-relaxed text-zinc-400">
-              Enregistre <span className="font-medium text-zinc-300">toutes</span>{" "}
-              les interactions de <span className="font-medium text-zinc-300">toutes</span>{" "}
-              les scènes (état courant du panneau).
-            </p>
-            <label className="mt-3 block text-[11px] font-medium text-zinc-500">
-              Secret d’écriture (SCENE_INTERACTIONS_WRITE_SECRET)
-            </label>
-            <input
-              type="password"
-              autoComplete="off"
-              value={publishSecret}
-              onChange={(e) => setPublishSecret(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none focus:border-sky-600"
-              placeholder="••••••••"
-              disabled={publishBusy}
-            />
-            {publishFeedback ? (
-              <p className="mt-2 text-xs text-red-400">{publishFeedback}</p>
-            ) : null}
-            <div className="mt-4 flex justify-end gap-2">
-              <button
-                type="button"
-                disabled={publishBusy}
-                onClick={() => !publishBusy && setPublishOpen(false)}
-                className="rounded-lg border border-zinc-600 px-3 py-1.5 text-xs text-zinc-300 hover:bg-zinc-800 disabled:opacity-50"
-              >
-                Annuler
-              </button>
-              <button
-                type="button"
-                disabled={publishBusy}
-                onClick={() => void publishToDb()}
-                className="rounded-lg bg-emerald-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-600 disabled:opacity-50"
-              >
-                {publishBusy ? "Envoi…" : "Enregistrer"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }
@@ -2423,6 +2393,8 @@ export function VisiteShell() {
   const [map, setMap] = useState<SceneInteractionsMap>(() =>
     getDefaultInteractions(),
   );
+  /** Après le premier chargement depuis l’API — évite d’écraser la base avant d’avoir la carte serveur. */
+  const [interactionsHydrated, setInteractionsHydrated] = useState(false);
   const [krpano, setKrpano] = useState<KrpanoViewer | null>(null);
   const [viewerContainerId, setViewerContainerId] = useState<string | null>(
     null,
@@ -2459,11 +2431,23 @@ export function VisiteShell() {
     void loadSiteInteractions().then((m) => {
       if (cancelled) return;
       setMap(m);
+      setInteractionsHydrated(true);
     });
     return () => {
       cancelled = true;
     };
   }, []);
+
+  /** Sauvegarde automatique vers PostgreSQL à chaque changement de carte. */
+  useEffect(() => {
+    if (!interactionsHydrated) return;
+    const t = window.setTimeout(() => {
+      void postSceneInteractionsToServer(map).then((r) => {
+        if (!r.ok) console.warn("[scene-interactions] auto-save:", r.error);
+      });
+    }, 800);
+    return () => clearTimeout(t);
+  }, [map, interactionsHydrated]);
 
   useEffect(() => {
     setListHoverButtonId(null);

@@ -21,8 +21,7 @@ import { loadKrpanoScene } from "@/lib/krpanoNavigation";
 import {
   exportInteractionsJson,
   getDefaultInteractions,
-  loadInteractions,
-  saveInteractions,
+  loadSiteInteractions,
 } from "@/lib/sceneInteractionsStorage";
 import { useIdleHomeRedirect } from "@/hooks/useIdleHomeRedirect";
 import { TOUR_SCENES } from "@/lib/tourScenes";
@@ -566,6 +565,10 @@ export function InteractionEditor({
   const [editingId, setEditingId] = useState<string | null>(null);
   /** Onglet du panneau : création (nouveau bouton) ou édition (liste + formulaire si modification). */
   const [panelTab, setPanelTab] = useState<"create" | "edit">("create");
+  const [publishOpen, setPublishOpen] = useState(false);
+  const [publishSecret, setPublishSecret] = useState("");
+  const [publishBusy, setPublishBusy] = useState(false);
+  const [publishFeedback, setPublishFeedback] = useState<string | null>(null);
 
   const buttons = map[sceneName] ?? [];
   const editingButton =
@@ -1077,10 +1080,42 @@ export function InteractionEditor({
     });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "interactions-scenes.json";
+    a.download = "scene-interactions.json";
     a.click();
     URL.revokeObjectURL(a.href);
   }, [map]);
+
+  const publishToDb = useCallback(async () => {
+    if (!publishSecret.trim()) {
+      setPublishFeedback("Indiquez le secret serveur (SCENE_INTERACTIONS_WRITE_SECRET).");
+      return;
+    }
+    setPublishBusy(true);
+    setPublishFeedback(null);
+    try {
+      const res = await fetch("/api/scene-interactions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-scene-interactions-secret": publishSecret.trim(),
+        },
+        body: JSON.stringify({ map }),
+      });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        throw new Error(data.error ?? `HTTP ${res.status}`);
+      }
+      setPublishFeedback(null);
+      setPublishOpen(false);
+      setPublishSecret("");
+    } catch (e) {
+      setPublishFeedback(
+        e instanceof Error ? e.message : "Échec de l’enregistrement",
+      );
+    } finally {
+      setPublishBusy(false);
+    }
+  }, [map, publishSecret]);
 
   return (
     <>
@@ -2211,12 +2246,21 @@ export function InteractionEditor({
             <button
               type="button"
               onClick={() => {
+                setPublishFeedback(null);
+                setPublishOpen(true);
+              }}
+              className="rounded-lg border border-emerald-800/60 bg-emerald-950/40 px-3 py-1.5 text-xs text-emerald-200 hover:bg-emerald-950/60"
+            >
+              Publier dans la base (toutes les scènes)
+            </button>
+            <button
+              type="button"
+              onClick={() => {
                 if (
                   typeof window !== "undefined" &&
                   window.confirm("Effacer tous les boutons de toutes les scènes ?")
                 ) {
                   onMapChange({});
-                  saveInteractions({});
                 }
               }}
               className="rounded-lg border border-red-900/50 bg-red-950/30 px-3 py-1.5 text-xs text-red-300 hover:bg-red-950/50"
@@ -2226,7 +2270,9 @@ export function InteractionEditor({
           </div>
 
           <p className="text-[10px] leading-snug text-zinc-500">
-            Le clic ancre le bouton dans le panorama. Données en stockage local.
+            Les visiteurs chargent la carte depuis PostgreSQL (fusion avec le JSON
+            par défaut dans le build). « Publier » envoie l’état actuel du panneau
+            (toutes les scènes) sur le serveur — secret requis.
           </p>
           </div>
         </div>
@@ -2241,6 +2287,69 @@ export function InteractionEditor({
           onPlace={(ath, atv) => addButtonAt(ath, atv)}
           onCancel={() => setPlacementMode(false)}
         />
+      )}
+
+      {publishOpen && (
+        <div className="pointer-events-auto fixed inset-0 z-125 flex items-center justify-center p-4">
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            aria-label="Fermer la fenêtre de publication"
+            disabled={publishBusy}
+            onClick={() => !publishBusy && setPublishOpen(false)}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="publish-dialog-title"
+            className="relative z-10 w-full max-w-sm rounded-2xl border border-zinc-700 bg-zinc-950 p-4 shadow-2xl"
+          >
+            <h2
+              id="publish-dialog-title"
+              className="text-sm font-semibold text-zinc-100"
+            >
+              Publier sur PostgreSQL
+            </h2>
+            <p className="mt-2 text-xs leading-relaxed text-zinc-400">
+              Enregistre <span className="font-medium text-zinc-300">toutes</span>{" "}
+              les interactions de <span className="font-medium text-zinc-300">toutes</span>{" "}
+              les scènes (état courant du panneau).
+            </p>
+            <label className="mt-3 block text-[11px] font-medium text-zinc-500">
+              Secret d’écriture (SCENE_INTERACTIONS_WRITE_SECRET)
+            </label>
+            <input
+              type="password"
+              autoComplete="off"
+              value={publishSecret}
+              onChange={(e) => setPublishSecret(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none focus:border-sky-600"
+              placeholder="••••••••"
+              disabled={publishBusy}
+            />
+            {publishFeedback ? (
+              <p className="mt-2 text-xs text-red-400">{publishFeedback}</p>
+            ) : null}
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                type="button"
+                disabled={publishBusy}
+                onClick={() => !publishBusy && setPublishOpen(false)}
+                className="rounded-lg border border-zinc-600 px-3 py-1.5 text-xs text-zinc-300 hover:bg-zinc-800 disabled:opacity-50"
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                disabled={publishBusy}
+                onClick={() => void publishToDb()}
+                className="rounded-lg bg-emerald-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-600 disabled:opacity-50"
+              >
+                {publishBusy ? "Envoi…" : "Enregistrer"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );
@@ -2314,7 +2423,6 @@ export function VisiteShell() {
   const [map, setMap] = useState<SceneInteractionsMap>(() =>
     getDefaultInteractions(),
   );
-  const [hydrated, setHydrated] = useState(false);
   const [krpano, setKrpano] = useState<KrpanoViewer | null>(null);
   const [viewerContainerId, setViewerContainerId] = useState<string | null>(
     null,
@@ -2347,18 +2455,19 @@ export function VisiteShell() {
   }, []);
 
   useEffect(() => {
-    setMap(loadInteractions());
-    setHydrated(true);
+    let cancelled = false;
+    void loadSiteInteractions().then((m) => {
+      if (cancelled) return;
+      setMap(m);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
     setListHoverButtonId(null);
   }, [sceneName]);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    saveInteractions(map);
-  }, [map, hydrated]);
 
   /** Secours uniquement au premier chargement si onblendcomplete ne vient pas — jamais pendant un changement de scène. */
   useEffect(() => {

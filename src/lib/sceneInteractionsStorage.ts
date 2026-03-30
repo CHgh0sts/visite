@@ -8,10 +8,12 @@ import {
 } from "@/types/interactions";
 
 /**
- * Carte des boutons d’interaction **versionnée** (build / prod).
- * Remplis ce fichier avec le JSON exporté depuis l’éditeur (« Télécharger JSON » sur /visite),
- * puis commit + rebuild : les boutons seront présents pour tous les visiteurs.
- * Le localStorage reste une couche optionnelle par navigateur (fusion : le local écrase par id).
+ * Carte des boutons d’interaction (sans localStorage).
+ *
+ * 1) `src/data/scene-interactions-default.json` — embarqué dans le build (fallback).
+ * 2) Base PostgreSQL via `GET /api/scene-interactions` — fusionné au chargement.
+ *
+ * Fusion : défauts puis base : pour un même `id` de bouton, la base remplace le défaut.
  */
 
 const COLOR_KEYS = [
@@ -31,8 +33,6 @@ function readColors(
   }
   return out;
 }
-
-const STORAGE_KEY = "micronique-scene-interactions-v1";
 
 function readPos(o: Record<string, unknown>): {
   ath?: number;
@@ -314,6 +314,10 @@ function migrateButton(raw: unknown): SceneInteractionButton {
   };
 }
 
+export function parseSceneInteractionsPayload(parsed: unknown): SceneInteractionsMap {
+  return migrateMap(parsed);
+}
+
 function migrateMap(parsed: unknown): SceneInteractionsMap {
   if (!parsed || typeof parsed !== "object") return {};
   const out: SceneInteractionsMap = {};
@@ -326,8 +330,10 @@ function migrateMap(parsed: unknown): SceneInteractionsMap {
   return out;
 }
 
-/** Fusion : pour chaque scène, les boutons du même `id` dans `overlay` remplacent ceux de `base`. */
-function mergeInteractionMaps(
+/**
+ * Fusion : pour chaque scène, les boutons du même `id` dans `overlay` remplacent ceux de `base`.
+ */
+export function mergeInteractionMaps(
   base: SceneInteractionsMap,
   overlay: SceneInteractionsMap,
 ): SceneInteractionsMap {
@@ -353,25 +359,22 @@ export function getDefaultInteractions(): SceneInteractionsMap {
   return migrateMap(defaultInteractionsJson as unknown);
 }
 
-export function loadInteractions(): SceneInteractionsMap {
+/**
+ * Charge défauts + carte en base (API). Côté serveur sans `fetch` : défauts seuls.
+ */
+export async function loadSiteInteractions(): Promise<SceneInteractionsMap> {
   const defaults = getDefaultInteractions();
   if (typeof window === "undefined") return defaults;
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return defaults;
-    const parsed = migrateMap(JSON.parse(raw) as unknown);
-    return mergeInteractionMaps(defaults, parsed);
+    const res = await fetch("/api/scene-interactions", { cache: "no-store" });
+    if (!res.ok) return defaults;
+    const data = (await res.json()) as { map?: unknown };
+    const fromDb = data.map
+      ? parseSceneInteractionsPayload(data.map)
+      : {};
+    return mergeInteractionMaps(defaults, fromDb);
   } catch {
     return defaults;
-  }
-}
-
-export function saveInteractions(map: SceneInteractionsMap): void {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
-  } catch {
-    /* quota / mode privé */
   }
 }
 

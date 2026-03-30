@@ -2392,14 +2392,14 @@ export function VisiteShell() {
     <div className="fixed inset-0">
       <Link
         href="/"
-        className="pointer-events-auto fixed left-4 top-4 z-[85] block w-[min(72vw,16rem)] max-w-[20rem] outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-black/50 sm:w-[min(64vw,18rem)]"
+        className="pointer-events-auto fixed left-3 top-3 z-[85] block w-[min(48vw,9rem)] max-w-[10rem] outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-black/50 sm:left-4 sm:top-4 sm:w-[min(36vw,11rem)] sm:max-w-[11rem]"
         aria-label="Micronique — retour à l’accueil"
       >
         <img
           src="/images/global/micronique.webp"
           alt="Micronique"
-          width={420}
-          height={140}
+          width={280}
+          height={93}
           className="h-auto w-full object-contain drop-shadow-[0_2px_12px_rgba(0,0,0,0.45)]"
           decoding="async"
         />

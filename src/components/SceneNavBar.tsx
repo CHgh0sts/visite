@@ -69,10 +69,14 @@ export function SceneNavBar({ krpano, currentSceneId }: SceneNavBarProps) {
           const cur = currentSceneId.trim();
           const target = item.sceneId.trim();
           const isOnTarget = cur === target;
-          const aliasIds =
-            item.otherSceneId?.map((id) => id.trim()).filter(Boolean) ?? [];
+          const aliasIds = [
+            ...(item.otherSceneId ?? []),
+            ...(item.otherSceneIds ?? []),
+          ]
+            .map((id) => id.trim())
+            .filter(Boolean);
           const isOnAlias = aliasIds.length > 0 && aliasIds.includes(cur);
-          /** Style « actif » : scène cible ou une des scènes listées dans `otherSceneId`. */
+          /** Style « actif » : scène cible ou une des scènes listées dans `otherSceneId` / `otherSceneIds`. */
           const looksActive = isOnTarget || isOnAlias;
           const src = item.iconUrl.trim();
           const rowKey = item.id?.trim() ?? `nav-${index}`;

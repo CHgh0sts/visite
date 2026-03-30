@@ -13,6 +13,7 @@
     },
     {
       "sceneId": "scene_micronique_22",
+      "otherSceneIds": ["scene_micronique_34"],
       "label": "CMS ILOT PROTOTYPES",
       "iconUrl": "/images/navbar/CMS-ILOT-PROTOTYPES.svg"
     },

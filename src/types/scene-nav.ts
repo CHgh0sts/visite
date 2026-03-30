@@ -10,8 +10,10 @@ export type SceneNavItem = {
   /**
    * Scènes « associées » : même style « zone actuelle » que `sceneId`, mais le clic
    * charge toujours `sceneId` (utile pour plusieurs hotspots d’une même zone).
+   * `otherSceneIds` est un alias (même tableau) — les deux noms sont acceptés.
    */
   otherSceneId?: string[];
+  otherSceneIds?: string[];
   /** Libellé sous l’icône. */
   label: string;
   /**

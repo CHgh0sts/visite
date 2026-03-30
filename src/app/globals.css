@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Boutons d’interaction (visite) : couleurs via variables */
+.ix-interaction-btn {
+  background-color: var(--ix-bg);
+  color: var(--ix-fg);
+}
+.ix-interaction-btn:hover {
+  background-color: var(--ix-bg-hover, var(--ix-bg));
+  color: var(--ix-fg-hover, var(--ix-fg));
+}
+
+/* Icône / SVG : rotation de base + rotation supplémentaire au survol du bouton */
+.ix-icon-rot {
+  transform: rotate(var(--ix-icon-base, 0deg));
+  transition: transform var(--ix-icon-duration, 0.25s) ease
+    var(--ix-icon-delay, 0s);
+}
+button:hover .ix-icon-rot {
+  transform: rotate(
+    calc(var(--ix-icon-base, 0deg) + var(--ix-icon-hover, 0deg))
+  );
+}
+@media (prefers-reduced-motion: reduce) {
+  .ix-icon-rot {
+    transition: none;
+  }
+}

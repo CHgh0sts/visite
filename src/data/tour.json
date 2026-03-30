@@ -1,0 +1,1367 @@
+{
+  "meta": {
+    "source": "https://micronique.juumo.fr/krpano/tour.xml",
+    "krpanoBasePath": "/krpano",
+    "defaultSceneId": "scene_micronique_1",
+    "credit": "Développé par Guillaume Ducuing — https://meetguillaume.dev",
+    "panoramaImagesBase": "/images/panorama",
+    "krpanoTileSizePx": 512
+  },
+  "scenes": [
+    {
+      "id": "scene_micronique_1",
+      "title": "Micronique 1",
+      "thumbRelative": "panos/Micronique_1.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_1.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_1.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_1/preview.jpg",
+      "panoramaFile": "scene_micronique_1.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_1__Micronique_2",
+          "name": "Micronique_2",
+          "ath": -17.506,
+          "atv": 7.263,
+          "targetSceneId": "scene_micronique_2"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_2",
+      "title": "Micronique 2",
+      "thumbRelative": "panos/Micronique_2.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_2.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_2.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_2/preview.jpg",
+      "panoramaFile": "scene_micronique_2.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_2__Micronique_1",
+          "name": "Micronique_1",
+          "ath": -145.423,
+          "atv": 13.455,
+          "targetSceneId": "scene_micronique_1"
+        },
+        {
+          "id": "scene_micronique_2__Micronique_3",
+          "name": "Micronique_3",
+          "ath": 36.128,
+          "atv": 6.276,
+          "targetSceneId": "scene_micronique_3"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_3",
+      "title": "Micronique 3",
+      "thumbRelative": "panos/Micronique_3.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_3.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_3.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_3/preview.jpg",
+      "panoramaFile": "scene_micronique_3.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_3__Micronique_2",
+          "name": "Micronique_2",
+          "ath": -171.145,
+          "atv": 9.522,
+          "targetSceneId": "scene_micronique_2"
+        },
+        {
+          "id": "scene_micronique_3__Micronique_25",
+          "name": "Micronique_25",
+          "ath": 14.139,
+          "atv": 6.712,
+          "targetSceneId": "scene_micronique_25"
+        },
+        {
+          "id": "scene_micronique_3__Micronique_6",
+          "name": "Micronique_6",
+          "ath": -33.06,
+          "atv": 5.845,
+          "targetSceneId": "scene_micronique_6"
+        },
+        {
+          "id": "scene_micronique_3__Micronique_4",
+          "name": "Micronique_4",
+          "ath": 31.899,
+          "atv": 7.73,
+          "targetSceneId": "scene_micronique_4"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_4",
+      "title": "Micronique 4",
+      "thumbRelative": "panos/Micronique_4.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_4.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_4.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_4/preview.jpg",
+      "panoramaFile": "scene_micronique_4.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_4__Micronique_25",
+          "name": "Micronique_25",
+          "ath": 156.604,
+          "atv": 8.603,
+          "targetSceneId": "scene_micronique_25"
+        },
+        {
+          "id": "scene_micronique_4__spot1965334736",
+          "name": "spot1965334736",
+          "ath": 10.957,
+          "atv": 18.94,
+          "targetSceneId": "scene_micronique_32"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_5",
+      "title": "Micronique 5",
+      "thumbRelative": "panos/Micronique_5.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_5.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_5.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_5/preview.jpg",
+      "panoramaFile": "scene_micronique_5.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_5__spot1965334236",
+          "name": "spot1965334236",
+          "ath": -117.464,
+          "atv": 14.335,
+          "targetSceneId": "scene_micronique_32"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_6",
+      "title": "Micronique 6",
+      "thumbRelative": "panos/Micronique_6.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_6.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_6.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_6/preview.jpg",
+      "panoramaFile": "scene_micronique_6.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_6__Micronique_3",
+          "name": "Micronique_3",
+          "ath": -38.92,
+          "atv": 10.647,
+          "targetSceneId": "scene_micronique_3"
+        },
+        {
+          "id": "scene_micronique_6__Micronique_22",
+          "name": "Micronique_22",
+          "ath": -120.086,
+          "atv": 6.924,
+          "targetSceneId": "scene_micronique_22"
+        },
+        {
+          "id": "scene_micronique_6__Micronique_15",
+          "name": "Micronique_15",
+          "ath": -163.064,
+          "atv": 3.704,
+          "targetSceneId": "scene_micronique_15"
+        },
+        {
+          "id": "scene_micronique_6__Micronique_7",
+          "name": "Micronique_7",
+          "ath": -177.297,
+          "atv": 11.92,
+          "targetSceneId": "scene_micronique_7"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_7",
+      "title": "Micronique 7",
+      "thumbRelative": "panos/Micronique_7.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_7.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_7.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_7/preview.jpg",
+      "panoramaFile": "scene_micronique_7.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_7__Micronique_15",
+          "name": "Micronique_15",
+          "ath": 66.16,
+          "atv": 10.396,
+          "targetSceneId": "scene_micronique_15"
+        },
+        {
+          "id": "scene_micronique_7__Micronique_8",
+          "name": "Micronique_8",
+          "ath": -100.861,
+          "atv": 4.945,
+          "targetSceneId": "scene_micronique_8"
+        },
+        {
+          "id": "scene_micronique_7__Micronique_9",
+          "name": "Micronique_9",
+          "ath": -74.043,
+          "atv": 3.085,
+          "targetSceneId": "scene_micronique_9"
+        },
+        {
+          "id": "scene_micronique_7__Micronique_10",
+          "name": "Micronique_10",
+          "ath": -25.512,
+          "atv": 1.528,
+          "targetSceneId": "scene_micronique_10"
+        },
+        {
+          "id": "scene_micronique_7__Micronique_14",
+          "name": "Micronique_14",
+          "ath": -1.447,
+          "atv": 12.192,
+          "targetSceneId": "scene_micronique_14"
+        },
+        {
+          "id": "scene_micronique_7__Micronique_6",
+          "name": "Micronique_6",
+          "ath": -161.337,
+          "atv": 16.463,
+          "targetSceneId": "scene_micronique_6"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_8",
+      "title": "Micronique 8",
+      "thumbRelative": "panos/Micronique_8.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_8.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_8.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_8/preview.jpg",
+      "panoramaFile": "scene_micronique_8.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_8__Micronique_15",
+          "name": "Micronique_15",
+          "ath": -58.857,
+          "atv": 0.948,
+          "targetSceneId": "scene_micronique_15"
+        },
+        {
+          "id": "scene_micronique_8__Micronique_9",
+          "name": "Micronique_9",
+          "ath": -151.962,
+          "atv": 14.412,
+          "targetSceneId": "scene_micronique_9"
+        },
+        {
+          "id": "scene_micronique_8__Micronique_7",
+          "name": "Micronique_7",
+          "ath": -58.141,
+          "atv": 18.705,
+          "targetSceneId": "scene_micronique_7"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_9",
+      "title": "Micronique 9",
+      "thumbRelative": "panos/Micronique_9.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_9.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_9.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_9/preview.jpg",
+      "panoramaFile": "scene_micronique_9.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_9__Micronique_8",
+          "name": "Micronique_8",
+          "ath": 120.246,
+          "atv": 18.515,
+          "targetSceneId": "scene_micronique_8"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_10",
+      "title": "Micronique 10",
+      "thumbRelative": "panos/Micronique_10.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_10.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_10.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_10/preview.jpg",
+      "panoramaFile": "scene_micronique_10.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_10__Micronique_7",
+          "name": "Micronique_7",
+          "ath": 67.194,
+          "atv": 6.375,
+          "targetSceneId": "scene_micronique_7"
+        },
+        {
+          "id": "scene_micronique_10__Micronique_11",
+          "name": "Micronique_11",
+          "ath": 131.479,
+          "atv": 7.832,
+          "targetSceneId": "scene_micronique_11"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_11",
+      "title": "Micronique 11",
+      "thumbRelative": "panos/Micronique_11.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_11.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_11.tiles/%s/l%l/%0v/l%l_%s_%0v_%0h.jpg",
+        "multires": [
+          512,
+          768,
+          1536,
+          2816,
+          5632
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_11/preview.jpg",
+      "panoramaFile": "scene_micronique_11.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_11__Micronique_10",
+          "name": "Micronique_10",
+          "ath": 90.834,
+          "atv": 3.255,
+          "targetSceneId": "scene_micronique_10"
+        },
+        {
+          "id": "scene_micronique_11__Micronique_12",
+          "name": "Micronique_12",
+          "ath": -75.548,
+          "atv": 5.215,
+          "targetSceneId": "scene_micronique_12"
+        },
+        {
+          "id": "scene_micronique_11__Micronique_16",
+          "name": "Micronique_16",
+          "ath": 103.928,
+          "atv": 1.547,
+          "targetSceneId": "scene_micronique_16"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_12",
+      "title": "Micronique 12",
+      "thumbRelative": "panos/Micronique_12.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_12.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_12.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_12/preview.jpg",
+      "panoramaFile": "scene_micronique_12.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_12__Micronique_11",
+          "name": "Micronique_11",
+          "ath": -143.394,
+          "atv": 2.134,
+          "targetSceneId": "scene_micronique_11"
+        },
+        {
+          "id": "scene_micronique_12__Micronique_13",
+          "name": "Micronique_13",
+          "ath": 33.371,
+          "atv": 4.222,
+          "targetSceneId": "scene_micronique_13"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_13",
+      "title": "Micronique 13",
+      "thumbRelative": "panos/Micronique_13.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_13.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_13.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_13/preview.jpg",
+      "panoramaFile": "scene_micronique_13.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_13__Micronique_12",
+          "name": "Micronique_12",
+          "ath": 213.371,
+          "atv": 4.222,
+          "targetSceneId": "scene_micronique_12"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_14",
+      "title": "Micronique 14",
+      "thumbRelative": "panos/Micronique_14.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_14.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_14.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_14/preview.jpg",
+      "panoramaFile": "scene_micronique_14.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_14__Micronique_7",
+          "name": "Micronique_7",
+          "ath": 63.855,
+          "atv": 17.587,
+          "targetSceneId": "scene_micronique_7"
+        },
+        {
+          "id": "scene_micronique_14__Micronique_15",
+          "name": "Micronique_15",
+          "ath": -56.472,
+          "atv": 10.701,
+          "targetSceneId": "scene_micronique_15"
+        },
+        {
+          "id": "scene_micronique_14__Micronique_16",
+          "name": "Micronique_16",
+          "ath": -140.898,
+          "atv": 3.191,
+          "targetSceneId": "scene_micronique_16"
+        },
+        {
+          "id": "scene_micronique_14__Micronique_19",
+          "name": "Micronique_19",
+          "ath": -92.403,
+          "atv": 5.339,
+          "targetSceneId": "scene_micronique_19"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_15",
+      "title": "Micronique 15",
+      "thumbRelative": "panos/Micronique_15.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_15.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_15.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_15/preview.jpg",
+      "panoramaFile": "scene_micronique_15.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_15__Micronique_21",
+          "name": "Micronique_21",
+          "ath": 132.005,
+          "atv": 7.289,
+          "targetSceneId": "scene_micronique_21"
+        },
+        {
+          "id": "scene_micronique_15__spot1941035861",
+          "name": "spot1941035861",
+          "ath": 63.383,
+          "atv": 10.893,
+          "targetSceneId": "scene_micronique_15b"
+        },
+        {
+          "id": "scene_micronique_15__Micronique_6",
+          "name": "Micronique_6",
+          "ath": -162.651,
+          "atv": 4.673,
+          "targetSceneId": "scene_micronique_6"
+        },
+        {
+          "id": "scene_micronique_15__Micronique_8",
+          "name": "Micronique_8",
+          "ath": -138.908,
+          "atv": 1.889,
+          "targetSceneId": "scene_micronique_8"
+        },
+        {
+          "id": "scene_micronique_15__Micronique_7",
+          "name": "Micronique_7",
+          "ath": -142.425,
+          "atv": 20.667,
+          "targetSceneId": "scene_micronique_7"
+        },
+        {
+          "id": "scene_micronique_15__Micronique_14",
+          "name": "Micronique_14",
+          "ath": -89.226,
+          "atv": 5.328,
+          "targetSceneId": "scene_micronique_14"
+        },
+        {
+          "id": "scene_micronique_15__Micronique_19",
+          "name": "Micronique_19",
+          "ath": -15.891,
+          "atv": 6.293,
+          "targetSceneId": "scene_micronique_19"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_15b",
+      "title": "Micronique 15b",
+      "thumbRelative": "panos/Micronique_15b.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_15b.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_15b.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_15b/preview.jpg",
+      "panoramaFile": "scene_micronique_15b.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_15b__Micronique_15",
+          "name": "Micronique_15",
+          "ath": 152.941,
+          "atv": 10.372,
+          "targetSceneId": "scene_micronique_15"
+        },
+        {
+          "id": "scene_micronique_15b__spot1941036084",
+          "name": "spot1941036084",
+          "ath": 37.083,
+          "atv": 11.867,
+          "targetSceneId": "scene_micronique_15c"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_15c",
+      "title": "Micronique 15c",
+      "thumbRelative": "panos/Micronique_15c.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_15c.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_15c.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_15c/preview.jpg",
+      "panoramaFile": "scene_micronique_15c.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_15c__spot1941036262",
+          "name": "spot1941036262",
+          "ath": -35.589,
+          "atv": 11.497,
+          "targetSceneId": "scene_micronique_15b"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_16",
+      "title": "Micronique 16",
+      "thumbRelative": "panos/Micronique_16.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_16.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_16.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_16/preview.jpg",
+      "panoramaFile": "scene_micronique_16.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_16__Micronique_14",
+          "name": "Micronique_14",
+          "ath": -144.001,
+          "atv": 5.485,
+          "targetSceneId": "scene_micronique_14"
+        },
+        {
+          "id": "scene_micronique_16__Micronique_11",
+          "name": "Micronique_11",
+          "ath": -90.724,
+          "atv": 3.674,
+          "targetSceneId": "scene_micronique_11"
+        },
+        {
+          "id": "scene_micronique_16__Micronique_19",
+          "name": "Micronique_19",
+          "ath": 152.44,
+          "atv": 2.864,
+          "targetSceneId": "scene_micronique_19"
+        },
+        {
+          "id": "scene_micronique_16__Micronique_17",
+          "name": "Micronique_17",
+          "ath": 109.974,
+          "atv": 5.812,
+          "targetSceneId": "scene_micronique_17"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_17",
+      "title": "Micronique 17",
+      "thumbRelative": "panos/Micronique_17.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_17.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_17.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_17/preview.jpg",
+      "panoramaFile": "scene_micronique_17.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_17__Micronique_16",
+          "name": "Micronique_16",
+          "ath": 122.579,
+          "atv": 4.263,
+          "targetSceneId": "scene_micronique_16"
+        },
+        {
+          "id": "scene_micronique_17__Micronique_19",
+          "name": "Micronique_19",
+          "ath": 78.989,
+          "atv": 4.061,
+          "targetSceneId": "scene_micronique_19"
+        },
+        {
+          "id": "scene_micronique_17__Micronique_18",
+          "name": "Micronique_18",
+          "ath": -122.156,
+          "atv": 9.575,
+          "targetSceneId": "scene_micronique_18"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_18",
+      "title": "Micronique 18",
+      "thumbRelative": "panos/Micronique_18.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_18.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_18.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_18/preview.jpg",
+      "panoramaFile": "scene_micronique_18.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_18__Micronique_17",
+          "name": "Micronique_17",
+          "ath": -62.655,
+          "atv": 11.271,
+          "targetSceneId": "scene_micronique_17"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_19",
+      "title": "Micronique 19",
+      "thumbRelative": "panos/Micronique_19.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_19.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_19.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_19/preview.jpg",
+      "panoramaFile": "scene_micronique_19.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_19__Micronique_16",
+          "name": "Micronique_16",
+          "ath": -30.869,
+          "atv": 3.338,
+          "targetSceneId": "scene_micronique_16"
+        },
+        {
+          "id": "scene_micronique_19__Micronique_17",
+          "name": "Micronique_17",
+          "ath": 59.341,
+          "atv": 7.841,
+          "targetSceneId": "scene_micronique_17"
+        },
+        {
+          "id": "scene_micronique_19__Micronique_20",
+          "name": "Micronique_20",
+          "ath": 129.354,
+          "atv": 4.263,
+          "targetSceneId": "scene_micronique_20"
+        },
+        {
+          "id": "scene_micronique_19__Micronique_14",
+          "name": "Micronique_14",
+          "ath": -93.003,
+          "atv": 2.608,
+          "targetSceneId": "scene_micronique_14"
+        },
+        {
+          "id": "scene_micronique_19__Micronique_15",
+          "name": "Micronique_15",
+          "ath": -103.199,
+          "atv": 3.774,
+          "targetSceneId": "scene_micronique_15"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_20",
+      "title": "Micronique 20",
+      "thumbRelative": "panos/Micronique_20.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_20.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_20.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_20/preview.jpg",
+      "panoramaFile": "scene_micronique_20.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_20__Micronique_19",
+          "name": "Micronique_19",
+          "ath": -169.115,
+          "atv": 3.616,
+          "targetSceneId": "scene_micronique_19"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_21",
+      "title": "Micronique 21",
+      "thumbRelative": "panos/Micronique_21.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_21.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_21.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_21/preview.jpg",
+      "panoramaFile": "scene_micronique_21.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_21__Micronique_15",
+          "name": "Micronique_15",
+          "ath": -13.696,
+          "atv": 5.507,
+          "targetSceneId": "scene_micronique_15"
+        },
+        {
+          "id": "scene_micronique_21__spot1965337860",
+          "name": "spot1965337860",
+          "ath": 148.705,
+          "atv": 15.727,
+          "targetSceneId": "scene_micronique_34"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_22",
+      "title": "Micronique 22",
+      "thumbRelative": "panos/Micronique_22.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_22.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_22.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_22/preview.jpg",
+      "panoramaFile": "scene_micronique_22.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_22__Micronique_25",
+          "name": "Micronique_25",
+          "ath": -44.042,
+          "atv": 6.203,
+          "targetSceneId": "scene_micronique_25"
+        },
+        {
+          "id": "scene_micronique_22__Micronique_21",
+          "name": "Micronique_21",
+          "ath": 85.49,
+          "atv": 9.684,
+          "targetSceneId": "scene_micronique_21"
+        },
+        {
+          "id": "scene_micronique_22__Micronique_6",
+          "name": "Micronique_6",
+          "ath": 45.706,
+          "atv": 4.875,
+          "targetSceneId": "scene_micronique_6"
+        },
+        {
+          "id": "scene_micronique_22__spot1965348876",
+          "name": "spot1965348876",
+          "ath": -95.471,
+          "atv": 17.562,
+          "targetSceneId": "scene_micronique_34"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_23",
+      "title": "Micronique 23",
+      "thumbRelative": "panos/Micronique_23.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_23.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_23.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_23/preview.jpg",
+      "panoramaFile": "scene_micronique_23.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_23__Micronique_25",
+          "name": "Micronique_25",
+          "ath": 85.13,
+          "atv": 8.947,
+          "targetSceneId": "scene_micronique_25"
+        },
+        {
+          "id": "scene_micronique_23__spot1965336294",
+          "name": "spot1965336294",
+          "ath": -13.349,
+          "atv": 13.119,
+          "targetSceneId": "scene_micronique_33"
+        },
+        {
+          "id": "scene_micronique_23__spot1965337312",
+          "name": "spot1965337312",
+          "ath": -172.089,
+          "atv": 13.339,
+          "targetSceneId": "scene_micronique_34"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_25",
+      "title": "Micronique 25",
+      "thumbRelative": "panos/Micronique_25.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_25.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_25.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_25/preview.jpg",
+      "panoramaFile": "scene_micronique_25.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_25__Micronique_4",
+          "name": "Micronique_4",
+          "ath": 170.441,
+          "atv": 10.066,
+          "targetSceneId": "scene_micronique_4"
+        },
+        {
+          "id": "scene_micronique_25__Micronique_3",
+          "name": "Micronique_3",
+          "ath": -147.527,
+          "atv": 12.131,
+          "targetSceneId": "scene_micronique_3"
+        },
+        {
+          "id": "scene_micronique_25__Micronique_23",
+          "name": "Micronique_23",
+          "ath": 21.289,
+          "atv": 8.115,
+          "targetSceneId": "scene_micronique_23"
+        },
+        {
+          "id": "scene_micronique_25__Micronique_22",
+          "name": "Micronique_22",
+          "ath": -23.991,
+          "atv": 2.475,
+          "targetSceneId": "scene_micronique_22"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_26",
+      "title": "Micronique 26",
+      "thumbRelative": "panos/Micronique_26.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_26.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_26.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_26/preview.jpg",
+      "panoramaFile": "scene_micronique_26.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_26__Micronique_28",
+          "name": "Micronique_28",
+          "ath": 61.3,
+          "atv": 11.41,
+          "targetSceneId": "scene_micronique_28"
+        },
+        {
+          "id": "scene_micronique_26__spot1965336700",
+          "name": "spot1965336700",
+          "ath": -127.64,
+          "atv": 10.527,
+          "targetSceneId": "scene_micronique_33"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_27",
+      "title": "Micronique 27",
+      "thumbRelative": "panos/Micronique_27.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_27.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_27.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_27/preview.jpg",
+      "panoramaFile": "scene_micronique_27.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_27__Micronique_29",
+          "name": "Micronique_29",
+          "ath": 123.933,
+          "atv": 9.734,
+          "targetSceneId": "scene_micronique_29"
+        },
+        {
+          "id": "scene_micronique_27__spot1965365941",
+          "name": "spot1965365941",
+          "ath": -61.971,
+          "atv": 22.994,
+          "targetSceneId": "scene_micronique_35"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_28",
+      "title": "Micronique 28",
+      "thumbRelative": "panos/Micronique_28.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_28.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_28.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_28/preview.jpg",
+      "panoramaFile": "scene_micronique_28.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_28__Micronique_26",
+          "name": "Micronique_26",
+          "ath": -166.641,
+          "atv": 16.786,
+          "targetSceneId": "scene_micronique_26"
+        },
+        {
+          "id": "scene_micronique_28__spot1965365277",
+          "name": "spot1965365277",
+          "ath": 91.479,
+          "atv": 13.781,
+          "targetSceneId": "scene_micronique_36"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_29",
+      "title": "Micronique 29",
+      "thumbRelative": "panos/Micronique_29.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_29.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_29.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_29/preview.jpg",
+      "panoramaFile": "scene_micronique_29.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_29__Micronique_27",
+          "name": "Micronique_27",
+          "ath": -122.064,
+          "atv": 5.005,
+          "targetSceneId": "scene_micronique_27"
+        },
+        {
+          "id": "scene_micronique_29__spot1965347055",
+          "name": "spot1965347055",
+          "ath": 53.05,
+          "atv": 7.949,
+          "targetSceneId": "scene_micronique_31"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_30",
+      "title": "Micronique 30",
+      "thumbRelative": "panos/Micronique_30.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_30.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_30.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_30/preview.jpg",
+      "panoramaFile": "scene_micronique_30.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_30__Micronique_1",
+          "name": "Micronique_1",
+          "ath": -21.287,
+          "atv": 4.194,
+          "targetSceneId": "scene_micronique_1"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_31",
+      "title": "micronique 31",
+      "thumbRelative": "panos/micronique_31.tiles/thumb.jpg",
+      "previewRelative": "panos/micronique_31.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/micronique_31.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_31/preview.jpg",
+      "panoramaFile": "scene_micronique_31.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_31__Micronique_29",
+          "name": "Micronique_29",
+          "ath": 11.574,
+          "atv": 5.948,
+          "targetSceneId": "scene_micronique_29"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_32",
+      "title": "micronique 32",
+      "thumbRelative": "panos/micronique_32.tiles/thumb.jpg",
+      "previewRelative": "panos/micronique_32.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/micronique_32.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_32/preview.jpg",
+      "panoramaFile": "scene_micronique_32.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_32__Micronique_5",
+          "name": "Micronique_5",
+          "ath": -92.07,
+          "atv": 9.701,
+          "targetSceneId": "scene_micronique_5"
+        },
+        {
+          "id": "scene_micronique_32__Micronique_4",
+          "name": "Micronique_4",
+          "ath": 87.487,
+          "atv": 19.468,
+          "targetSceneId": "scene_micronique_4"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_33",
+      "title": "micronique 33",
+      "thumbRelative": "panos/micronique_33.tiles/thumb.jpg",
+      "previewRelative": "panos/micronique_33.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/micronique_33.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_33/preview.jpg",
+      "panoramaFile": "scene_micronique_33.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_33__Micronique_23",
+          "name": "Micronique_23",
+          "ath": -160.358,
+          "atv": 20.258,
+          "targetSceneId": "scene_micronique_23"
+        },
+        {
+          "id": "scene_micronique_33__Micronique_26",
+          "name": "Micronique_26",
+          "ath": 23.324,
+          "atv": 19.718,
+          "targetSceneId": "scene_micronique_26"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_34",
+      "title": "micronique 34",
+      "thumbRelative": "panos/micronique_34.tiles/thumb.jpg",
+      "previewRelative": "panos/micronique_34.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/micronique_34.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_34/preview.jpg",
+      "panoramaFile": "scene_micronique_34.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_34__Micronique_23",
+          "name": "Micronique_23",
+          "ath": -91.711,
+          "atv": 21.549,
+          "targetSceneId": "scene_micronique_23"
+        },
+        {
+          "id": "scene_micronique_34__Micronique_22",
+          "name": "Micronique_22",
+          "ath": 86.464,
+          "atv": 21.399,
+          "targetSceneId": "scene_micronique_22"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_35",
+      "title": "Micronique 35",
+      "thumbRelative": "panos/Micronique_35.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_35.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_35.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_35/preview.jpg",
+      "panoramaFile": "scene_micronique_35.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_35__spot1965365596",
+          "name": "spot1965365596",
+          "ath": -108.719,
+          "atv": 8.613,
+          "targetSceneId": "scene_micronique_36"
+        },
+        {
+          "id": "scene_micronique_35__Micronique_27",
+          "name": "Micronique_27",
+          "ath": 81.288,
+          "atv": 27.464,
+          "targetSceneId": "scene_micronique_27"
+        }
+      ]
+    },
+    {
+      "id": "scene_micronique_36",
+      "title": "Micronique 36",
+      "thumbRelative": "panos/Micronique_36.tiles/thumb.jpg",
+      "previewRelative": "panos/Micronique_36.tiles/preview.jpg",
+      "krpanoCube": {
+        "cubeUrlTemplate": "panos/Micronique_36.tiles/%s/l%l/%v/l%l_%s_%v_%h.jpg",
+        "multires": [
+          512,
+          640,
+          1280,
+          2624
+        ]
+      },
+      "panoramaPreviewUrl": "/images/panorama/scene_micronique_36/preview.jpg",
+      "panoramaFile": "scene_micronique_36.jpg",
+      "hotspots": [
+        {
+          "id": "scene_micronique_36__Micronique_28",
+          "name": "Micronique_28",
+          "ath": -5.778,
+          "atv": 12.206,
+          "targetSceneId": "scene_micronique_28"
+        },
+        {
+          "id": "scene_micronique_36__spot1965365462",
+          "name": "spot1965365462",
+          "ath": 158.117,
+          "atv": 7.329,
+          "targetSceneId": "scene_micronique_35"
+        }
+      ]
+    }
+  ]
+}

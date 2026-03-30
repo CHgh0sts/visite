@@ -1,0 +1,55 @@
+{
+  "accentColor": "#0e203d",
+  "items": [
+    {
+      "sceneId": "scene_micronique_9",
+      "label": "MAGASIN",
+      "iconUrl": "/images/navbar/MAGASIN.svg"
+    },
+    {
+      "sceneId": "scene_micronique_7",
+      "label": "PREPARATION",
+      "iconUrl": "/images/navbar/PREPARATION.svg"
+    },
+    {
+      "sceneId": "scene_micronique_22",
+      "label": "CMS ILOT PROTOTYPES",
+      "iconUrl": "/images/navbar/CMS-ILOT-PROTOTYPES.svg"
+    },
+    {
+      "sceneId": "scene_micronique_1",
+      "label": "CMS SERIES",
+      "iconUrl": "/images/navbar/CMS-SERIES.svg"
+    },
+    {
+      "sceneId": "scene_micronique_23",
+      "label": "CONTROLE – REPARATION",
+      "iconUrl": "/images/navbar/CONTROLE–REPARATION.svg"
+    },
+    {
+      "sceneId": "scene_micronique_28",
+      "label": "CABLAGE",
+      "iconUrl": "/images/navbar/CABLAGE.svg"
+    },
+    {
+      "sceneId": "scene_micronique_15b",
+      "label": "VERNISSAGE",
+      "iconUrl": "/images/navbar/VERNISSAGE.svg"
+    },
+    {
+      "sceneId": "scene_micronique_16",
+      "label": "TEST",
+      "iconUrl": "/images/navbar/TEST.svg"
+    },
+    {
+      "sceneId": "scene_micronique_12",
+      "label": "MONTAGE",
+      "iconUrl": "/images/navbar/MONTAGE.svg"
+    },
+    {
+      "sceneId": "scene_micronique_17",
+      "label": "DETOURAGE DEVERMINAGE",
+      "iconUrl": "/images/navbar/DETOURAGE DEVERMINAGE.svg"
+    }
+  ]
+}

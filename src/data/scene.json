@@ -1,0 +1,30 @@
+{
+  "title": "Scène",
+  "background": "#0f172a",
+  "images": [
+    {
+      "id": "milieu-0-centre",
+      "src": "images/panorama/cms-series/l1_f_1_1.jpg",
+      "alt": "Exemple — remplacez par votre image dans public/scene/",
+      "top": "8%",
+      "left": "50%",
+      "width": "500px",
+      "height": "500px",
+      "zIndex": 1,
+      "transform": "translateX(-50%)",
+      "objectFit": "contain"
+    },
+    {
+      "id": "milieu-1-droite",
+      "src": "images/panorama/cms-series/l1_f_1_2.jpg",
+      "alt": "Exemple",
+      "top": "38.8%",
+      "left": "70%",
+      "width": "500px",
+      "height": "500px",
+      "zIndex": 2,
+      "transform": "translate(-50%, -50%), rotate(180deg)",
+      "objectFit": "contain"
+    }
+  ]
+}

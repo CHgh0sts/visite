@@ -3,37 +3,43 @@
   "items": [
     {
       "sceneId": "scene_micronique_9",
-      "label": "MAGASIN",
+      "otherSceneIds": ["scene_micronique_8", "scene_micronique_19", "scene_micronique_10", "scene_micronique_11"],
+      "label": "MAGAZIN",
       "iconUrl": "/images/navbar/MAGASIN.svg"
     },
     {
       "sceneId": "scene_micronique_7",
+      "otherSceneIds": ["scene_micronique_15", "scene_micronique_14", "scene_micronique_20"],
       "label": "PREPARATION",
       "iconUrl": "/images/navbar/PREPARATION.svg"
     },
     {
       "sceneId": "scene_micronique_22",
-      "otherSceneIds": ["scene_micronique_34"],
+      "otherSceneIds": ["scene_micronique_34", "scene_micronique_21"],
       "label": "CMS ILOT PROTOTYPES",
       "iconUrl": "/images/navbar/CMS-ILOT-PROTOTYPES.svg"
     },
     {
       "sceneId": "scene_micronique_1",
+      "otherSceneIds": ["scene_micronique_2", "scene_micronique_3", "scene_micronique_4", "scene_micronique_5", "scene_micronique_6", "scene_micronique_32", "scene_micronique_25"],
       "label": "CMS SERIES",
       "iconUrl": "/images/navbar/CMS-SERIES.svg"
     },
     {
       "sceneId": "scene_micronique_23",
+      "otherSceneIds": ["scene_micronique_33", "scene_micronique_26"],
       "label": "CONTROLE – REPARATION",
       "iconUrl": "/images/navbar/CONTROLE–REPARATION.svg"
     },
     {
       "sceneId": "scene_micronique_28",
+      "otherSceneIds": ["scene_micronique_36", "scene_micronique_31", "scene_micronique_28", "scene_micronique_29", "scene_micronique_35"],
       "label": "CABLAGE",
       "iconUrl": "/images/navbar/CABLAGE.svg"
     },
     {
       "sceneId": "scene_micronique_15b",
+      "otherSceneIds": ["scene_micronique_15c"],
       "label": "VERNISSAGE",
       "iconUrl": "/images/navbar/VERNISSAGE.svg"
     },
@@ -44,11 +50,13 @@
     },
     {
       "sceneId": "scene_micronique_12",
+      "otherSceneIds": ["scene_micronique_13"],
       "label": "MONTAGE",
       "iconUrl": "/images/navbar/MONTAGE.svg"
     },
     {
       "sceneId": "scene_micronique_17",
+      "otherSceneIds": ["scene_micronique_18"],
       "label": "DETOURAGE DEVERMINAGE",
       "iconUrl": "/images/navbar/DETOURAGE DEVERMINAGE.svg"
     }

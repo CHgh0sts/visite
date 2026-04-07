@@ -46,13 +46,16 @@ const items = (raw.items ?? []).filter(
 const n = items.length;
 const athMin = -48;
 const athMax = 48;
-/** Plus haut dans le champ de vision (évite l’effet « collé au sol »). */
-const atv = 24;
+/**
+ * Aligné sur la bande basse écran (proche des flèches skin_webvr atv≈45) pour cohabiter avec le layer blanc.
+ * atv trop petit = icônes au-dessus du panneau 2D.
+ */
+const atv = 45;
 const lines = [];
 lines.push(`<!-- Généré par scripts/generate-krpano-vr-bottombar.mjs — ne pas éditer -->`);
 lines.push(`<krpano>`);
 lines.push(
-  `\t<style name="react_vr_bottombar_style" torigin="view" depth="1000" distorted="true" atv="${atv}" scale="0.36" alpha="0.92" />`,
+  `\t<style name="react_vr_bottombar_style" torigin="view" depth="1000" distorted="true" atv="${atv}" scale="0.32" alpha="0.95" />`,
 );
 
 for (let i = 0; i < n; i++) {

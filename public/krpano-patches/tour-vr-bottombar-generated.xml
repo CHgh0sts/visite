@@ -1,6 +1,6 @@
 <!-- Généré par scripts/generate-krpano-vr-bottombar.mjs — ne pas éditer -->
 <krpano>
-	<style name="react_vr_bottombar_style" torigin="view" depth="1000" distorted="true" atv="24" scale="0.36" alpha="0.92" />
+	<style name="react_vr_bottombar_style" torigin="view" depth="1000" distorted="true" atv="45" scale="0.32" alpha="0.95" />
 	<hotspot name="react_vr_nav_0" keep="true" style="react_vr_bottombar_style" type="image" devices="webgl"
 		url="/images/navbar/MAGASIN.svg"
 		ath="-48.000"

@@ -28,7 +28,7 @@
                    gyro_keeplookingdirection="false"
                    webvr="true"
                    webvr_keeplookingdirection="true"
-                   webvr_prev_next_hotspots="false"
+                   webvr_prev_next_hotspots="true"
                    autotour="false"
                    littleplanetintro="false"
                    followmousecontrol="true"
@@ -549,34 +549,25 @@
 		onblendcomplete="jscall(calc('reactKrpano.onSceneChange(`' + get(xml.scene) + '`)'))"
 	/>
 	<!--
-	  Interface VR : mêmes hotspots distordus que les flèches krpano (visibles en WebXR).
-	  Le HTML React reste invisible au casque — jscall → reactKrpano.vr* (voir reactVrUiBridge).
-	  Navigation dock = scene-nav.json (pas l’ordre des vignettes krpano) → webvr_prev_next_hotspots désactivé.
+	  Interface VR : uniquement hotspots image (sprites vtourskin.png), comme les flèches blanches.
+	  calc:webvr.isenabled est peu fiable sur Quest → visible=true. type=text ne rend pas comme les flèches en WebXR.
+	  jscall → reactKrpano.vr* (reactVrUiBridge). Flèches scène krpano : ±88 ; dock perso : ±155 ; menu / recherche / VR au centre.
 	-->
 	<hotspot name="react_vr_dock_prev" keep="true" style="skin_base|skin_webvr_menu_style" devices="webgl"
-		crop="0|64|64|64" ox="-135" vr_timeout="750" onclick="jscall(reactKrpano.vrDockPrev());"
-		visible="calc:webvr.isenabled" enabled="calc:webvr.isenabled" />
-	<hotspot name="react_vr_menu" keep="true" type="text" devices="webgl"
-		torigin="view" depth="1000" distorted="true" ath="0" atv="42" ox="-70" scale="0.5" alpha="0.88"
-		vr_timeout="750" onclick="jscall(reactKrpano.vrToggleMenu());"
-		html="&#9776;" css="color:#FFFFFF;font-family:Arial;font-size:24px;font-weight:bold;text-shadow:0 0 6px #000;"
-		bg="true" bgcolor="0x333333" bgalpha="0.55" bgroundedge="12" padding="10 14"
-		visible="calc:webvr.isenabled" enabled="calc:webvr.isenabled" />
-	<hotspot name="react_vr_search" keep="true" type="text" devices="webgl"
-		torigin="view" depth="1000" distorted="true" ath="0" atv="42" ox="0" scale="0.5" alpha="0.88"
-		vr_timeout="750" onclick="jscall(reactKrpano.vrToggleSearch());"
-		html="S" css="color:#FFFFFF;font-family:Arial;font-size:22px;font-weight:bold;text-shadow:0 0 6px #000;"
-		bg="true" bgcolor="0x333333" bgalpha="0.55" bgroundedge="12" padding="10 14"
-		visible="calc:webvr.isenabled" enabled="calc:webvr.isenabled" />
-	<hotspot name="react_vr_exitvr" keep="true" type="text" devices="webgl"
-		torigin="view" depth="1000" distorted="true" ath="0" atv="42" ox="70" scale="0.5" alpha="0.88"
-		vr_timeout="750" onclick="jscall(reactKrpano.vrToggleVr());"
-		html="VR" css="color:#FFFFFF;font-family:Arial;font-size:15px;font-weight:bold;text-shadow:0 0 6px #000;"
-		bg="true" bgcolor="0x333333" bgalpha="0.55" bgroundedge="12" padding="10 14"
-		visible="calc:webvr.isenabled" enabled="calc:webvr.isenabled" />
+		crop="0|64|64|64" ox="-155" vr_timeout="750" onclick="jscall(reactKrpano.vrDockPrev());"
+		visible="true" enabled="true" />
+	<hotspot name="react_vr_menu" keep="true" style="skin_base|skin_webvr_menu_style" devices="webgl"
+		crop="0|128|64|64" ox="-58" vr_timeout="750" onclick="jscall(reactKrpano.vrToggleMenu());"
+		visible="true" enabled="true" />
+	<hotspot name="react_vr_search" keep="true" style="skin_base|skin_webvr_menu_style" devices="webgl"
+		crop="64|128|64|64" ox="0" vr_timeout="750" onclick="jscall(reactKrpano.vrToggleSearch());"
+		visible="true" enabled="true" />
+	<hotspot name="react_vr_exitvr" keep="true" style="skin_base|skin_webvr_menu_style" devices="webgl"
+		crop="0|0|80|64" ox="58" vr_timeout="750" onclick="jscall(reactKrpano.vrToggleVr());"
+		visible="true" enabled="true" />
 	<hotspot name="react_vr_dock_next" keep="true" style="skin_base|skin_webvr_menu_style" devices="webgl"
-		crop="64|64|64|64" ox="135" vr_timeout="750" onclick="jscall(reactKrpano.vrDockNext());"
-		visible="calc:webvr.isenabled" enabled="calc:webvr.isenabled" />
+		crop="64|64|64|64" ox="155" vr_timeout="750" onclick="jscall(reactKrpano.vrDockNext());"
+		visible="true" enabled="true" />
 	<!-- Remplace webvr.xml : pas de bandeau « Simulated VR Mode » / lien Meta Quest / bouton X -->
 	<action name="webvr_show_infos" scope="local" args="show">
 		if(show == false,

@@ -90,7 +90,7 @@
 	<plugin name="webvr" keep="true" devices="webgl"
 	        url="calc:skin_settings.webvr == true ? '%VIEWER%/plugins/webvr.js' : null"
 	        onavailable="skin_webvr_onavailable();"
-	        onentervr="skin_showloading(false); webvr_onentervr(); skin_webvr_setup(); skin_reloadscene_webvr();"
+	        onentervr="skin_showloading(false); webvr_onentervr(); skin_showskin(); skin_webvr_setup(); skin_reloadscene_webvr();"
 	        onexitvr="webvr_onexitvr(); skin_webvr_setup(); skin_reloadscene_webvr();"
 	        />
 	<!-- webvr button style (adjust to match skin style) -->
@@ -320,7 +320,8 @@
 	       html=""
 	       />
 	<!-- skin layout -->
-	<layer name="skin_layer" keep="true" type="container" align="top" width="get:skin_settings.layout_width" maxwidth="get:skin_settings.layout_maxwidth" height="100%" maskchildren="true" visible="false" bgcapture="false" zorder="1">
+	<!-- vr="true" : la barre / le skin sont aussi rendus en session WebXR (sinon seul le pano est visible au casque). -->
+	<layer name="skin_layer" keep="true" type="container" align="top" width="get:skin_settings.layout_width" maxwidth="get:skin_settings.layout_maxwidth" height="100%" maskchildren="true" visible="false" bgcapture="false" zorder="1" vr="true">
 		<layer name="skin_scroll_window" type="container" align="bottom" width="100%" height="100%" x="0" y="calc:skin_settings.controlbar_offset + skin_settings.controlbar_height - skin_settings.controlbar_overlap" maskchildren="true" onloaded="skin_calc_opened_closed();" zorder="1" bgroundedge.firefox="1">
 			<layer name="skin_scroll_layer" type="container" align="bottom" width="get:skin_settings.controlbar_width" height="100%" x="0" y="200" y_offset="get:skin_settings.controlbar_overlap" accuracy="1" bgalpha="get:skin_settings.design_bgalpha" bgcolor="get:skin_settings.design_bgcolor" bgborder="get:skin_settings.design_bgborder" bgroundedge="get:skin_settings.design_bgroundedge" bgshadow="get:skin_settings.design_bgshadow">
 				<layer name="skin_title" type="text" align="lefttop" edge="leftbottom" x="4" y="0" zorder="4" enabled="false" bg="false" css="calc:skin_settings.design_text_css + ' text-align:left; font-style:italic; font-size:12px;'" txtshadow="get:skin_settings.design_text_txtshadow" visible="false" onautosized="skin_video_updateseekbarwidth();" />

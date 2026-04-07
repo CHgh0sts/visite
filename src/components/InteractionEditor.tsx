@@ -14,6 +14,7 @@ import { EquipmentCatalogPanel } from "@/components/EquipmentCatalogPanel";
 import { KrpanoViewHud } from "@/components/KrpanoViewHud";
 import { KrpanoTour } from "@/components/KrpanoTour";
 import { SceneNavBar } from "@/components/SceneNavBar";
+import { SceneNavBarVr } from "@/components/SceneNavBarVr";
 import { SceneInteractionOverlay } from "@/components/SceneInteractionOverlay";
 import { KRPANO_START_SCENE } from "@/constants/krpano";
 import { sceneNavbarBottomReservePaddingClass } from "@/constants/sceneNavbarLayout";
@@ -26,6 +27,7 @@ import {
   loadSiteInteractions,
 } from "@/lib/sceneInteractionsStorage";
 import { useIdleHomeRedirect } from "@/hooks/useIdleHomeRedirect";
+import { useKrpanoWebVrEnabled } from "@/hooks/useKrpanoWebVrEnabled";
 import { TOUR_SCENES } from "@/lib/tourScenes";
 import type { KrpanoViewer } from "@/types/krpanoViewer";
 import {
@@ -2397,6 +2399,7 @@ export function VisiteShell() {
   /** Après le premier chargement depuis l’API — évite d’écraser la base avant d’avoir la carte serveur. */
   const [interactionsHydrated, setInteractionsHydrated] = useState(false);
   const [krpano, setKrpano] = useState<KrpanoViewer | null>(null);
+  const webVr = useKrpanoWebVrEnabled(krpano);
   const [viewerContainerId, setViewerContainerId] = useState<string | null>(
     null,
   );
@@ -2551,7 +2554,10 @@ export function VisiteShell() {
         sceneName={sceneName}
         visible={shellPanelsVisible}
       />
-      <SceneNavBar krpano={krpano} currentSceneId={sceneName} />
+      <div className={webVr ? "hidden" : undefined} aria-hidden={webVr}>
+        <SceneNavBar krpano={krpano} currentSceneId={sceneName} />
+      </div>
+      <SceneNavBarVr krpano={krpano} currentSceneId={sceneName} />
       <InteractionEditor
         key={sceneName}
         sceneName={sceneName}

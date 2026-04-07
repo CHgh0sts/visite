@@ -1,6 +1,6 @@
 /**
  * Génère `public/krpano-patches/tour-vr-bottombar-generated.xml` depuis `src/data/scene-nav.json`.
- * Barre bas VR alignée sur SceneNavBar (mêmes icônes + navigation vers sceneId).
+ * Couches 2D (parent react_vr_nav_icons_row) : menu + recherche (sprites skin) + icônes zones (SVG).
  * À lancer après modification de scene-nav.json : `node scripts/generate-krpano-vr-bottombar.mjs`
  */
 import fs from "node:fs";
@@ -24,7 +24,7 @@ function escapeXmlAttr(s) {
     .replace(/</g, "&lt;");
 }
 
-/** Espace → %20 uniquement — ne pas altérer tirets / caractères Unicode des noms de fichiers. */
+/** Espace → %20 uniquement */
 function encodeIconUrlForXml(url) {
   const u = String(url).trim();
   return escapeXmlAttr(u.replace(/ /g, "%20"));
@@ -44,41 +44,59 @@ const items = (raw.items ?? []).filter(
 );
 
 const n = items.length;
-const athMin = -48;
-const athMax = 48;
-/**
- * Aligné sur la bande basse écran (proche des flèches skin_webvr atv≈45) pour cohabiter avec le layer blanc.
- * atv trop petit = icônes au-dessus du panneau 2D.
- */
-const atv = 45;
+const menuW = 9;
+const searchW = 9;
+const gapAfterSearch = 2;
+const startNavPct = menuW + searchW + gapAfterSearch;
+const navW = n > 0 ? (100 - startNavPct) / n : 0;
+
 const lines = [];
 lines.push(`<!-- Généré par scripts/generate-krpano-vr-bottombar.mjs — ne pas éditer -->`);
 lines.push(`<krpano>`);
+
+/** Même sprite que la barre bas VT (style skin_base + crop) */
 lines.push(
-  `\t<style name="react_vr_bottombar_style" torigin="view" depth="1000" distorted="true" atv="${atv}" scale="0.32" alpha="0.95" />`,
+  `\t<layer name="react_vr_nav_menu_btn" keep="true" parent="react_vr_nav_icons_row" type="image" devices="webgl"`,
+);
+lines.push(`\t\tstyle="skin_base" crop="0|128|64|64" align="lefttop" edge="left" x="0%" y="8%"`);
+lines.push(
+  `\t\twidth="${menuW}%" height="84%" scalechildren="true" bgalpha="0"`,
+);
+lines.push(
+  `\t\tonclick="jscall(reactKrpano.vrToggleMenu());" enabled="true" visible="true" />`,
+);
+
+lines.push(
+  `\t<layer name="react_vr_nav_search_btn" keep="true" parent="react_vr_nav_icons_row" type="image" devices="webgl"`,
+);
+lines.push(`\t\tstyle="skin_base" crop="64|128|64|64" align="lefttop" edge="left" x="${menuW}%" y="8%"`);
+lines.push(
+  `\t\twidth="${searchW}%" height="84%" scalechildren="true" bgalpha="0"`,
+);
+lines.push(
+  `\t\tonclick="jscall(reactKrpano.vrToggleSearch());" enabled="true" visible="true" />`,
 );
 
 for (let i = 0; i < n; i++) {
-  const ath =
-    n === 1 ? 0 : athMin + (i * (athMax - athMin)) / (n - 1);
   const sceneId = items[i].sceneId.trim();
   const iconUrl = encodeIconUrlForXml(items[i].iconUrl.trim());
   const sid = escapeSceneIdForJscall(sceneId);
+  const left = startNavPct + i * navW;
+  const w = Math.max(4, navW - 0.8);
   lines.push(
-    `\t<hotspot name="react_vr_nav_${i}" keep="true" style="react_vr_bottombar_style" type="image" devices="webgl"`,
+    `\t<layer name="react_vr_nav_${i}" keep="true" parent="react_vr_nav_icons_row" type="image" devices="webgl"`,
   );
-  lines.push(`\t\turl="${iconUrl}"`);
-  lines.push(`\t\tath="${ath.toFixed(3)}"`);
-  lines.push(`\t\twidth="56" height="56"`);
-  lines.push(`\t\tzorder="20"`);
+  lines.push(`\t\turl="${iconUrl}" align="lefttop" edge="left" x="${left.toFixed(2)}%" y="6%"`);
   lines.push(
-    `\t\tvr_timeout="750" onclick="jscall(reactKrpano.vrNavigateToScene('${sid}'));"`,
+    `\t\twidth="${w.toFixed(2)}%" height="88%" scalechildren="true" bgalpha="0"`,
   );
-  lines.push(`\t\tvisible="false" enabled="false" />`);
+  lines.push(
+    `\t\tonclick="jscall(reactKrpano.vrNavigateToScene('${sid}'));" enabled="true" visible="true" />`,
+  );
 }
 
 lines.push(`</krpano>`);
 lines.push("");
 
 fs.writeFileSync(outPath, lines.join("\n"), "utf8");
-console.log(`Wrote ${outPath} (${n} items)`);
+console.log(`Wrote ${outPath} (menu+search + ${n} zones)`);

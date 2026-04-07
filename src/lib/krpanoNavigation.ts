@@ -154,20 +154,28 @@ export function getKrpanoWebVrEnabled(krpano: KrpanoViewer): boolean {
   }
 }
 
+/** Dernière valeur appliquée — évite des `call` krpano inutiles à chaque tick. */
+let lastVrNavbarVisibility: boolean | null = null;
+
 /**
- * Masque la barre VR krpano (fond + layers) : la navigation en session WebXR est rendue
- * par `SceneNavBar` (même Dock que hors VR) via `useKrpanoWebVrEnabled`.
+ * Affiche / masque la barre VR krpano (fond + icônes + menu/recherche) selon `webvr.isenabled`.
+ * Utilisé en JS car `calc:webvr.isenabled` dans le XML est peu fiable sur Quest.
  */
 export function syncKrpanoVrNavbarVisibility(krpano: KrpanoViewer): void {
+  const on = getKrpanoWebVrEnabled(krpano);
+  if (lastVrNavbarVisibility === on) return;
+  lastVrNavbarVisibility = on;
   try {
-    krpano.call(`react_vr_navbar_set_visibility(0);`);
+    krpano.call(`react_vr_navbar_set_visibility(${on ? 1 : 0});`);
   } catch {
-    /* ignore */
+    lastVrNavbarVisibility = null;
   }
 }
 
-/** À démontage du viewer — compatibilité avec l’ancien cache (no-op). */
-export function resetKrpanoVrNavbarVisibilityCache(): void {}
+/** À démontage du viewer — permet un resync après remount. */
+export function resetKrpanoVrNavbarVisibilityCache(): void {
+  lastVrNavbarVisibility = null;
+}
 
 /**
  * Rendu double image côte à côte (`display.stereo`, ex. paysage + gyro / VR mobile).

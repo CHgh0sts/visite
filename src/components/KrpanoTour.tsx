@@ -103,6 +103,8 @@ export function KrpanoTour({
 
   useEffect(() => {
     let cancelled = false;
+    let vrNavInterval: number | null = null;
+
     const assetBase = `${window.location.origin}${MICRONIQUE_PROXY_PREFIX}`;
 
     window.reactKrpano = {
@@ -195,6 +197,9 @@ export function KrpanoTour({
             /* Barre / miniatures krpano masquées — navigation gérée par `SceneNavBar` + JSON. */
             hideKrpanoTourChrome(viewer);
             syncKrpanoVrNavbarVisibility(viewer);
+            vrNavInterval = window.setInterval(() => {
+              if (!cancelled) syncKrpanoVrNavbarVisibility(viewer);
+            }, 250);
             /* Recharge fiable : loadscene explicite après init viewer + skin */
             krpano.call(
               `delayedcall(0, loadscene('${KRPANO_START_SCENE}', null, MERGE, BLEND(0)));`,
@@ -217,6 +222,7 @@ export function KrpanoTour({
 
     return () => {
       cancelled = true;
+      if (vrNavInterval) clearInterval(vrNavInterval);
       resetKrpanoVrNavbarVisibilityCache();
       setKrpanoViewerForLoadComplete(null);
       clearPendingReactLookAt();

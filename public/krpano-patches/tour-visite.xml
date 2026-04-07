@@ -549,17 +549,20 @@
 		onnewscene="jscall(reactKrpano.onSceneTransitionStart());"
 		onblendcomplete="jscall(calc('reactKrpano.onSceneChange(`' + get(xml.scene) + '`)'))"
 	/>
+	<!-- Fond blanc derrière la barre VR (layer écran + vr pour casque) -->
+	<layer name="react_vr_bottombar_panel" keep="true" type="container" devices="webgl"
+		vr="true" align="bottom" width="92%" height="26%" y="18%" x="0"
+		bgcolor="0xFFFFFF" bgalpha="0.97" bgroundedge="28"
+		bgshadow="0 8 28 0x000000 0.14"
+		zorder="3" enabled="false" bgcapture="false" visible="true" />
 	<!-- Barre bas VR = même liste que SceneNavBar (src/data/scene-nav.json) — fichier généré -->
 	<include url="tour-vr-bottombar-generated.xml" />
-	<!-- Haut / centre : catalogue, recherche, WebXR (sprites skin krpano) -->
+	<!-- Menu + recherche (sprites skin), alignés sur la même hauteur que les icônes zones -->
 	<hotspot name="react_vr_menu" keep="true" style="skin_base|skin_webvr_menu_style" devices="webgl"
-		crop="0|128|64|64" ox="-58" vr_timeout="750" onclick="jscall(reactKrpano.vrToggleMenu());"
+		crop="0|128|64|64" ath="0" atv="24" ox="-32" zorder="20" vr_timeout="750" onclick="jscall(reactKrpano.vrToggleMenu());"
 		visible="true" enabled="true" />
 	<hotspot name="react_vr_search" keep="true" style="skin_base|skin_webvr_menu_style" devices="webgl"
-		crop="64|128|64|64" ox="0" vr_timeout="750" onclick="jscall(reactKrpano.vrToggleSearch());"
-		visible="true" enabled="true" />
-	<hotspot name="react_vr_exitvr" keep="true" style="skin_base|skin_webvr_menu_style" devices="webgl"
-		crop="0|0|80|64" ox="58" vr_timeout="750" onclick="jscall(reactKrpano.vrToggleVr());"
+		crop="64|128|64|64" ath="0" atv="24" ox="32" zorder="20" vr_timeout="750" onclick="jscall(reactKrpano.vrToggleSearch());"
 		visible="true" enabled="true" />
 	<!-- Remplace webvr.xml : pas de bandeau « Simulated VR Mode » / lien Meta Quest / bouton X -->
 	<action name="webvr_show_infos" scope="local" args="show">

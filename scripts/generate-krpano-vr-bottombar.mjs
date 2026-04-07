@@ -46,7 +46,8 @@ const items = (raw.items ?? []).filter(
 const n = items.length;
 const athMin = -48;
 const athMax = 48;
-const atv = 58;
+/** Plus haut dans le champ de vision (évite l’effet « collé au sol »). */
+const atv = 24;
 const lines = [];
 lines.push(`<!-- Généré par scripts/generate-krpano-vr-bottombar.mjs — ne pas éditer -->`);
 lines.push(`<krpano>`);
@@ -66,6 +67,7 @@ for (let i = 0; i < n; i++) {
   lines.push(`\t\turl="${iconUrl}"`);
   lines.push(`\t\tath="${ath.toFixed(3)}"`);
   lines.push(`\t\twidth="56" height="56"`);
+  lines.push(`\t\tzorder="20"`);
   lines.push(
     `\t\tvr_timeout="750" onclick="jscall(reactKrpano.vrNavigateToScene('${sid}'));"`,
   );

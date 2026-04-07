@@ -1,64 +1,74 @@
 <!-- Généré par scripts/generate-krpano-vr-bottombar.mjs — ne pas éditer -->
 <krpano>
-	<style name="react_vr_bottombar_style" torigin="view" depth="1000" distorted="true" atv="58" scale="0.36" alpha="0.92" />
+	<style name="react_vr_bottombar_style" torigin="view" depth="1000" distorted="true" atv="24" scale="0.36" alpha="0.92" />
 	<hotspot name="react_vr_nav_0" keep="true" style="react_vr_bottombar_style" type="image" devices="webgl"
 		url="/images/navbar/MAGASIN.svg"
 		ath="-48.000"
 		width="56" height="56"
+		zorder="20"
 		vr_timeout="750" onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_9'));"
 		visible="true" enabled="true" />
 	<hotspot name="react_vr_nav_1" keep="true" style="react_vr_bottombar_style" type="image" devices="webgl"
 		url="/images/navbar/PREPARATION.svg"
 		ath="-37.333"
 		width="56" height="56"
+		zorder="20"
 		vr_timeout="750" onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_7'));"
 		visible="true" enabled="true" />
 	<hotspot name="react_vr_nav_2" keep="true" style="react_vr_bottombar_style" type="image" devices="webgl"
 		url="/images/navbar/CMS-ILOT-PROTOTYPES.svg"
 		ath="-26.667"
 		width="56" height="56"
+		zorder="20"
 		vr_timeout="750" onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_22'));"
 		visible="true" enabled="true" />
 	<hotspot name="react_vr_nav_3" keep="true" style="react_vr_bottombar_style" type="image" devices="webgl"
 		url="/images/navbar/CMS-SERIES.svg"
 		ath="-16.000"
 		width="56" height="56"
+		zorder="20"
 		vr_timeout="750" onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_1'));"
 		visible="true" enabled="true" />
 	<hotspot name="react_vr_nav_4" keep="true" style="react_vr_bottombar_style" type="image" devices="webgl"
 		url="/images/navbar/CONTROLE–REPARATION.svg"
 		ath="-5.333"
 		width="56" height="56"
+		zorder="20"
 		vr_timeout="750" onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_23'));"
 		visible="true" enabled="true" />
 	<hotspot name="react_vr_nav_5" keep="true" style="react_vr_bottombar_style" type="image" devices="webgl"
 		url="/images/navbar/CABLAGE.svg"
 		ath="5.333"
 		width="56" height="56"
+		zorder="20"
 		vr_timeout="750" onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_28'));"
 		visible="true" enabled="true" />
 	<hotspot name="react_vr_nav_6" keep="true" style="react_vr_bottombar_style" type="image" devices="webgl"
 		url="/images/navbar/VERNISSAGE.svg"
 		ath="16.000"
 		width="56" height="56"
+		zorder="20"
 		vr_timeout="750" onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_15b'));"
 		visible="true" enabled="true" />
 	<hotspot name="react_vr_nav_7" keep="true" style="react_vr_bottombar_style" type="image" devices="webgl"
 		url="/images/navbar/TEST.svg"
 		ath="26.667"
 		width="56" height="56"
+		zorder="20"
 		vr_timeout="750" onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_16'));"
 		visible="true" enabled="true" />
 	<hotspot name="react_vr_nav_8" keep="true" style="react_vr_bottombar_style" type="image" devices="webgl"
 		url="/images/navbar/MONTAGE.svg"
 		ath="37.333"
 		width="56" height="56"
+		zorder="20"
 		vr_timeout="750" onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_12'));"
 		visible="true" enabled="true" />
 	<hotspot name="react_vr_nav_9" keep="true" style="react_vr_bottombar_style" type="image" devices="webgl"
 		url="/images/navbar/DETOURAGE%20DEVERMINAGE.svg"
 		ath="48.000"
 		width="56" height="56"
+		zorder="20"
 		vr_timeout="750" onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_17'));"
 		visible="true" enabled="true" />
 </krpano>

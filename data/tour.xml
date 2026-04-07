@@ -548,4 +548,10 @@
 		onnewscene="jscall(reactKrpano.onSceneTransitionStart());"
 		onblendcomplete="jscall(calc('reactKrpano.onSceneChange(`' + get(xml.scene) + '`)'))"
 	/>
+	<!-- Remplace webvr.xml : pas de bandeau « Simulated VR Mode » / lien Meta Quest / bouton X -->
+	<action name="webvr_show_infos" scope="local" args="show">
+		if(show == false,
+			removelayer(webvr_show_infos, true);
+		);
+	</action>
 </krpano>

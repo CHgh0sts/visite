@@ -134,6 +134,101 @@ export function clearPendingReactLookAt(): void {
   pendingReactLookAt = null;
 }
 
+function parseKrpanoBool(v: unknown): boolean {
+  if (v === true || v === 1) return true;
+  if (typeof v === "string") {
+    const s = v.trim().toLowerCase();
+    return s === "true" || s === "1";
+  }
+  return false;
+}
+
+/** Mode WebVR / stéréo actif (équivalent `webvr.isenabled` dans le skin). */
+export function getKrpanoWebVrEnabled(krpano: KrpanoViewer): boolean {
+  const g = krpano.get;
+  if (typeof g !== "function") return false;
+  try {
+    return parseKrpanoBool(g("webvr.isenabled"));
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Rendu double image côte à côte (`display.stereo`, ex. paysage + gyro / VR mobile).
+ * Utilisé pour l’overlay HTML : les coords `spheretoscreen` sont ramenées sur la moitié gauche.
+ */
+export function getKrpanoDisplayStereo(krpano: KrpanoViewer): boolean {
+  const g = krpano.get;
+  if (typeof g !== "function") return false;
+  try {
+    return parseKrpanoBool(g("display.stereo"));
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Met à l’échelle le point `spheretoscreen(ath,atv)` du **repère stage** krpano vers les
+ * pixels du conteneur viewer (même origine que `screentosphere(x,y)` au clic dans
+ * PlacementLayer : coin haut-gauche du div `#krpano-target-*`).
+ *
+ * **Ne pas** modifier `p.x` / `p.y` (ex. ×0,5 en stéréo) : krpano calcule déjà la projection
+ * cohérente avec `screentosphere` ; une correction manuelle casse le suivi quand la vue tourne
+ * (VR / SBS / mono).
+ */
+export function krpanoSpheretoscreenToOverlayLocalPx(
+  krpano: KrpanoViewer,
+  p: { x: number; y: number },
+  containerWidthPx: number,
+  containerHeightPx: number,
+): { x: number; y: number } {
+  const g = krpano.get;
+  const sw =
+    (typeof g === "function" ? parseKrpanoNumber(g("stagewidth")) : null) ??
+    containerWidthPx;
+  const sh =
+    (typeof g === "function" ? parseKrpanoNumber(g("stageheight")) : null) ??
+    containerHeightPx;
+  const swSafe = Math.max(1, sw);
+  const shSafe = Math.max(1, sh);
+  return {
+    x: (p.x / swSafe) * containerWidthPx,
+    y: (p.y / shSafe) * containerHeightPx,
+  };
+}
+
+/** WebVR utilisable dans ce navigateur (`webvr.isavailable`). */
+export function getKrpanoWebVrAvailable(krpano: KrpanoViewer): boolean {
+  const g = krpano.get;
+  if (typeof g !== "function") return false;
+  try {
+    return parseKrpanoBool(g("webvr.isavailable"));
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Bascule entre vue normale et mode VR — même logique que le bouton `skin_btn_vr` du vtourskin
+ * (`webvr.enterVR()` / `webvr.exitVR()`).
+ */
+export function toggleKrpanoWebVr(krpano: KrpanoViewer): void {
+  try {
+    if (getKrpanoWebVrEnabled(krpano)) {
+      krpano.call("webvr.exitVR();");
+    } else {
+      krpano.call("webvr.enterVR();");
+    }
+  } catch {
+    try {
+      krpano.call("webvr.enterVR();");
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
 /**
  * Masque toute la barre / skin krpano (vtourskin).
  * `skin_startup` remet `skin_layer` visible après `onready` — un second passage en différé supprime la bande grise + le strip « réafficher ».

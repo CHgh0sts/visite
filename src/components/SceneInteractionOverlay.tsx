@@ -1,13 +1,21 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { InteractionButtonView } from "@/components/InteractionButtonView";
 import { InteractionContentPanel } from "@/components/InteractionContentModal";
 import {
   adjustedAthAtvToCenterModalBesideButton,
+  getKrpanoDisplayStereo,
   getKrpanoViewSnapshot,
   hideKrpanoTourChrome,
+  krpanoSpheretoscreenToOverlayLocalPx,
   loadKrpanoScene,
   lookAtForSceneNavigationButton,
   tweenKrpanoViewToAnchor,
@@ -22,16 +30,43 @@ import {
   type SceneInteractionsMap,
 } from "@/types/interactions";
 
+/** Suit `display.stereo` (re-render seulement si ça change). */
+function useKrpanoStereoRaf(krpano: KrpanoViewer | null): boolean {
+  const [stereo, setStereo] = useState(false);
+  useEffect(() => {
+    if (!krpano) return;
+    let last = getKrpanoDisplayStereo(krpano);
+    let first = true;
+    let id = 0;
+    const tick = () => {
+      const next = getKrpanoDisplayStereo(krpano);
+      if (first || next !== last) {
+        first = false;
+        last = next;
+        setStereo(next);
+      }
+      id = requestAnimationFrame(tick);
+    };
+    id = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(id);
+  }, [krpano]);
+  return krpano ? stereo : false;
+}
+
 function ScreenPercentButtons({
   buttons,
   onActivate,
   highlightButtonId,
+  stereoHorizontalHalve,
 }: {
   buttons: SceneInteractionButton[];
   onActivate: (b: SceneInteractionButton) => void;
   /** Synchronisé avec le survol de la liste dans l’éditeur. */
   highlightButtonId: string | null;
+  /** En SBS, les % ont été calibrés en mono plein écran — ramener l’axe X sur la moitié gauche. */
+  stereoHorizontalHalve?: boolean;
 }) {
+  const hFactor = stereoHorizontalHalve ? 0.5 : 1;
   return (
     <div className="pointer-events-none absolute inset-0 z-50">
       {buttons.map((b) => {
@@ -44,7 +79,7 @@ function ScreenPercentButtons({
             }`}
             style={{
               top: `${b.topPct ?? 0}%`,
-              left: `${b.leftPct ?? 0}%`,
+              left: `${(b.leftPct ?? 0) * hFactor}%`,
             }}
           >
             <div
@@ -71,14 +106,18 @@ function SphereAnchoredButtons({
   buttons,
   onActivate,
   highlightButtonId,
+  viewerContainerId,
 }: {
   krpano: KrpanoViewer;
   buttons: SceneInteractionButton[];
   onActivate: (b: SceneInteractionButton) => void;
   highlightButtonId: string | null;
+  /** Conteneur `#krpano-target-*` — même taille que le stage pour le mapping. */
+  viewerContainerId: string | null;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const buttonsRef = useRef(buttons);
+  // eslint-disable-next-line react-hooks/refs -- le rAF lit la liste courante sans [buttons] dans l’effet
   buttonsRef.current = buttons;
   const rafRef = useRef(0);
 
@@ -104,10 +143,23 @@ function SphereAnchoredButtons({
             el.style.visibility = "hidden";
             el.style.pointerEvents = "none";
           } else {
+            const container = viewerContainerId
+              ? document.getElementById(viewerContainerId)
+              : null;
+            const cw =
+              container?.clientWidth ?? wrap?.clientWidth ?? 1;
+            const ch =
+              container?.clientHeight ?? wrap?.clientHeight ?? 1;
+            const { x, y } = krpanoSpheretoscreenToOverlayLocalPx(
+              krpano,
+              p,
+              cw,
+              ch,
+            );
             el.style.visibility = "visible";
             el.style.pointerEvents = "auto";
-            el.style.left = `${p.x}px`;
-            el.style.top = `${p.y}px`;
+            el.style.left = `${x}px`;
+            el.style.top = `${y}px`;
           }
         }
       }
@@ -115,7 +167,7 @@ function SphereAnchoredButtons({
     };
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [krpano]);
+  }, [krpano, viewerContainerId]);
 
   return (
     <div
@@ -155,16 +207,19 @@ function SphereAnchoredButtons({
 function AnchoredContentModal({
   button,
   krpano,
+  viewerContainerId,
   onClose,
   onVideoPlaybackChange,
 }: {
   button: SceneInteractionButton;
   krpano: KrpanoViewer | null;
+  viewerContainerId: string | null;
   onClose: () => void;
   onVideoPlaybackChange?: (playing: boolean) => void;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef(button);
+  // eslint-disable-next-line react-hooks/refs -- le rAF lit le bouton courant sans [button] dans l’effet
   buttonRef.current = button;
   const rafRef = useRef(0);
   const modal = button.modal;
@@ -219,13 +274,7 @@ function AnchoredContentModal({
     return () => {
       if (saved) tweenKrpanoViewToSnapshot(krpano, saved);
     };
-  }, [
-    krpano,
-    modal?.centerViewForModal,
-    button.ath,
-    button.atv,
-    button.id,
-  ]);
+  }, [krpano, modal?.centerViewForModal, button]);
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -234,8 +283,11 @@ function AnchoredContentModal({
     const tickLegacy = () => {
       const b = buttonRef.current;
       const offsetPx = sceneButtonAnchorOffsetPx(b);
+      const stereo =
+        krpano != null ? getKrpanoDisplayStereo(krpano) : false;
+      const hf = stereo ? 0.5 : 1;
       el.style.visibility = "visible";
-      el.style.left = `calc(${b.leftPct ?? 0}% + ${offsetPx}px)`;
+      el.style.left = `calc(${(b.leftPct ?? 0) * hf}% + ${offsetPx}px)`;
       el.style.top = `${b.topPct ?? 0}%`;
       el.style.transform = "translate(0, -50%)";
     };
@@ -268,16 +320,30 @@ function AnchoredContentModal({
       if (!p || Number.isNaN(p.x) || Number.isNaN(p.y)) {
         node.style.visibility = "hidden";
       } else {
+        const container = viewerContainerId
+          ? document.getElementById(viewerContainerId)
+          : null;
+        const wrap = node.parentElement;
+        const cw =
+          container?.clientWidth ?? wrap?.clientWidth ?? 1;
+        const ch =
+          container?.clientHeight ?? wrap?.clientHeight ?? 1;
+        const { x, y } = krpanoSpheretoscreenToOverlayLocalPx(
+          krpano,
+          p,
+          cw,
+          ch,
+        );
         node.style.visibility = "visible";
-        node.style.left = `${p.x + off}px`;
-        node.style.top = `${p.y}px`;
+        node.style.left = `${x + off}px`;
+        node.style.top = `${y}px`;
         node.style.transform = "translate(0, -50%)";
       }
       rafRef.current = requestAnimationFrame(tick);
     };
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [krpano, button.id]);
+  }, [krpano, button.id, viewerContainerId]);
 
   return (
     <>
@@ -311,6 +377,7 @@ export function SceneInteractionOverlay({
   sceneName,
   map,
   krpano,
+  viewerContainerId = null,
   scenePanoReady = true,
   highlightButtonId = null,
   pendingActivation = null,
@@ -320,6 +387,8 @@ export function SceneInteractionOverlay({
   sceneName: string;
   map: SceneInteractionsMap;
   krpano: KrpanoViewer | null;
+  /** `#krpano-target-*` — aligne le mapping sur la taille du stage (VR / stéréo). */
+  viewerContainerId?: string | null;
   /** false jusqu’au 1er onblendcomplete (ou équivalent) — évite les boutons avant l’image. */
   scenePanoReady?: boolean;
   /** Bouton mis en avant quand la ligne correspondante est survolée dans l’éditeur. */
@@ -338,6 +407,7 @@ export function SceneInteractionOverlay({
     null,
   );
   const processedActivationNonce = useRef<number | null>(null);
+  const stereoSbs = useKrpanoStereoRaf(krpano);
 
   const list = useMemo(() => map[sceneName] ?? [], [map, sceneName]);
   const sphere = useMemo(() => list.filter(isSphereAnchored), [list]);
@@ -382,6 +452,7 @@ export function SceneInteractionOverlay({
       onPendingActivationConsumed?.();
       return;
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- synchronisation catalogue → ouverture modale
     activate(btn);
     onPendingActivationConsumed?.();
   }, [
@@ -406,6 +477,7 @@ export function SceneInteractionOverlay({
           buttons={sphere}
           onActivate={activate}
           highlightButtonId={highlightButtonId ?? null}
+          viewerContainerId={viewerContainerId}
         />
       )}
       {scenePanoReady && screen.length > 0 && (
@@ -413,12 +485,14 @@ export function SceneInteractionOverlay({
           buttons={screen}
           onActivate={activate}
           highlightButtonId={highlightButtonId ?? null}
+          stereoHorizontalHalve={stereoSbs}
         />
       )}
       {modalButton && hasModalContent(modalButton.modal) && (
         <AnchoredContentModal
           button={modalButton}
           krpano={krpano}
+          viewerContainerId={viewerContainerId}
           onClose={() => setModalButton(null)}
           onVideoPlaybackChange={onVideoPlaybackChange}
         />

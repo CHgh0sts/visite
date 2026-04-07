@@ -2515,6 +2515,7 @@ export function VisiteShell() {
       />
       <EquipmentCatalogPanel
         map={map}
+        krpano={krpano}
         onPickEquipment={handlePickEquipment}
         onNavigateToZone={(sceneId) => {
           if (krpano) loadKrpanoScene(krpano, sceneId);
@@ -2524,6 +2525,7 @@ export function VisiteShell() {
         sceneName={sceneName}
         map={map}
         krpano={krpano}
+        viewerContainerId={viewerContainerId}
         scenePanoReady={scenePanoReady}
         highlightButtonId={listHoverButtonId}
         pendingActivation={pendingActivation}

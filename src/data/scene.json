@@ -23,7 +23,7 @@
       "width": "500px",
       "height": "500px",
       "zIndex": 2,
-      "transform": "translate(-50%, -50%), rotate(180deg)",
+      "transform": "translate(-50%, -50%)",
       "objectFit": "contain"
     }
   ]

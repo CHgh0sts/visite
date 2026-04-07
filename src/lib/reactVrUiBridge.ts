@@ -10,10 +10,8 @@ export type ReactVrUiCallbacks = {
   toggleSearch: () => void;
   /** Entrée / sortie WebXR (casque). */
   toggleVr: () => void;
-  /** Dock : scène précédente (scene-nav.json). */
-  dockPrev: () => void;
-  /** Dock : scène suivante. */
-  dockNext: () => void;
+  /** Barre bas VR : charger une scène (même `sceneId` que SceneNavBar / scene-nav.json). */
+  navigateToScene: (sceneId: string) => void;
 };
 
 let callbacks: Partial<ReactVrUiCallbacks> = {};

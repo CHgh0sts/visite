@@ -152,18 +152,11 @@ export function KrpanoTour({
           console.error("[krpano] vrToggleVr", e);
         }
       },
-      vrDockPrev() {
+      vrNavigateToScene(sceneId: string) {
         try {
-          getReactVrUiCallbacks().dockPrev?.();
+          getReactVrUiCallbacks().navigateToScene?.(sceneId);
         } catch (e) {
-          console.error("[krpano] vrDockPrev", e);
-        }
-      },
-      vrDockNext() {
-        try {
-          getReactVrUiCallbacks().dockNext?.();
-        } catch (e) {
-          console.error("[krpano] vrDockNext", e);
+          console.error("[krpano] vrNavigateToScene", e);
         }
       },
     };
@@ -177,7 +170,7 @@ export function KrpanoTour({
           return;
         }
         embed({
-          xml: `${assetBase}/tour.xml`,
+          xml: `${assetBase}/tour-visite.xml`,
           target: targetId,
           id: viewerId,
           html5: "only",

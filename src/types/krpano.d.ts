@@ -16,8 +16,7 @@ declare global {
       vrToggleMenu: () => void;
       vrToggleSearch: () => void;
       vrToggleVr: () => void;
-      vrDockPrev: () => void;
-      vrDockNext: () => void;
+      vrNavigateToScene: (sceneId: string) => void;
     };
   }
 }

@@ -71,7 +71,7 @@ for (let i = 0; i < n; i++) {
   lines.push(
     `\t\tvr_timeout="750" onclick="jscall(reactKrpano.vrNavigateToScene('${sid}'));"`,
   );
-  lines.push(`\t\tvisible="true" enabled="true" />`);
+  lines.push(`\t\tvisible="false" enabled="false" />`);
 }
 
 lines.push(`</krpano>`);

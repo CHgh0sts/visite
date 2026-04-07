@@ -154,6 +154,29 @@ export function getKrpanoWebVrEnabled(krpano: KrpanoViewer): boolean {
   }
 }
 
+/** Dernière valeur appliquée — évite des `call` krpano inutiles à chaque tick. */
+let lastVrNavbarVisibility: boolean | null = null;
+
+/**
+ * Affiche / masque la barre VR krpano (fond + icônes + menu/recherche) selon `webvr.isenabled`.
+ * Utilisé en JS car `calc:webvr.isenabled` dans le XML est peu fiable sur Quest.
+ */
+export function syncKrpanoVrNavbarVisibility(krpano: KrpanoViewer): void {
+  const on = getKrpanoWebVrEnabled(krpano);
+  if (lastVrNavbarVisibility === on) return;
+  lastVrNavbarVisibility = on;
+  try {
+    krpano.call(`react_vr_navbar_set_visibility(${on ? 1 : 0});`);
+  } catch {
+    lastVrNavbarVisibility = null;
+  }
+}
+
+/** À démontage du viewer — permet un resync après remount. */
+export function resetKrpanoVrNavbarVisibilityCache(): void {
+  lastVrNavbarVisibility = null;
+}
+
 /**
  * Rendu double image côte à côte (`display.stereo`, ex. paysage + gyro / VR mobile).
  * Utilisé pour l’overlay HTML : les coords `spheretoscreen` sont ramenées sur la moitié gauche.

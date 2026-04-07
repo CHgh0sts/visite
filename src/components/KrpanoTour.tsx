@@ -1,5 +1,7 @@
 "use client";
 
+import "@/lib/webxrDomOverlayPatch";
+
 import { useEffect, useId, useRef } from "react";
 
 import { KRPANO_START_SCENE } from "@/constants/krpano";

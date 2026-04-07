@@ -11,6 +11,7 @@ import {
   getKrpanoWebVrEnabled,
   toggleKrpanoWebVr,
 } from "@/lib/krpanoNavigation";
+import { setReactVrUiCallbacks } from "@/lib/reactVrUiBridge";
 import { mergeEquipmentCatalogZones } from "@/lib/mergedEquipmentZones";
 import type { KrpanoViewer } from "@/types/krpanoViewer";
 import type { SceneInteractionsMap } from "@/types/interactions";
@@ -116,6 +117,54 @@ export function EquipmentCatalogPanel({
     tick();
     const id = window.setInterval(tick, 400);
     return () => clearInterval(id);
+  }, [krpano]);
+
+  /** Hotspots VR (tour.xml jscall) : en WebXR le HTML est invisible — menu/recherche quittent la VR puis ouvrent le panneau. */
+  useEffect(() => {
+    const VR_THEN_PANEL_MS = 480;
+
+    setReactVrUiCallbacks({
+      toggleCatalog: () => {
+        if (krpano && getKrpanoWebVrEnabled(krpano)) {
+          try {
+            krpano.call("webvr.exitVR();");
+          } catch {
+            toggleKrpanoWebVr(krpano);
+          }
+          window.setTimeout(() => {
+            setOpen(true);
+            setSearchOpen(false);
+          }, VR_THEN_PANEL_MS);
+          return;
+        }
+        setOpen((v) => !v);
+      },
+      toggleSearch: () => {
+        if (krpano && getKrpanoWebVrEnabled(krpano)) {
+          try {
+            krpano.call("webvr.exitVR();");
+          } catch {
+            toggleKrpanoWebVr(krpano);
+          }
+          window.setTimeout(() => {
+            setSearchOpen(true);
+            setOpen(false);
+          }, VR_THEN_PANEL_MS);
+          return;
+        }
+        setSearchOpen((v) => !v);
+      },
+      toggleVr: () => {
+        if (krpano) toggleKrpanoWebVr(krpano);
+      },
+    });
+    return () => {
+      setReactVrUiCallbacks({
+        toggleCatalog: undefined,
+        toggleSearch: undefined,
+        toggleVr: undefined,
+      });
+    };
   }, [krpano]);
 
   const selectedZone = zones[selectedZoneIdx] ?? null;

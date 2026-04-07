@@ -18,6 +18,8 @@ import { SceneInteractionOverlay } from "@/components/SceneInteractionOverlay";
 import { KRPANO_START_SCENE } from "@/constants/krpano";
 import { sceneNavbarBottomReservePaddingClass } from "@/constants/sceneNavbarLayout";
 import { loadKrpanoScene } from "@/lib/krpanoNavigation";
+import { setReactVrUiCallbacks } from "@/lib/reactVrUiBridge";
+import { dockNavSceneIdAfterDelta } from "@/lib/sceneDockNav";
 import { postSceneInteractionsToServer } from "@/lib/sceneInteractionsApi";
 import {
   exportInteractionsJson,
@@ -2483,6 +2485,23 @@ export function VisiteShell() {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
+
+  /** Hotspots VR (scene-nav.json) — même logique que la dock React, mais rendu krpano en WebXR. */
+  useEffect(() => {
+    setReactVrUiCallbacks({
+      dockPrev: () => {
+        const id = dockNavSceneIdAfterDelta(sceneName, -1);
+        if (id && krpano) loadKrpanoScene(krpano, id);
+      },
+      dockNext: () => {
+        const id = dockNavSceneIdAfterDelta(sceneName, +1);
+        if (id && krpano) loadKrpanoScene(krpano, id);
+      },
+    });
+    return () => {
+      setReactVrUiCallbacks({ dockPrev: undefined, dockNext: undefined });
+    };
+  }, [sceneName, krpano]);
 
   return (
     <div className="fixed inset-0">

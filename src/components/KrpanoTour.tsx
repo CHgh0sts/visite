@@ -12,6 +12,7 @@ import {
   setKrpanoViewerForLoadComplete,
   tryApplyPendingLookAtForScene,
 } from "@/lib/krpanoNavigation";
+import { getReactVrUiCallbacks } from "@/lib/reactVrUiBridge";
 import type { KrpanoViewer } from "@/types/krpanoViewer";
 
 /**
@@ -128,6 +129,41 @@ export function KrpanoTour({
           onReactPanoLoadComplete();
         } catch (e) {
           console.error("[krpano] onPanoLoadComplete", e);
+        }
+      },
+      vrToggleMenu() {
+        try {
+          getReactVrUiCallbacks().toggleCatalog?.();
+        } catch (e) {
+          console.error("[krpano] vrToggleMenu", e);
+        }
+      },
+      vrToggleSearch() {
+        try {
+          getReactVrUiCallbacks().toggleSearch?.();
+        } catch (e) {
+          console.error("[krpano] vrToggleSearch", e);
+        }
+      },
+      vrToggleVr() {
+        try {
+          getReactVrUiCallbacks().toggleVr?.();
+        } catch (e) {
+          console.error("[krpano] vrToggleVr", e);
+        }
+      },
+      vrDockPrev() {
+        try {
+          getReactVrUiCallbacks().dockPrev?.();
+        } catch (e) {
+          console.error("[krpano] vrDockPrev", e);
+        }
+      },
+      vrDockNext() {
+        try {
+          getReactVrUiCallbacks().dockNext?.();
+        } catch (e) {
+          console.error("[krpano] vrDockNext", e);
         }
       },
     };

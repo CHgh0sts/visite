@@ -25,6 +25,11 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* WebXR : masquer l’overlay React — l’UI VR est dans krpano (barre + layers). */
+body.kr-vr-mode .visite-react-ui {
+  display: none !important;
+}
+
 /* Boutons d’interaction (visite) : couleurs via variables */
 .ix-interaction-btn {
   background-color: var(--ix-bg);

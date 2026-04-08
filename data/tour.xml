@@ -3,13 +3,13 @@
 	<!-- ############################################################## -->
 	<!-- #############   Style commun à tous les Hotspot   ############# -->
 	<!-- ############################################################## -->
-	<style name="hotspot_custom_style"
+<style name="hotspot_custom_style"
    type="html"
    width="48"
    height="48"
    renderer="css3d"
    zorder="500"
-   edge="left"
+   edge="center"
    scale="0"
    oy="30"
    visible="true"
@@ -17,6 +17,36 @@
    onclick="loadscene(get(linkedscene), null, MERGE, BLEND(0.5));"
    onover="set(zorder,999);"
    onout="set(zorder,500);"
+/>
+
+<style name="vr_button_style"
+   type="image"
+   renderer="webgl"
+   distorted="true"
+   capture="true"
+   visible="false"
+   enabled="true"
+   edge="center"
+   width="140"
+   height="140"
+   alpha="0.95"
+   scale="1.0"
+   ondown="tween(scale,0.92,0.08);"
+   onup="tween(scale,1.0,0.08);"
+   onover="tween(alpha,1.0,0.08);"
+   onout="tween(alpha,0.95,0.08);"
+/>
+
+<style name="vr_label_style"
+   type="text"
+   css="color:#ffffff;font-family:Arial;font-size:28px;font-weight:bold;text-align:center;background:rgba(20,20,20,0.55);padding:12px 20px;border-radius:999px;"
+   renderer="webgl"
+   distorted="true"
+   visible="false"
+   enabled="false"
+   edge="center"
+   ox="0"
+   oy="0"
 />
 	<skin_settings maps="true"
                    maps_type="openstreetmaps"
@@ -26,7 +56,7 @@
                    maps_loadonfirstuse="true"
                    gyro="true"
                    gyro_keeplookingdirection="false"
-                   webvr="false"
+                   webvr="true"
                    webvr_keeplookingdirection="true"
                    webvr_prev_next_hotspots="false"
                    autotour="false"
@@ -543,11 +573,124 @@
 	  React : onnewscene = début chargement scène → masquer les boutons overlay pendant le blend.
 	  onloadcomplete = lookat enregistré ; onblendcomplete = fin fondu → nom scène + réafficher boutons.
 	-->
+	<!-- ====================================================== -->
+<!-- ===================== UI VR ========================== -->
+<!-- ====================================================== -->
+
+<action name="show_vr_ui">
+    set(hotspot[vr_ui_anchor].visible, true);
+    set(hotspot[vr_btn_prev].visible, true);
+    set(hotspot[vr_btn_home].visible, true);
+    set(hotspot[vr_btn_next].visible, true);
+    set(hotspot[vr_label].visible, true);
+</action>
+
+<action name="hide_vr_ui">
+    set(hotspot[vr_ui_anchor].visible, false);
+    set(hotspot[vr_btn_prev].visible, false);
+    set(hotspot[vr_btn_home].visible, false);
+    set(hotspot[vr_btn_next].visible, false);
+    set(hotspot[vr_label].visible, false);
+</action>
+
+<action name="notify_react_vr_enter">
+    jscall(try{ reactKrpano.onEnterVR && reactKrpano.onEnterVR(); }catch(e){});
+</action>
+
+<action name="notify_react_vr_exit">
+    jscall(try{ reactKrpano.onExitVR && reactKrpano.onExitVR(); }catch(e){});
+</action>
+
+<action name="vr_go_prev_scene">
+    skin_prevring();
+</action>
+
+<action name="vr_go_next_scene">
+    skin_nextring();
+</action>
+
+<action name="vr_go_home_scene">
+    loadscene(scene_micronique_1, null, MERGE, BLEND(0.5));
+</action>
+
+<!-- point d'ancrage attaché à la vue -->
+<hotspot name="vr_ui_anchor"
+         type="image"
+         url=""
+         renderer="webgl"
+         distorted="true"
+         visible="false"
+         enabled="false"
+         capture="false"
+         torigin="view"
+         tx="0"
+         ty="140"
+         tz="1200"
+         scale="0.18"
+         zorder="2000" />
+
+<!-- fond de barre -->
+<hotspot name="vr_bar_bg"
+         parent="vr_ui_anchor"
+         type="text"
+         html=" "
+         css="background:rgba(18,18,18,0.70);border-radius:999px;"
+         renderer="webgl"
+         distorted="true"
+         visible="true"
+         enabled="false"
+         width="1100"
+         height="240"
+         tx="0"
+         ty="0"
+         tz="0"
+         edge="center" />
+
+<!-- bouton précédent -->
+<hotspot name="vr_btn_prev"
+         parent="vr_ui_anchor"
+         style="vr_button_style"
+         url="%SWFPATH%/skin/skin_prevscene.png"
+         tx="-260"
+         ty="0"
+         tz="10"
+         onclick="vr_go_prev_scene();" />
+
+<!-- bouton home -->
+<hotspot name="vr_btn_home"
+         parent="vr_ui_anchor"
+         style="vr_button_style"
+         url="%SWFPATH%/skin/skin_menu.png"
+         tx="0"
+         ty="0"
+         tz="10"
+         onclick="vr_go_home_scene();" />
+
+<!-- bouton suivant -->
+<hotspot name="vr_btn_next"
+         parent="vr_ui_anchor"
+         style="vr_button_style"
+         url="%SWFPATH%/skin/skin_nextscene.png"
+         tx="260"
+         ty="0"
+         tz="10"
+         onclick="vr_go_next_scene();" />
+
+<!-- label nom de scène -->
+<hotspot name="vr_label"
+         parent="vr_ui_anchor"
+         style="vr_label_style"
+         tx="0"
+         ty="-150"
+         tz="10"
+         html="get(scene[get(xml.scene)].title)" />
 	<events
-		onloadcomplete="jscall(reactKrpano.onPanoLoadComplete());"
-		onnewscene="jscall(reactKrpano.onSceneTransitionStart());"
-		onblendcomplete="jscall(calc('reactKrpano.onSceneChange(`' + get(xml.scene) + '`)'))"
-	/>
+    onloadcomplete="jscall(reactKrpano.onPanoLoadComplete()); if(webvr.isenabled, set(hotspot[vr_label].html,get(scene[get(xml.scene)].title)); );"
+    onnewscene="jscall(reactKrpano.onSceneTransitionStart());"
+    onblendcomplete="jscall(calc('reactKrpano.onSceneChange(`' + get(xml.scene) + '`)')); if(webvr.isenabled, set(hotspot[vr_label].html,get(scene[get(xml.scene)].title)); );"
+    onentervr="show_vr_ui(); notify_react_vr_enter();"
+    onexitvr="hide_vr_ui(); notify_react_vr_exit();"
+/>
 	<!-- Remplace webvr.xml : pas de bandeau « Simulated VR Mode » / lien Meta Quest / bouton X -->
 	<action name="webvr_show_infos" scope="local" args="show">
 		if(show == false,

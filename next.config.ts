@@ -16,6 +16,11 @@ const nextConfig: NextConfig = {
         source: "/micronique-assets/tour-visite.xml",
         destination: "/krpano-patches/tour-visite.xml",
       },
+      /* Barre VR (générée depuis scene-nav.json) — sinon le catch-all pointe vers le worker → 404 */
+      {
+        source: "/micronique-assets/tour-vr-bottombar-generated.xml",
+        destination: "/krpano-patches/tour-vr-bottombar-generated.xml",
+      },
       /* Skin du worker : blocs UI commentés → skin_startup casse ; version décommentée dans public/ */
       {
         source: "/micronique-assets/skin/vtourskin.xml",

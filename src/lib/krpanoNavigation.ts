@@ -29,6 +29,11 @@ export function setKrpanoViewerForLoadComplete(k: KrpanoViewer | null): void {
   krpanoViewerRefForLoadComplete = k;
 }
 
+/** Viewer krpano courant — entrée/sortie WebXR (`reactKrpano.onEnterVR` / `onExitVR`). */
+export function getKrpanoViewerForTour(): KrpanoViewer | null {
+  return krpanoViewerRefForLoadComplete;
+}
+
 /** N’applique que si `sceneName` est la scène attendue — évite de vider le pending sur un `onloadcomplete` obsolète. */
 function applyPendingIfSceneMatches(
   krpano: KrpanoViewer,
@@ -372,4 +377,59 @@ export function tweenKrpanoViewToSnapshot(
       /* ignore */
     }
   }
+}
+
+/** Affiche / masque la barre VR krpano (`tour.xml` → `react_vr_navbar_set_visibility`). */
+export function setKrpanoVrNavbarVisibility(
+  krpano: KrpanoViewer,
+  visible: boolean,
+): void {
+  try {
+    krpano.call(`react_vr_navbar_set_visibility(${visible ? 1 : 0});`);
+  } catch {
+    /* ignore */
+  }
+}
+
+/** Session WebXR active (plugin `webvr`). */
+export function getKrpanoWebVrEnabled(krpano: KrpanoViewer): boolean {
+  const g = krpano.get;
+  if (typeof g !== "function") return false;
+  try {
+    return parseKrpanoBool(g("webvr.isenabled"));
+  } catch {
+    return false;
+  }
+}
+
+/** WebXR utilisable sur cet appareil / navigateur. */
+export function getKrpanoWebVrAvailable(krpano: KrpanoViewer): boolean {
+  const g = krpano.get;
+  if (typeof g !== "function") return false;
+  try {
+    return parseKrpanoBool(g("webvr.isavailable"));
+  } catch {
+    return false;
+  }
+}
+
+export function enterKrpanoWebVr(krpano: KrpanoViewer): void {
+  try {
+    krpano.call("webvr.enterVR();");
+  } catch {
+    /* ignore */
+  }
+}
+
+export function exitKrpanoWebVr(krpano: KrpanoViewer): void {
+  try {
+    krpano.call("webvr.exitVR();");
+  } catch {
+    /* ignore */
+  }
+}
+
+export function toggleKrpanoWebVr(krpano: KrpanoViewer): void {
+  if (getKrpanoWebVrEnabled(krpano)) exitKrpanoWebVr(krpano);
+  else enterKrpanoWebVr(krpano);
 }

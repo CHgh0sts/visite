@@ -4,10 +4,12 @@ import { Home, Menu, Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { KrpanoVrToggleButton } from "@/components/KrpanoVrToggleButton";
 import { catalogEquipmentRowDisplay } from "@/lib/catalogDisplayLabels";
 import { findBestEquipmentCatalogSearchMatch } from "@/lib/equipmentCatalogSearch";
 import { mergeEquipmentCatalogZones } from "@/lib/mergedEquipmentZones";
 import type { SceneInteractionsMap } from "@/types/interactions";
+import type { KrpanoViewer } from "@/types/krpanoViewer";
 
 /** Lignes catalogue : nom du bouton (équipement). */
 const CATALOG_ITEM_LABEL = "equipment" as const;
@@ -18,6 +20,8 @@ export type EquipmentCatalogPanelProps = {
   onPickEquipment: (sceneId: string, buttonId: string) => void;
   /** Navigation vers une zone (scène) depuis la recherche — équivalent à un clic dock / zone catalogue. */
   onNavigateToZone: (sceneId: string) => void;
+  /** Viewer krpano — bouton entrée / sortie WebXR en haut à droite. */
+  krpano?: KrpanoViewer | null;
 };
 
 /**
@@ -27,6 +31,7 @@ export function EquipmentCatalogPanel({
   map,
   onPickEquipment,
   onNavigateToZone,
+  krpano = null,
 }: EquipmentCatalogPanelProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -102,6 +107,7 @@ export function EquipmentCatalogPanel({
         className="pointer-events-auto fixed right-4 top-4 z-[310] flex flex-col items-end gap-2"
       >
         <div className="flex items-center gap-2">
+          <KrpanoVrToggleButton krpano={krpano} />
           {searchOpen ? (
             <div
               id="equipment-catalog-search"

@@ -1,0 +1,51 @@
+<!-- Généré par scripts/generate-krpano-vr-bottombar.mjs — ne pas éditer -->
+<krpano>
+	<layer name="react_vr_nav_menu_btn" keep="true" parent="react_vr_nav_icons_row" type="image" devices="webgl"
+		style="skin_base" crop="0|128|64|64" align="lefttop" edge="left" x="0%" y="8%"
+		width="9%" height="84%" scalechildren="true" bgalpha="0"
+		onclick="jscall(reactKrpano.vrToggleMenu());" enabled="true" visible="true" />
+	<layer name="react_vr_nav_search_btn" keep="true" parent="react_vr_nav_icons_row" type="image" devices="webgl"
+		style="skin_base" crop="64|128|64|64" align="lefttop" edge="left" x="9%" y="8%"
+		width="9%" height="84%" scalechildren="true" bgalpha="0"
+		onclick="jscall(reactKrpano.vrToggleSearch());" enabled="true" visible="true" />
+	<layer name="react_vr_nav_0" keep="true" parent="react_vr_nav_icons_row" type="image" devices="webgl"
+		url="/images/navbar/MAGASIN.svg" align="lefttop" edge="left" x="20.00%" y="6%"
+		width="7.20%" height="88%" scalechildren="true" bgalpha="0"
+		onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_9'));" enabled="true" visible="true" />
+	<layer name="react_vr_nav_1" keep="true" parent="react_vr_nav_icons_row" type="image" devices="webgl"
+		url="/images/navbar/PREPARATION.svg" align="lefttop" edge="left" x="28.00%" y="6%"
+		width="7.20%" height="88%" scalechildren="true" bgalpha="0"
+		onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_7'));" enabled="true" visible="true" />
+	<layer name="react_vr_nav_2" keep="true" parent="react_vr_nav_icons_row" type="image" devices="webgl"
+		url="/images/navbar/CMS-ILOT-PROTOTYPES.svg" align="lefttop" edge="left" x="36.00%" y="6%"
+		width="7.20%" height="88%" scalechildren="true" bgalpha="0"
+		onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_22'));" enabled="true" visible="true" />
+	<layer name="react_vr_nav_3" keep="true" parent="react_vr_nav_icons_row" type="image" devices="webgl"
+		url="/images/navbar/CMS-SERIES.svg" align="lefttop" edge="left" x="44.00%" y="6%"
+		width="7.20%" height="88%" scalechildren="true" bgalpha="0"
+		onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_1'));" enabled="true" visible="true" />
+	<layer name="react_vr_nav_4" keep="true" parent="react_vr_nav_icons_row" type="image" devices="webgl"
+		url="/images/navbar/CONTROLE–REPARATION.svg" align="lefttop" edge="left" x="52.00%" y="6%"
+		width="7.20%" height="88%" scalechildren="true" bgalpha="0"
+		onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_23'));" enabled="true" visible="true" />
+	<layer name="react_vr_nav_5" keep="true" parent="react_vr_nav_icons_row" type="image" devices="webgl"
+		url="/images/navbar/CABLAGE.svg" align="lefttop" edge="left" x="60.00%" y="6%"
+		width="7.20%" height="88%" scalechildren="true" bgalpha="0"
+		onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_28'));" enabled="true" visible="true" />
+	<layer name="react_vr_nav_6" keep="true" parent="react_vr_nav_icons_row" type="image" devices="webgl"
+		url="/images/navbar/VERNISSAGE.svg" align="lefttop" edge="left" x="68.00%" y="6%"
+		width="7.20%" height="88%" scalechildren="true" bgalpha="0"
+		onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_15b'));" enabled="true" visible="true" />
+	<layer name="react_vr_nav_7" keep="true" parent="react_vr_nav_icons_row" type="image" devices="webgl"
+		url="/images/navbar/TEST.svg" align="lefttop" edge="left" x="76.00%" y="6%"
+		width="7.20%" height="88%" scalechildren="true" bgalpha="0"
+		onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_16'));" enabled="true" visible="true" />
+	<layer name="react_vr_nav_8" keep="true" parent="react_vr_nav_icons_row" type="image" devices="webgl"
+		url="/images/navbar/MONTAGE.svg" align="lefttop" edge="left" x="84.00%" y="6%"
+		width="7.20%" height="88%" scalechildren="true" bgalpha="0"
+		onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_12'));" enabled="true" visible="true" />
+	<layer name="react_vr_nav_9" keep="true" parent="react_vr_nav_icons_row" type="image" devices="webgl"
+		url="/images/navbar/DETOURAGE%20DEVERMINAGE.svg" align="lefttop" edge="left" x="92.00%" y="6%"
+		width="7.20%" height="88%" scalechildren="true" bgalpha="0"
+		onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_17'));" enabled="true" visible="true" />
+</krpano>

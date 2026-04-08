@@ -12,6 +12,9 @@ declare global {
       onSceneTransitionStart: () => void;
       onSceneChange: (sceneName: string) => void;
       onPanoLoadComplete: () => void;
+      /** Entrée / sortie WebXR — `body.kr-vr-mode` + barre VR krpano (plugin webvr dans tour.xml). */
+      onEnterVR: () => void;
+      onExitVR: () => void;
     };
   }
 }

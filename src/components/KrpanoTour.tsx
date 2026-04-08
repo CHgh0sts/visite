@@ -5,9 +5,11 @@ import { useEffect, useId, useRef } from "react";
 import { KRPANO_START_SCENE } from "@/constants/krpano";
 import {
   clearPendingReactLookAt,
+  getKrpanoViewerForTour,
   hideKrpanoTourChrome,
   onReactPanoLoadComplete,
   setKrpanoViewerForLoadComplete,
+  setKrpanoVrNavbarVisibility,
   tryApplyPendingLookAtForScene,
 } from "@/lib/krpanoNavigation";
 import type { KrpanoViewer } from "@/types/krpanoViewer";
@@ -128,6 +130,24 @@ export function KrpanoTour({
           console.error("[krpano] onPanoLoadComplete", e);
         }
       },
+      onEnterVR() {
+        try {
+          document.body.classList.add("kr-vr-mode");
+          const k = getKrpanoViewerForTour();
+          if (k) setKrpanoVrNavbarVisibility(k, true);
+        } catch (e) {
+          console.error("[krpano] onEnterVR", e);
+        }
+      },
+      onExitVR() {
+        try {
+          document.body.classList.remove("kr-vr-mode");
+          const k = getKrpanoViewerForTour();
+          if (k) setKrpanoVrNavbarVisibility(k, false);
+        } catch (e) {
+          console.error("[krpano] onExitVR", e);
+        }
+      },
     };
 
     loadKrpanoScript(assetBase)
@@ -184,6 +204,7 @@ export function KrpanoTour({
 
     return () => {
       cancelled = true;
+      document.body.classList.remove("kr-vr-mode");
       setKrpanoViewerForLoadComplete(null);
       clearPendingReactLookAt();
       if (embeddedRef.current && typeof window.removepano === "function") {

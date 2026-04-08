@@ -12,11 +12,6 @@ declare global {
       onSceneTransitionStart: () => void;
       onSceneChange: (sceneName: string) => void;
       onPanoLoadComplete: () => void;
-      /** Hotspots VR (même rendu que les flèches krpano) — jscall depuis tour.xml. */
-      vrToggleMenu: () => void;
-      vrToggleSearch: () => void;
-      vrToggleVr: () => void;
-      vrNavigateToScene: (sceneId: string) => void;
     };
   }
 }

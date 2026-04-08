@@ -18,7 +18,6 @@ import { SceneInteractionOverlay } from "@/components/SceneInteractionOverlay";
 import { KRPANO_START_SCENE } from "@/constants/krpano";
 import { sceneNavbarBottomReservePaddingClass } from "@/constants/sceneNavbarLayout";
 import { loadKrpanoScene } from "@/lib/krpanoNavigation";
-import { setReactVrUiCallbacks } from "@/lib/reactVrUiBridge";
 import { postSceneInteractionsToServer } from "@/lib/sceneInteractionsApi";
 import {
   exportInteractionsJson,
@@ -2485,19 +2484,6 @@ export function VisiteShell() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  /** Hotspots VR barre bas (tour-vr-bottombar-generated.xml) — même sceneId que SceneNavBar. */
-  useEffect(() => {
-    setReactVrUiCallbacks({
-      navigateToScene: (sceneId: string) => {
-        const id = sceneId.trim();
-        if (id && krpano) loadKrpanoScene(krpano, id);
-      },
-    });
-    return () => {
-      setReactVrUiCallbacks({ navigateToScene: undefined });
-    };
-  }, [krpano]);
-
   return (
     <div className="fixed inset-0">
       <Link
@@ -2529,7 +2515,6 @@ export function VisiteShell() {
       />
       <EquipmentCatalogPanel
         map={map}
-        krpano={krpano}
         onPickEquipment={handlePickEquipment}
         onNavigateToZone={(sceneId) => {
           if (krpano) loadKrpanoScene(krpano, sceneId);

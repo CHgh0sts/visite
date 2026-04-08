@@ -143,40 +143,6 @@ function parseKrpanoBool(v: unknown): boolean {
   return false;
 }
 
-/** Mode WebVR / stéréo actif (équivalent `webvr.isenabled` dans le skin). */
-export function getKrpanoWebVrEnabled(krpano: KrpanoViewer): boolean {
-  const g = krpano.get;
-  if (typeof g !== "function") return false;
-  try {
-    return parseKrpanoBool(g("webvr.isenabled"));
-  } catch {
-    return false;
-  }
-}
-
-/** Dernière valeur appliquée — évite des `call` krpano inutiles à chaque tick. */
-let lastVrNavbarVisibility: boolean | null = null;
-
-/**
- * Affiche / masque la barre VR krpano (fond + icônes + menu/recherche) selon `webvr.isenabled`.
- * Utilisé en JS car `calc:webvr.isenabled` dans le XML est peu fiable sur Quest.
- */
-export function syncKrpanoVrNavbarVisibility(krpano: KrpanoViewer): void {
-  const on = getKrpanoWebVrEnabled(krpano);
-  if (lastVrNavbarVisibility === on) return;
-  lastVrNavbarVisibility = on;
-  try {
-    krpano.call(`react_vr_navbar_set_visibility(${on ? 1 : 0});`);
-  } catch {
-    lastVrNavbarVisibility = null;
-  }
-}
-
-/** À démontage du viewer — permet un resync après remount. */
-export function resetKrpanoVrNavbarVisibilityCache(): void {
-  lastVrNavbarVisibility = null;
-}
-
 /**
  * Rendu double image côte à côte (`display.stereo`, ex. paysage + gyro / VR mobile).
  * Utilisé pour l’overlay HTML : les coords `spheretoscreen` sont ramenées sur la moitié gauche.
@@ -219,37 +185,6 @@ export function krpanoSpheretoscreenToOverlayLocalPx(
     x: (p.x / swSafe) * containerWidthPx,
     y: (p.y / shSafe) * containerHeightPx,
   };
-}
-
-/** WebVR utilisable dans ce navigateur (`webvr.isavailable`). */
-export function getKrpanoWebVrAvailable(krpano: KrpanoViewer): boolean {
-  const g = krpano.get;
-  if (typeof g !== "function") return false;
-  try {
-    return parseKrpanoBool(g("webvr.isavailable"));
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Bascule entre vue normale et mode VR — même logique que le bouton `skin_btn_vr` du vtourskin
- * (`webvr.enterVR()` / `webvr.exitVR()`).
- */
-export function toggleKrpanoWebVr(krpano: KrpanoViewer): void {
-  try {
-    if (getKrpanoWebVrEnabled(krpano)) {
-      krpano.call("webvr.exitVR();");
-    } else {
-      krpano.call("webvr.enterVR();");
-    }
-  } catch {
-    try {
-      krpano.call("webvr.enterVR();");
-    } catch {
-      /* ignore */
-    }
-  }
 }
 
 /**

@@ -1,19 +1,12 @@
 "use client";
 
-import { Glasses, Home, Menu, Search, X } from "lucide-react";
+import { Home, Menu, Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { catalogEquipmentRowDisplay } from "@/lib/catalogDisplayLabels";
 import { findBestEquipmentCatalogSearchMatch } from "@/lib/equipmentCatalogSearch";
-import {
-  getKrpanoWebVrAvailable,
-  getKrpanoWebVrEnabled,
-  toggleKrpanoWebVr,
-} from "@/lib/krpanoNavigation";
-import { setReactVrUiCallbacks } from "@/lib/reactVrUiBridge";
 import { mergeEquipmentCatalogZones } from "@/lib/mergedEquipmentZones";
-import type { KrpanoViewer } from "@/types/krpanoViewer";
 import type { SceneInteractionsMap } from "@/types/interactions";
 
 /** Lignes catalogue : nom du bouton (équipement). */
@@ -21,8 +14,6 @@ const CATALOG_ITEM_LABEL = "equipment" as const;
 
 export type EquipmentCatalogPanelProps = {
   map: SceneInteractionsMap;
-  /** Viewer krpano — pour le bouton mode VR (remplace le bouton du skin masqué). */
-  krpano?: KrpanoViewer | null;
   /** Appelé avec la scène cible et l’id du bouton — le parent charge la scène si besoin puis déclenche l’activation. */
   onPickEquipment: (sceneId: string, buttonId: string) => void;
   /** Navigation vers une zone (scène) depuis la recherche — équivalent à un clic dock / zone catalogue. */
@@ -34,7 +25,6 @@ export type EquipmentCatalogPanelProps = {
  */
 export function EquipmentCatalogPanel({
   map,
-  krpano = null,
   onPickEquipment,
   onNavigateToZone,
 }: EquipmentCatalogPanelProps) {
@@ -43,8 +33,6 @@ export function EquipmentCatalogPanel({
   const [selectedZoneIdx, setSelectedZoneIdx] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [vrOn, setVrOn] = useState(false);
-  const [vrAvailable, setVrAvailable] = useState(false);
   const searchWrapRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -103,69 +91,6 @@ export function EquipmentCatalogPanel({
   useEffect(() => {
     if (open) setSelectedZoneIdx(0);
   }, [open]);
-
-  useEffect(() => {
-    if (!krpano) {
-      setVrOn(false);
-      setVrAvailable(false);
-      return;
-    }
-    const tick = () => {
-      setVrOn(getKrpanoWebVrEnabled(krpano));
-      setVrAvailable(getKrpanoWebVrAvailable(krpano));
-    };
-    tick();
-    const id = window.setInterval(tick, 400);
-    return () => clearInterval(id);
-  }, [krpano]);
-
-  /** Hotspots VR (tour.xml jscall) : en WebXR le HTML est invisible — menu/recherche quittent la VR puis ouvrent le panneau. */
-  useEffect(() => {
-    const VR_THEN_PANEL_MS = 480;
-
-    setReactVrUiCallbacks({
-      toggleCatalog: () => {
-        if (krpano && getKrpanoWebVrEnabled(krpano)) {
-          try {
-            krpano.call("webvr.exitVR();");
-          } catch {
-            toggleKrpanoWebVr(krpano);
-          }
-          window.setTimeout(() => {
-            setOpen(true);
-            setSearchOpen(false);
-          }, VR_THEN_PANEL_MS);
-          return;
-        }
-        setOpen((v) => !v);
-      },
-      toggleSearch: () => {
-        if (krpano && getKrpanoWebVrEnabled(krpano)) {
-          try {
-            krpano.call("webvr.exitVR();");
-          } catch {
-            toggleKrpanoWebVr(krpano);
-          }
-          window.setTimeout(() => {
-            setSearchOpen(true);
-            setOpen(false);
-          }, VR_THEN_PANEL_MS);
-          return;
-        }
-        setSearchOpen((v) => !v);
-      },
-      toggleVr: () => {
-        if (krpano) toggleKrpanoWebVr(krpano);
-      },
-    });
-    return () => {
-      setReactVrUiCallbacks({
-        toggleCatalog: undefined,
-        toggleSearch: undefined,
-        toggleVr: undefined,
-      });
-    };
-  }, [krpano]);
 
   const selectedZone = zones[selectedZoneIdx] ?? null;
   const selectedZoneDisplay = selectedZone?.displayLabel ?? "";
@@ -228,31 +153,6 @@ export function EquipmentCatalogPanel({
               <Search strokeWidth={2} className="size-5" aria-hidden />
             </button>
           )}
-          {krpano ? (
-            <button
-              type="button"
-              onClick={() => toggleKrpanoWebVr(krpano)}
-              disabled={!vrAvailable}
-              title={
-                !vrAvailable
-                  ? "WebVR non disponible sur ce navigateur"
-                  : vrOn
-                    ? "Quitter le mode VR"
-                    : "Mode VR (casque)"
-              }
-              aria-pressed={vrOn}
-              className={`flex size-11 items-center justify-center rounded-xl border shadow-lg backdrop-blur-md transition focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-40 ${
-                vrOn
-                  ? "border-sky-400/80 bg-sky-600/90 text-white ring-1 ring-sky-300/50"
-                  : "border-white/15 bg-zinc-900/90 text-zinc-100 hover:bg-zinc-800/95"
-              }`}
-            >
-              <Glasses strokeWidth={2} className="size-5" aria-hidden />
-              <span className="sr-only">
-                {vrOn ? "Désactiver le mode VR" : "Activer le mode VR"}
-              </span>
-            </button>
-          ) : null}
           {/* Bouton menu : ouvre / ferme le catalogue, icône Menu ↔ X */}
           <button
             type="button"

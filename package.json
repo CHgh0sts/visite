@@ -4,8 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "generate:krpano-vr": "node scripts/generate-krpano-vr-bottombar.mjs",
-    "build": "node scripts/generate-krpano-vr-bottombar.mjs && prisma generate && next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",

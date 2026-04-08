@@ -3,20 +3,22 @@
 	<!-- ############################################################## -->
 	<!-- #############   Style commun à tous les Hotspot   ############# -->
 	<!-- ############################################################## -->
+<!-- WebGL + distorted : obligatoire en WebXR casque (HTML/css3d n’est pas rendu en VR). -->
 <style name="hotspot_custom_style"
-   type="html"
-   width="48"
-   height="48"
-   renderer="css3d"
-   zorder="500"
-   edge="center"
-   scale="0"
-   oy="30"
-   visible="true"
-   onloaded="delayedcall(0, tween(scale,1,1.3,easeOutQuart); tween(oy,0,3,easeOutQuart));"
-   onclick="loadscene(get(linkedscene), null, MERGE, BLEND(0.5));"
-   onover="set(zorder,999);"
-   onout="set(zorder,500);"
+	url="skin/vtourskin_hotspot.png"
+	edge="top"
+	distorted="true"
+	renderer="webgl"
+	depth="1000"
+	zorder="500"
+	scale="0"
+	oy="30"
+	visible="true"
+	vr_timeout="750"
+	onloaded="delayedcall(0, tween(scale,0.5,1.3,easeOutQuart); tween(oy,0,3,easeOutQuart));"
+	onclick="loadscene(get(linkedscene), null, MERGE, BLEND(0.5));"
+	onover="set(zorder,999); tween(scale,0.55);"
+	onout="set(zorder,500); tween(scale,0.5);"
 />
 
 <style name="vr_button_style"

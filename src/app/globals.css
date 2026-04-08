@@ -25,7 +25,11 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* WebXR : masquer l’overlay React — l’UI VR est dans krpano (barre + layers). */
+/*
+ * WebXR : masquer l’overlay React (DOM au-dessus du canvas).
+ * Les hotspots de navigation doivent être WebGL dans tour.xml — le HTML/css3d
+ * n’est pas rendu en VR casque.
+ */
 body.kr-vr-mode .visite-react-ui {
   display: none !important;
 }

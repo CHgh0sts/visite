@@ -52,7 +52,7 @@ lines.push(`<!-- Généré par scripts/generate-krpano-vr-bottombar.mjs — ne p
 lines.push(`<krpano>`);
 
 lines.push(
-  `\t<layer name="react_vr_nav_menu_btn" keep="true" parent="react_vr_nav_icons_row" type="image" devices="webgl"`,
+  `\t<layer name="react_vr_nav_menu_btn" keep="true" parent="react_vr_nav_icons_row" type="image"`,
 );
 lines.push(`\t\tstyle="skin_base" crop="0|128|64|64" align="lefttop" edge="left" x="0%" y="8%"`);
 lines.push(
@@ -63,7 +63,7 @@ lines.push(
 );
 
 lines.push(
-  `\t<layer name="react_vr_nav_search_btn" keep="true" parent="react_vr_nav_icons_row" type="image" devices="webgl"`,
+  `\t<layer name="react_vr_nav_search_btn" keep="true" parent="react_vr_nav_icons_row" type="image"`,
 );
 lines.push(`\t\tstyle="skin_base" crop="64|128|64|64" align="lefttop" edge="left" x="${menuW}%" y="8%"`);
 lines.push(
@@ -80,7 +80,7 @@ for (let i = 0; i < n; i++) {
   const left = startNavPct + i * navW;
   const w = Math.max(4, navW - 0.8);
   lines.push(
-    `\t<layer name="react_vr_nav_${i}" keep="true" parent="react_vr_nav_icons_row" type="image" devices="webgl"`,
+    `\t<layer name="react_vr_nav_${i}" keep="true" parent="react_vr_nav_icons_row" type="image"`,
   );
   lines.push(`\t\turl="${iconUrl}" align="lefttop" edge="left" x="${left.toFixed(2)}%" y="6%"`);
   lines.push(

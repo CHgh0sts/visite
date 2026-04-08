@@ -554,12 +554,12 @@
 		onnewscene="jscall(reactKrpano.onSceneTransitionStart());"
 		onblendcomplete="jscall(calc('reactKrpano.onSceneChange(`' + get(xml.scene) + '`)'))"
 	/>
-	<layer name="react_vr_bottombar_panel" keep="true" type="container" devices="webgl"
+	<layer name="react_vr_bottombar_panel" keep="true" type="container"
 		vr="true" align="bottom" width="78%" height="12%" y="14%" x="0"
 		bgcolor="0xFFFFFF" bgalpha="0.97" bgroundedge="16"
 		bgshadow="0 6 20 0x000000 0.12"
-		zorder="3" enabled="false" bgcapture="true" visible="false">
-		<layer name="react_vr_nav_icons_row" keep="true" type="container" devices="webgl"
+		zorder="100" enabled="false" bgcapture="true" visible="false">
+		<layer name="react_vr_nav_icons_row" keep="true" type="container"
 			align="lefttop" width="100%" height="100%" bgalpha="0" />
 	</layer>
 	<include url="tour-vr-bottombar-generated.xml" />

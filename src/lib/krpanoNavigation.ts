@@ -391,6 +391,23 @@ export function setKrpanoVrNavbarVisibility(
   }
 }
 
+/**
+ * Garde la barre VR alignée sur `webvr.isenabled` (casques réels : reload VR peut
+ * réinitialiser les layers après `jscall(reactKrpano.onEnterVR)`).
+ */
+let lastVrNavbarSyncedToWebVr: boolean | null = null;
+
+export function syncKrpanoVrNavbarVisibility(krpano: KrpanoViewer): void {
+  const on = getKrpanoWebVrEnabled(krpano);
+  if (lastVrNavbarSyncedToWebVr === on) return;
+  lastVrNavbarSyncedToWebVr = on;
+  setKrpanoVrNavbarVisibility(krpano, on);
+}
+
+export function resetKrpanoVrNavbarVisibilitySyncCache(): void {
+  lastVrNavbarSyncedToWebVr = null;
+}
+
 /** Session WebXR active (plugin `webvr`). */
 export function getKrpanoWebVrEnabled(krpano: KrpanoViewer): boolean {
   const g = krpano.get;

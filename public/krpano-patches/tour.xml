@@ -557,16 +557,13 @@
 		onblendcomplete="jscall(calc('reactKrpano.onSceneChange(`' + get(xml.scene) + '`)'))"
 	/>
 	<!-- Barre VR : hotspots WebGL + sync screentosphere (bas d’écran → ath/atv), voir script générateur. -->
-	<hotspot name="react_vr_bottombar_panel" keep="true" type="text"
+	<!-- PNG sous /images/ comme les icônes nav — SVG/krpano-patches pouvait ne pas se charger via le worker (texture cassée → box à gauche). -->
+	<hotspot name="react_vr_bottombar_panel" keep="true" type="image"
+		url="/images/vr-bottombar-bg.png?v=2"
 		distorted="true" renderer="webgl" depth="1000" depthbuffer="false"
 		torigin="world"
 		ath="0" atv="0" align="center" edge="bottom" ox="0" oy="0"
 		width="780" height="110"
-		bg="true" bgcolor="0xFFFFFF" bgalpha="0.97" bgroundedge="16"
-		bgshadow="0 6 20 0x000000 0.12"
-		txtshadow="0 0 0 0x000000 0"
-		css="font-size:1px; color:transparent;"
-		html="&#160;"
 		enabled="false" visible="false" capture="true" zorder="100"
 		vr_timeout="750"
 	/>

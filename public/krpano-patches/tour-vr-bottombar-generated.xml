@@ -3,85 +3,85 @@
 	<hotspot name="react_vr_nav_menu_btn" keep="true" type="image"
 		style="skin_base" crop="0|128|64|64"
 		distorted="true" renderer="webgl" depth="1000" depthbuffer="false"
-		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="0" oy="0"
-		width="90" height="92" scale="1" zoom="false"
+		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="-329" oy="15"
+		width="90" height="80" scale="1" zoom="false"
 		vr_timeout="750" zorder="101" capture="true" handcursor="true"
 		onclick="jscall(reactKrpano.vrToggleMenu());" enabled="true" visible="true" />
 	<hotspot name="react_vr_nav_search_btn" keep="true" type="image"
 		style="skin_base" crop="64|128|64|64"
 		distorted="true" renderer="webgl" depth="1000" depthbuffer="false"
-		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="0" oy="0"
-		width="90" height="92" scale="1" zoom="false"
+		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="-229" oy="15"
+		width="90" height="80" scale="1" zoom="false"
 		vr_timeout="750" zorder="101" capture="true" handcursor="true"
 		onclick="jscall(reactKrpano.vrToggleSearch());" enabled="true" visible="true" />
 	<hotspot name="react_vr_nav_0" keep="true" type="image"
 		url="/images/navbar/MAGASIN.svg"
 		distorted="true" renderer="webgl" depth="1000" depthbuffer="false"
-		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="0" oy="0"
-		width="58" height="88" scale="1" zoom="false"
+		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="-145" oy="19"
+		width="49" height="72" scale="1" zoom="false"
 		vr_timeout="750" zorder="101" capture="true" handcursor="true"
 		onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_9'));" enabled="true" visible="true" />
 	<hotspot name="react_vr_nav_1" keep="true" type="image"
 		url="/images/navbar/PREPARATION.svg"
 		distorted="true" renderer="webgl" depth="1000" depthbuffer="false"
-		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="0" oy="0"
-		width="58" height="88" scale="1" zoom="false"
+		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="-90" oy="19"
+		width="49" height="72" scale="1" zoom="false"
 		vr_timeout="750" zorder="101" capture="true" handcursor="true"
 		onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_7'));" enabled="true" visible="true" />
 	<hotspot name="react_vr_nav_2" keep="true" type="image"
 		url="/images/navbar/CMS-ILOT-PROTOTYPES.svg"
 		distorted="true" renderer="webgl" depth="1000" depthbuffer="false"
-		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="0" oy="0"
-		width="58" height="88" scale="1" zoom="false"
+		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="-35" oy="19"
+		width="49" height="72" scale="1" zoom="false"
 		vr_timeout="750" zorder="101" capture="true" handcursor="true"
 		onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_22'));" enabled="true" visible="true" />
 	<hotspot name="react_vr_nav_3" keep="true" type="image"
 		url="/images/navbar/CMS-SERIES.svg"
 		distorted="true" renderer="webgl" depth="1000" depthbuffer="false"
-		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="0" oy="0"
-		width="58" height="88" scale="1" zoom="false"
+		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="20" oy="19"
+		width="49" height="72" scale="1" zoom="false"
 		vr_timeout="750" zorder="101" capture="true" handcursor="true"
 		onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_1'));" enabled="true" visible="true" />
 	<hotspot name="react_vr_nav_4" keep="true" type="image"
 		url="/images/navbar/CONTROLE–REPARATION.svg"
 		distorted="true" renderer="webgl" depth="1000" depthbuffer="false"
-		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="0" oy="0"
-		width="58" height="88" scale="1" zoom="false"
+		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="75" oy="19"
+		width="49" height="72" scale="1" zoom="false"
 		vr_timeout="750" zorder="101" capture="true" handcursor="true"
 		onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_23'));" enabled="true" visible="true" />
 	<hotspot name="react_vr_nav_5" keep="true" type="image"
 		url="/images/navbar/CABLAGE.svg"
 		distorted="true" renderer="webgl" depth="1000" depthbuffer="false"
-		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="0" oy="0"
-		width="58" height="88" scale="1" zoom="false"
+		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="130" oy="19"
+		width="49" height="72" scale="1" zoom="false"
 		vr_timeout="750" zorder="101" capture="true" handcursor="true"
 		onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_28'));" enabled="true" visible="true" />
 	<hotspot name="react_vr_nav_6" keep="true" type="image"
 		url="/images/navbar/VERNISSAGE.svg"
 		distorted="true" renderer="webgl" depth="1000" depthbuffer="false"
-		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="0" oy="0"
-		width="58" height="88" scale="1" zoom="false"
+		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="185" oy="19"
+		width="49" height="72" scale="1" zoom="false"
 		vr_timeout="750" zorder="101" capture="true" handcursor="true"
 		onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_15b'));" enabled="true" visible="true" />
 	<hotspot name="react_vr_nav_7" keep="true" type="image"
 		url="/images/navbar/TEST.svg"
 		distorted="true" renderer="webgl" depth="1000" depthbuffer="false"
-		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="0" oy="0"
-		width="58" height="88" scale="1" zoom="false"
+		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="240" oy="19"
+		width="49" height="72" scale="1" zoom="false"
 		vr_timeout="750" zorder="101" capture="true" handcursor="true"
 		onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_16'));" enabled="true" visible="true" />
 	<hotspot name="react_vr_nav_8" keep="true" type="image"
 		url="/images/navbar/MONTAGE.svg"
 		distorted="true" renderer="webgl" depth="1000" depthbuffer="false"
-		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="0" oy="0"
-		width="58" height="88" scale="1" zoom="false"
+		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="295" oy="19"
+		width="49" height="72" scale="1" zoom="false"
 		vr_timeout="750" zorder="101" capture="true" handcursor="true"
 		onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_12'));" enabled="true" visible="true" />
 	<hotspot name="react_vr_nav_9" keep="true" type="image"
 		url="/images/navbar/DETOURAGE%20DEVERMINAGE.svg"
 		distorted="true" renderer="webgl" depth="1000" depthbuffer="false"
-		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="0" oy="0"
-		width="58" height="88" scale="1" zoom="false"
+		torigin="world" ath="0" atv="0" edge="bottom" align="center" ox="350" oy="19"
+		width="49" height="72" scale="1" zoom="false"
 		vr_timeout="750" zorder="101" capture="true" handcursor="true"
 		onclick="jscall(reactKrpano.vrNavigateToScene('scene_micronique_17'));" enabled="true" visible="true" />
 	<action name="react_vr_followbar_sync" type="Javascript"><![CDATA[
@@ -92,29 +92,45 @@
 		var sh = Number(k.get("stageheight")) || 0;
 		if (sw < 8 || sh < 8) return;
 		if (typeof k.screentosphere != "function") return;
-		var cx = sw * 0.5;
 		var baseY = sh - 14;
-		var stRef = k.screentosphere(cx, baseY);
-		if (!stRef) return;
-		var atv = stRef.y;
-		var baseAth = 0;
-		function placeHS(name, athOff) {
-			var h = k.get("hotspot[" + name + "]");
-			if (h) { h.ath = baseAth + athOff; h.atv = atv; }
+		var stereo = false;
+		try { var ds = k.get("display.stereo"); stereo = (ds === true || ds === 1 || ds === "1" || ds === "true"); } catch (e) {}
+		var baseAth, atv, stRef;
+		if (stereo) {
+			var stL = k.screentosphere(sw * 0.25, baseY);
+			var stR = k.screentosphere(sw * 0.75, baseY);
+			if (stL && stR && !isNaN(stL.x) && !isNaN(stR.x) && !isNaN(stL.y) && !isNaN(stR.y)) {
+				baseAth = (stL.x + stR.x) * 0.5 + 0;
+				atv = (stL.y + stR.y) * 0.5;
+			} else {
+				stRef = k.screentosphere(sw * 0.5, baseY);
+				if (!stRef) return;
+				atv = stRef.y;
+				baseAth = stRef.x + 0;
+			}
+		} else {
+			stRef = k.screentosphere(sw * 0.5, baseY);
+			if (!stRef) return;
+			atv = stRef.y;
+			baseAth = stRef.x + 0;
 		}
-		placeHS("react_vr_bottombar_panel", 0.000000);
-		placeHS("react_vr_nav_menu_btn", -31.050000);
-		placeHS("react_vr_nav_search_btn", -22.950000);
-		placeHS("react_vr_nav_0", -14.850000);
-		placeHS("react_vr_nav_1", -9.630000);
-		placeHS("react_vr_nav_2", -4.410000);
-		placeHS("react_vr_nav_3", 0.810000);
-		placeHS("react_vr_nav_4", 6.030000);
-		placeHS("react_vr_nav_5", 11.250000);
-		placeHS("react_vr_nav_6", 16.470000);
-		placeHS("react_vr_nav_7", 21.690000);
-		placeHS("react_vr_nav_8", 26.910000);
-		placeHS("react_vr_nav_9", 32.130000);
+		function placeHS(name) {
+			var h = k.get("hotspot[" + name + "]");
+			if (h) { h.ath = baseAth; h.atv = atv; }
+		}
+		placeHS("react_vr_bottombar_panel");
+		placeHS("react_vr_nav_menu_btn");
+		placeHS("react_vr_nav_search_btn");
+		placeHS("react_vr_nav_0");
+		placeHS("react_vr_nav_1");
+		placeHS("react_vr_nav_2");
+		placeHS("react_vr_nav_3");
+		placeHS("react_vr_nav_4");
+		placeHS("react_vr_nav_5");
+		placeHS("react_vr_nav_6");
+		placeHS("react_vr_nav_7");
+		placeHS("react_vr_nav_8");
+		placeHS("react_vr_nav_9");
 	]]></action>
 	<action name="react_vr_navbar_set_visibility_children" scope="local" args="v">
 		set(hotspot[react_vr_nav_menu_btn].visible, get(v));

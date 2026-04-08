@@ -11,6 +11,7 @@ import {
   resetKrpanoVrNavbarVisibilitySyncCache,
   setKrpanoViewerForLoadComplete,
   setKrpanoVrNavbarVisibility,
+  syncKrpanoVrFollowBar,
   syncKrpanoVrNavbarVisibility,
   tryApplyPendingLookAtForScene,
 } from "@/lib/krpanoNavigation";
@@ -193,7 +194,10 @@ export function KrpanoTour({
             vrNavSyncInterval = setInterval(() => {
               if (cancelled) return;
               const k = getKrpanoViewerForTour();
-              if (k) syncKrpanoVrNavbarVisibility(k);
+              if (k) {
+                syncKrpanoVrNavbarVisibility(k);
+                syncKrpanoVrFollowBar(k);
+              }
             }, 250);
           },
         });

@@ -408,6 +408,15 @@ export function resetKrpanoVrNavbarVisibilitySyncCache(): void {
   lastVrNavbarSyncedToWebVr = null;
 }
 
+/** Recalcule ath/atv via `screentosphere` (bas d’écran) — complète onviewchange sur certains casques. */
+export function syncKrpanoVrFollowBar(krpano: KrpanoViewer): void {
+  try {
+    krpano.call("react_vr_followbar_sync();");
+  } catch {
+    /* ignore */
+  }
+}
+
 /** Session WebXR active (plugin `webvr`). */
 export function getKrpanoWebVrEnabled(krpano: KrpanoViewer): boolean {
   const g = krpano.get;

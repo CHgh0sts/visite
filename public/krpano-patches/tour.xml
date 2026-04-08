@@ -556,24 +556,24 @@
 		onnewscene="jscall(reactKrpano.onSceneTransitionStart());"
 		onblendcomplete="jscall(calc('reactKrpano.onSceneChange(`' + get(xml.scene) + '`)'))"
 	/>
-	<layer name="react_vr_bottombar_panel" keep="true" type="container"
-		vr="true" align="bottom" width="78%" height="12%" y="14%" x="0"
-		bgcolor="0xFFFFFF" bgalpha="0.97" bgroundedge="16"
+	<!-- Barre VR : hotspots WebGL + sync screentosphere (bas d’écran → ath/atv), voir script générateur. -->
+	<hotspot name="react_vr_bottombar_panel" keep="true" type="text"
+		distorted="true" renderer="webgl" depth="1000" depthbuffer="false"
+		torigin="world"
+		ath="0" atv="0" align="center" edge="bottom" ox="0" oy="0"
+		width="780" height="110"
+		bg="true" bgcolor="0xFFFFFF" bgalpha="0.97" bgroundedge="16"
 		bgshadow="0 6 20 0x000000 0.12"
-		zorder="100" enabled="false" bgcapture="true" visible="false">
-		<layer name="react_vr_nav_icons_row" keep="true" type="container"
-			align="lefttop" width="100%" height="100%" bgalpha="0" />
-	</layer>
+		txtshadow="0 0 0 0x000000 0"
+		css="font-size:1px; color:transparent;"
+		html="&#160;"
+		enabled="false" visible="false" capture="true" zorder="100"
+		vr_timeout="750"
+	/>
 	<include url="tour-vr-bottombar-generated.xml" />
-	<action name="react_vr_navbar_set_visibility" scope="local" args="v">
-		if(v == 1,
-			set(layer[react_vr_bottombar_panel].visible, true);
-			set(layer[react_vr_bottombar_panel].enabled, true);
-		  ,
-			set(layer[react_vr_bottombar_panel].visible, false);
-			set(layer[react_vr_bottombar_panel].enabled, false);
-		);
-	</action>
+	<events name="react_vr_followbar_events" keep="true"
+		onviewchange="if(webvr.isenabled, react_vr_followbar_sync(); );"
+	/>
 	<!-- Remplace webvr.xml : pas de bandeau « Simulated VR Mode » / lien Meta Quest / bouton X -->
 	<action name="webvr_show_infos" scope="local" args="show">
 		if(show == false,

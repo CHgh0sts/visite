@@ -1,252 +1,208 @@
 /**
- * Génère `public/krpano-patches/tour-vr-bottombar-generated.xml` depuis `src/data/scene-nav.json`.
+ * Génère `public/krpano-patches/tour-vr-bottombar-generated.xml` + assets PNG
+ * depuis `src/data/scene-nav.json` (même logique que `SceneNavBar` : loadscene vers `sceneId`).
  *
- * - **ath / atv** : un seul point d’ancrage pour toute la barre — `screentosphere(cx, baseY)` donne **x et y**
- *   (bas centre de l’écran). Tous les hotspots partagent ce **même** ath/atv pour éviter le parallaxe entre
- *   billboards (avant : ath différent par icône = plans tangents différents = décalage quand la caméra bouge).
- * - **ox / oy** : layout 2D sur ce plan (px depuis le centre de la barre en horizontal) ; `oy` pour centrer dans la bande 110px.
- *
- * Hotspots WebGL dans la scène (`distorted` + `renderer="webgl"`).
- *
- * À lancer : `node scripts/generate-krpano-vr-bottombar.mjs`
+ * Placement : **screentosphere(x,y)** (doc krpano) — pixels du stage → ath/atv monde.
+ * Mis à jour à chaque `onviewchange` pour rester en bas de l’écran (desktop / stéréo WebXR),
+ * sans `torigin="view"` ni réglages `atv` à la main.
  */
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import sharp from "sharp";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, "..");
-const navPath = path.join(root, "src", "data", "scene-nav.json");
-const outPath = path.join(
+const sceneNavPath = path.join(root, "src", "data", "scene-nav.json");
+const outXmlPath = path.join(
   root,
   "public",
   "krpano-patches",
   "tour-vr-bottombar-generated.xml",
 );
+const patchesDir = path.join(root, "public", "krpano-patches");
+const iconsOutDir = path.join(patchesDir, "vr-nav-icons");
 
-const BAR_W = 780;
-/** Hauteur du fond blanc (`tour.xml` panel) — sert au centrage vertical des icônes. */
-const BAR_H = 110;
-const MENU_BTN_W = 90;
-const SEARCH_BTN_W = 90;
-/** Marges intérieures gauche / droite de la barre (px). */
-const PAD_X = 16;
-/** Espace menu ↔ recherche, et après recherche avant la zone icônes (px). */
-const GAP_MENU_SEARCH = 10;
-const GAP_AFTER_SEARCH = 14;
-/** Espace entre deux icônes de navigation (px). */
-const GAP_NAV_ICONS = 6;
-const CTRL_ROW_H = 80;
-const ICON_ROW_H = 72;
-/** Offset longitude (°) ajouté à `screentosphere(...).x` pour toute la barre (optionnel). */
-const BAR_ATH = 0;
-
-/** Px horizontaux depuis le centre de la barre (align=center) : gauche négatif, droite positif. */
-function oxFromBarCenter(centerFromBarLeft) {
-  return Math.round(centerFromBarLeft - BAR_W * 0.5);
-}
-
-function escapeXmlAttr(s) {
+function xmlEscapeAttr(s) {
   return String(s)
     .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;");
+    .replace(/"/g, "&quot;");
 }
 
-function encodeIconUrlForXml(url) {
-  return escapeXmlAttr(String(url).trim().replace(/ /g, "%20"));
+function escapeSceneIdForKrpano(s) {
+  return s.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
 }
 
-function escapeSceneIdForJscall(id) {
-  return String(id).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+async function writeBarBgPng() {
+  const w = 640;
+  const h = 112;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
+  <rect x="2" y="2" width="${w - 4}" height="${h - 4}" rx="28" ry="28" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
+</svg>`;
+  const out = path.join(patchesDir, "vr-nav-bar-bg.png");
+  await sharp(Buffer.from(svg)).png().toFile(out);
+  return "krpano-patches/vr-nav-bar-bg.png";
 }
 
-const raw = JSON.parse(fs.readFileSync(navPath, "utf8"));
-const items = (raw.items ?? []).filter(
-  (i) =>
-    i.sceneId?.trim() &&
-    i.label?.trim() &&
-    typeof i.iconUrl === "string" &&
-    i.iconUrl.trim().length > 0,
-);
-
-const n = items.length;
-
-const menuLeft = PAD_X;
-const searchLeft = menuLeft + MENU_BTN_W + GAP_MENU_SEARCH;
-const navZoneLeft = searchLeft + SEARCH_BTN_W + GAP_AFTER_SEARCH;
-const navZoneRight = BAR_W - PAD_X;
-const navZoneW = Math.max(0, navZoneRight - navZoneLeft);
-const navWpx =
-  n > 0
-    ? Math.max(1, Math.floor((navZoneW - (n - 1) * GAP_NAV_ICONS) / n))
-    : 0;
-
-const oyMenu = Math.round((BAR_H - CTRL_ROW_H) / 2);
-const oyIcon = Math.round((BAR_H - ICON_ROW_H) / 2);
-
-const barCenterX = BAR_W * 0.5;
-const menuCenterFromBarLeft = menuLeft + MENU_BTN_W * 0.5;
-const searchCenterFromBarLeft = searchLeft + SEARCH_BTN_W * 0.5;
-const iconCentersFromBarLeft = [];
-for (let i = 0; i < n; i++) {
-  const slotLeft = navZoneLeft + i * (navWpx + GAP_NAV_ICONS);
-  iconCentersFromBarLeft.push(slotLeft + navWpx * 0.5);
+async function rasterizeNavIcon(svgAbsPath, outPngPath) {
+  const buf = await fs.promises.readFile(svgAbsPath);
+  await sharp(buf, {
+    density: 120,
+    limitInputPixels: false,
+  })
+    .resize(96, 96, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .png()
+    .toFile(outPngPath);
 }
 
-const oxMenu = oxFromBarCenter(menuCenterFromBarLeft);
-const oxSearch = oxFromBarCenter(searchCenterFromBarLeft);
-const oxIcons = iconCentersFromBarLeft.map((cx) => oxFromBarCenter(cx));
-
-const hs = [];
-
-hs.push(
-  `\t<hotspot name="react_vr_nav_menu_btn" keep="true" type="image"`,
-);
-hs.push(`\t\tstyle="skin_base" crop="0|128|64|64"`);
-hs.push(
-  `\t\tdistorted="true" renderer="webgl" depth="1000" depthbuffer="false"`,
-);
-hs.push(
-  `\t\ttorigin="world" ath="0" atv="0" edge="bottom" align="center" ox="${oxMenu}" oy="${oyMenu}"`,
-);
-hs.push(
-  `\t\twidth="${MENU_BTN_W}" height="${CTRL_ROW_H}" scale="1" zoom="false"`,
-);
-hs.push(
-  `\t\tvr_timeout="750" zorder="101" capture="true" handcursor="true"`,
-);
-hs.push(
-  `\t\tonclick="jscall(reactKrpano.vrToggleMenu());" enabled="true" visible="true" />`,
-);
-
-hs.push(
-  `\t<hotspot name="react_vr_nav_search_btn" keep="true" type="image"`,
-);
-hs.push(`\t\tstyle="skin_base" crop="64|128|64|64"`);
-hs.push(
-  `\t\tdistorted="true" renderer="webgl" depth="1000" depthbuffer="false"`,
-);
-hs.push(
-  `\t\ttorigin="world" ath="0" atv="0" edge="bottom" align="center" ox="${oxSearch}" oy="${oyMenu}"`,
-);
-hs.push(
-  `\t\twidth="${SEARCH_BTN_W}" height="${CTRL_ROW_H}" scale="1" zoom="false"`,
-);
-hs.push(
-  `\t\tvr_timeout="750" zorder="101" capture="true" handcursor="true"`,
-);
-hs.push(
-  `\t\tonclick="jscall(reactKrpano.vrToggleSearch());" enabled="true" visible="true" />`,
-);
-
-for (let i = 0; i < n; i++) {
-  const sceneId = items[i].sceneId.trim();
-  const iconUrl = encodeIconUrlForXml(items[i].iconUrl.trim());
-  const sid = escapeSceneIdForJscall(sceneId);
-  const wi = navWpx;
-  const oxi = oxIcons[i];
-  hs.push(`\t<hotspot name="react_vr_nav_${i}" keep="true" type="image"`);
-  hs.push(`\t\turl="${iconUrl}"`);
-  hs.push(
-    `\t\tdistorted="true" renderer="webgl" depth="1000" depthbuffer="false"`,
+async function main() {
+  const raw = JSON.parse(await fs.promises.readFile(sceneNavPath, "utf8"));
+  const items = (raw.items ?? []).filter(
+    (i) =>
+      i.sceneId?.trim() &&
+      i.label?.trim() &&
+      typeof i.iconUrl === "string" &&
+      i.iconUrl.trim().length > 0,
   );
-  hs.push(
-    `\t\ttorigin="world" ath="0" atv="0" edge="bottom" align="center" ox="${oxi}" oy="${oyIcon}"`,
+
+  await fs.promises.mkdir(iconsOutDir, { recursive: true });
+
+  const bgUrl = await writeBarBgPng();
+
+  const iconUrls = [];
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    const rel = item.iconUrl.trim().replace(/^\//, "");
+    const svgPath = path.join(root, "public", rel);
+    const pngName = `${i}.png`;
+    const pngRel = `krpano-patches/vr-nav-icons/${pngName}`;
+    const pngAbs = path.join(iconsOutDir, pngName);
+    try {
+      await rasterizeNavIcon(svgPath, pngAbs);
+    } catch (e) {
+      console.warn(
+        `[generate-krpano-vr-bottombar] SVG → PNG échoué pour ${rel}:`,
+        e?.message ?? e,
+      );
+      await sharp({
+        create: {
+          width: 96,
+          height: 96,
+          channels: 4,
+          background: { r: 240, g: 240, b: 240, alpha: 1 },
+        },
+      })
+        .png()
+        .toFile(pngAbs);
+    }
+    iconUrls.push(pngRel);
+  }
+
+  const n = items.length;
+  const barScale = 0.42;
+  const iconScale = 0.18;
+  /** Pixels depuis le **bas** du stage : bord bas de la pilule (screentosphere). */
+  const barBottomOffsetPx = 36;
+  /** Pixels depuis le bas : ligne des centres d’icônes (au-dessus du bord bas). */
+  const iconRowOffsetPx = 88;
+
+  const lines = [];
+  lines.push(`<!-- Généré par scripts/generate-krpano-vr-bottombar.mjs — ne pas éditer à la main -->`);
+  lines.push(`<krpano>`);
+  lines.push(`\t<set var="vr_nav_st_h" val="0" />`);
+  lines.push(`\t<set var="vr_nav_st_v" val="0" />`);
+  lines.push(`\t<style name="vr_navbar_bg_style"`);
+  lines.push(`\t\turl="${xmlEscapeAttr(bgUrl)}"`);
+  lines.push(`\t\tedge="bottom"`);
+  lines.push(`\t\tdistorted="true"`);
+  lines.push(`\t\trenderer="webgl"`);
+  lines.push(`\t\tdepth="950"`);
+  lines.push(`\t\tzorder="2"`);
+  lines.push(`\t\tscale="${barScale}"`);
+  lines.push(`\t\talpha="0.98"`);
+  lines.push(`\t\tenabled="false"`);
+  lines.push(`\t\tvisible="false"`);
+  lines.push(`\t\tdevices="webgl"`);
+  lines.push(`\t/>`);
+  lines.push(`\t<style name="vr_navbar_icon_style"`);
+  lines.push(`\t\tedge="center"`);
+  lines.push(`\t\tdistorted="true"`);
+  lines.push(`\t\trenderer="webgl"`);
+  lines.push(`\t\tdepth="1000"`);
+  lines.push(`\t\tzorder="10"`);
+  lines.push(`\t\tscale="${iconScale}"`);
+  lines.push(`\t\tvr_timeout="750"`);
+  lines.push(
+    `\t\tonover="tween(scale,${(iconScale * 1.2).toFixed(3)});"`,
   );
-  hs.push(`\t\twidth="${wi}" height="${ICON_ROW_H}" scale="1" zoom="false"`);
-  hs.push(
-    `\t\tvr_timeout="750" zorder="101" capture="true" handcursor="true"`,
+  lines.push(`\t\tonout="tween(scale,${iconScale});"`);
+  lines.push(`\t\tvisible="false"`);
+  lines.push(`\t\tdevices="webgl"`);
+  lines.push(`\t/>`);
+
+  lines.push(
+    `\t<hotspot name="vr_nav_bg" keep="true" style="vr_navbar_bg_style" ath="0" atv="0" />`,
   );
-  hs.push(
-    `\t\tonclick="jscall(reactKrpano.vrNavigateToScene('${sid}'));" enabled="true" visible="true" />`,
-  );
+
+  for (let i = 0; i < n; i++) {
+    const sceneId = escapeSceneIdForKrpano(items[i].sceneId.trim());
+    const onclick = `loadscene('${sceneId}', null, MERGE, BLEND(0.5));`;
+    lines.push(
+      `\t<hotspot name="vr_nav_icon_${i}" keep="true" style="vr_navbar_icon_style" url="${xmlEscapeAttr(iconUrls[i])}" ath="0" atv="0" onclick="${xmlEscapeAttr(onclick)}" />`,
+    );
+  }
+
+  lines.push(`\t<events name="vr_navbar_events" keep="true" onviewchange="vr_navbar_follow_update();" />`);
+
+  lines.push(`\t<action name="vr_navbar_follow_update" type="Javascript"><![CDATA[`);
+  lines.push(`\t\ttry {`);
+  lines.push(`\t\t\tif (!krpano || !krpano.get("webvr.isenabled")) return;`);
+  lines.push(`\t\t\tvar bg = krpano.get("hotspot[vr_nav_bg]");`);
+  lines.push(`\t\t\tif (!bg || !bg.visible) return;`);
+  lines.push(`\t\t\tvar sw = 1.0 * krpano.get("stagewidth");`);
+  lines.push(`\t\t\tvar sh = 1.0 * krpano.get("stageheight");`);
+  lines.push(`\t\t\tif (!sw || !sh || sw < 16 || sh < 16) return;`);
+  lines.push(`\t\t\tvar n = ${n};`);
+  lines.push(`\t\t\tvar barBottomY = sh - ${barBottomOffsetPx};`);
+  lines.push(`\t\t\tvar iconY = sh - ${iconRowOffsetPx};`);
+  lines.push(`\t\t\tkrpano.call("screentosphere(" + (sw * 0.5) + ", " + barBottomY + ", vr_nav_st_h, vr_nav_st_v);");`);
+  lines.push(`\t\t\tbg.ath = 1.0 * krpano.get("vr_nav_st_h");`);
+  lines.push(`\t\t\tbg.atv = 1.0 * krpano.get("vr_nav_st_v");`);
+  lines.push(`\t\t\tvar gapPx = n <= 1 ? 0 : Math.min(56, (sw * 0.82) / Math.max(1, n - 1));`);
+  lines.push(`\t\t\tvar startX = sw * 0.5 - gapPx * (n - 1) * 0.5;`);
+  lines.push(`\t\t\tfor (var ii = 0; ii < n; ii++) {`);
+  lines.push(`\t\t\t\tvar cx = startX + gapPx * ii;`);
+  lines.push(`\t\t\t\tkrpano.call("screentosphere(" + cx + ", " + iconY + ", vr_nav_st_h, vr_nav_st_v);");`);
+  lines.push(`\t\t\t\tvar hs = krpano.get("hotspot[vr_nav_icon_" + ii + "]");`);
+  lines.push(`\t\t\t\tif (hs) { hs.ath = 1.0 * krpano.get("vr_nav_st_h"); hs.atv = 1.0 * krpano.get("vr_nav_st_v"); }`);
+  lines.push(`\t\t\t}`);
+  lines.push(`\t\t} catch (e) {}`);
+  lines.push(`\t]]></action>`);
+
+  lines.push(`\t<action name="vr_navbar_show">`);
+  lines.push(`\t\tset(hotspot[vr_nav_bg].visible, true);`);
+  for (let i = 0; i < n; i++) {
+    lines.push(`\t\tset(hotspot[vr_nav_icon_${i}].visible, true);`);
+  }
+  lines.push(`\t\tvr_navbar_follow_update();`);
+  lines.push(`\t\tdelayedcall(0, vr_navbar_follow_update());`);
+  lines.push(`\t</action>`);
+  lines.push(`\t<action name="vr_navbar_hide">`);
+  lines.push(`\t\tset(hotspot[vr_nav_bg].visible, false);`);
+  for (let i = 0; i < n; i++) {
+    lines.push(`\t\tset(hotspot[vr_nav_icon_${i}].visible, false);`);
+  }
+  lines.push(`\t</action>`);
+
+  lines.push(`</krpano>`);
+  lines.push(``);
+
+  await fs.promises.writeFile(outXmlPath, lines.join("\n"), "utf8");
+  console.log(`Wrote ${outXmlPath} (${n} icônes)`);
 }
 
-const MARGIN_BOTTOM = 14;
-
-const js = [];
-js.push(`\t<action name="react_vr_followbar_sync" type="Javascript"><![CDATA[`);
-js.push(`\t\tvar k = krpano;`);
-js.push(`\t\tif (k.get("webvr.isenabled") != true) return;`);
-js.push(`\t\tif (k.get("hotspot[react_vr_bottombar_panel].visible") != true) return;`);
-js.push(`\t\tvar sw = Number(k.get("stagewidth")) || 0;`);
-js.push(`\t\tvar sh = Number(k.get("stageheight")) || 0;`);
-js.push(`\t\tif (sw < 8 || sh < 8) return;`);
-js.push(`\t\tif (typeof k.screentosphere != "function") return;`);
-js.push(`\t\tvar baseY = sh - ${MARGIN_BOTTOM};`);
-js.push(`\t\tvar stereo = false;`);
-js.push(`\t\ttry { var ds = k.get("display.stereo"); stereo = (ds === true || ds === 1 || ds === "1" || ds === "true"); } catch (e) {}`);
-js.push(`\t\tvar baseAth, atv, stRef;`);
-js.push(`\t\tif (stereo) {`);
-js.push(`\t\t\tvar stL = k.screentosphere(sw * 0.25, baseY);`);
-js.push(`\t\t\tvar stR = k.screentosphere(sw * 0.75, baseY);`);
-js.push(`\t\t\tif (stL && stR && !isNaN(stL.x) && !isNaN(stR.x) && !isNaN(stL.y) && !isNaN(stR.y)) {`);
-js.push(`\t\t\t\tbaseAth = (stL.x + stR.x) * 0.5 + ${BAR_ATH};`);
-js.push(`\t\t\t\tatv = (stL.y + stR.y) * 0.5;`);
-js.push(`\t\t\t} else {`);
-js.push(`\t\t\t\tstRef = k.screentosphere(sw * 0.5, baseY);`);
-js.push(`\t\t\t\tif (!stRef) return;`);
-js.push(`\t\t\t\tatv = stRef.y;`);
-js.push(`\t\t\t\tbaseAth = stRef.x + ${BAR_ATH};`);
-js.push(`\t\t\t}`);
-js.push(`\t\t} else {`);
-js.push(`\t\t\tstRef = k.screentosphere(sw * 0.5, baseY);`);
-js.push(`\t\t\tif (!stRef) return;`);
-js.push(`\t\t\tatv = stRef.y;`);
-js.push(`\t\t\tbaseAth = stRef.x + ${BAR_ATH};`);
-js.push(`\t\t}`);
-js.push(`\t\tfunction placeHS(name) {`);
-js.push(`\t\t\tvar h = k.get("hotspot[" + name + "]");`);
-js.push(`\t\t\tif (h) { h.ath = baseAth; h.atv = atv; }`);
-js.push(`\t\t}`);
-js.push(`\t\tplaceHS("react_vr_bottombar_panel");`);
-js.push(`\t\tplaceHS("react_vr_nav_menu_btn");`);
-js.push(`\t\tplaceHS("react_vr_nav_search_btn");`);
-for (let i = 0; i < n; i++) {
-  js.push(`\t\tplaceHS("react_vr_nav_${i}");`);
-}
-js.push(`\t]]></action>`);
-
-const visOn = [
-  `\t<action name="react_vr_navbar_set_visibility_children" scope="local" args="v">`,
-  `\t\tset(hotspot[react_vr_nav_menu_btn].visible, get(v));`,
-  `\t\tset(hotspot[react_vr_nav_menu_btn].enabled, get(v));`,
-  `\t\tset(hotspot[react_vr_nav_search_btn].visible, get(v));`,
-  `\t\tset(hotspot[react_vr_nav_search_btn].enabled, get(v));`,
-];
-for (let i = 0; i < n; i++) {
-  visOn.push(`\t\tset(hotspot[react_vr_nav_${i}].visible, get(v));`);
-  visOn.push(`\t\tset(hotspot[react_vr_nav_${i}].enabled, get(v));`);
-}
-visOn.push(`\t</action>`);
-
-const visMain = [
-  `\t<action name="react_vr_navbar_set_visibility" scope="local" args="v">`,
-  `\t\tif(v == 1,`,
-  `\t\t\tset(hotspot[react_vr_bottombar_panel].visible, true);`,
-  `\t\t\tset(hotspot[react_vr_bottombar_panel].enabled, true);`,
-  `\t\t\treact_vr_navbar_set_visibility_children(1);`,
-  `\t\t\treact_vr_followbar_sync();`,
-  `\t\t  ,`,
-  `\t\t\tset(hotspot[react_vr_bottombar_panel].visible, false);`,
-  `\t\t\tset(hotspot[react_vr_bottombar_panel].enabled, false);`,
-  `\t\t\treact_vr_navbar_set_visibility_children(0);`,
-  `\t\t);`,
-  `\t</action>`,
-];
-
-const lines = [];
-lines.push(`<!-- Généré par scripts/generate-krpano-vr-bottombar.mjs — ne pas éditer -->`);
-lines.push(`<krpano>`);
-lines.push(...hs);
-lines.push(...js);
-lines.push(...visOn);
-lines.push(...visMain);
-lines.push(`</krpano>`);
-lines.push("");
-
-fs.writeFileSync(outPath, lines.join("\n"), "utf8");
-console.log(
-  `Wrote ${outPath} (screentosphere x+y + ox layout, ${n} icônes)`,
-);
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

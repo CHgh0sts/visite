@@ -21,6 +21,11 @@ const nextConfig: NextConfig = {
         source: "/micronique-assets/tour-vr-bottombar-generated.xml",
         destination: "/krpano-patches/tour-vr-bottombar-generated.xml",
       },
+      /* PNG / assets générés (barre VR) — même origine que tour.xml (`basepath` krpano) */
+      {
+        source: "/micronique-assets/krpano-patches/:path*",
+        destination: "/krpano-patches/:path*",
+      },
       /* Skin du worker : blocs UI commentés → skin_startup casse ; version décommentée dans public/ */
       {
         source: "/micronique-assets/skin/vtourskin.xml",

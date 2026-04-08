@@ -1,9 +1,10 @@
 <!-- Alias / copie : l’app charge `tour.xml` — garder ce fichier aligné si l’URL `/micronique-assets/tour-visite.xml` est encore utilisée. -->
 <krpano version="1.23" title="Virtual Tour" startscene="scene_micronique_1" showerrors="false" onstart="jscall(reactKrpano.onStart())">
 	<include url="skin/vtourskin.xml" />
+	<include url="tour-vr-bottombar-generated.xml" />
 	<plugin name="webvr" keep="true" devices="webgl"
-		onentervr="skin_showloading(false); webvr_onentervr(); skin_showskin(); skin_webvr_setup(); skin_reloadscene_webvr(); jscall(reactKrpano.onEnterVR());"
-		onexitvr="webvr_onexitvr(); skin_webvr_setup(); skin_reloadscene_webvr(); jscall(reactKrpano.onExitVR());"
+		onentervr="skin_showloading(false); webvr_onentervr(); skin_showskin(); skin_webvr_setup(); skin_reloadscene_webvr(); jscall(reactKrpano.onEnterVR()); vr_navbar_show();"
+		onexitvr="webvr_onexitvr(); skin_webvr_setup(); skin_reloadscene_webvr(); jscall(reactKrpano.onExitVR()); vr_navbar_hide();"
 	/>
 	<!-- ############################################################## -->
 	<!-- #############   Style commun à tous les Hotspot   ############# -->
@@ -554,21 +555,6 @@
 		onloadcomplete="jscall(reactKrpano.onPanoLoadComplete());"
 		onnewscene="jscall(reactKrpano.onSceneTransitionStart());"
 		onblendcomplete="jscall(calc('reactKrpano.onSceneChange(`' + get(xml.scene) + '`)'))"
-	/>
-	<!-- Barre VR : hotspots WebGL + sync screentosphere (bas d’écran → ath/atv), voir script générateur. -->
-	<!-- PNG sous /images/ comme les icônes nav — SVG/krpano-patches pouvait ne pas se charger via le worker (texture cassée → box à gauche). -->
-	<hotspot name="react_vr_bottombar_panel" keep="true" type="image"
-		url="/images/vr-bottombar-bg.png?v=2"
-		distorted="true" renderer="webgl" depth="1000" depthbuffer="false"
-		torigin="world"
-		ath="0" atv="0" align="center" edge="bottom" ox="0" oy="0"
-		width="780" height="110"
-		enabled="false" visible="false" capture="true" zorder="100"
-		vr_timeout="750"
-	/>
-	<include url="tour-vr-bottombar-generated.xml" />
-	<events name="react_vr_followbar_events" keep="true"
-		onviewchange="if(webvr.isenabled, react_vr_followbar_sync(); );"
 	/>
 	<!-- Remplace webvr.xml : pas de bandeau « Simulated VR Mode » / lien Meta Quest / bouton X -->
 	<action name="webvr_show_infos" scope="local" args="show">

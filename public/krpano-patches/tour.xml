@@ -1,3 +1,4 @@
+<!-- Entrée visite : chargée par l’app (`/micronique-assets/tour.xml`). Barre VR = `tour-vr-bottombar-generated.xml` (scene-nav.json). -->
 <krpano version="1.23" title="Virtual Tour" startscene="scene_micronique_1" showerrors="false" onstart="jscall(reactKrpano.onStart())">
 	<include url="skin/vtourskin.xml" />
 	<!-- ############################################################## -->
@@ -28,7 +29,7 @@
                    gyro_keeplookingdirection="false"
                    webvr="true"
                    webvr_keeplookingdirection="true"
-                   webvr_prev_next_hotspots="true"
+                   webvr_prev_next_hotspots="false"
                    autotour="false"
                    littleplanetintro="false"
                    followmousecontrol="true"
@@ -548,26 +549,40 @@
 		onnewscene="jscall(reactKrpano.onSceneTransitionStart());"
 		onblendcomplete="jscall(calc('reactKrpano.onSceneChange(`' + get(xml.scene) + '`)'))"
 	/>
-	<!--
-	  Interface VR : uniquement hotspots image (sprites vtourskin.png), comme les flèches blanches.
-	  calc:webvr.isenabled est peu fiable sur Quest → visible=true. type=text ne rend pas comme les flèches en WebXR.
-	  jscall → reactKrpano.vr* (reactVrUiBridge). Flèches scène krpano : ±88 ; dock perso : ±155 ; menu / recherche / VR au centre.
-	-->
-	<hotspot name="react_vr_dock_prev" keep="true" style="skin_base|skin_webvr_menu_style" devices="webgl"
-		crop="0|64|64|64" ox="-155" vr_timeout="750" onclick="jscall(reactKrpano.vrDockPrev());"
-		visible="true" enabled="true" />
-	<hotspot name="react_vr_menu" keep="true" style="skin_base|skin_webvr_menu_style" devices="webgl"
-		crop="0|128|64|64" ox="-58" vr_timeout="750" onclick="jscall(reactKrpano.vrToggleMenu());"
-		visible="true" enabled="true" />
-	<hotspot name="react_vr_search" keep="true" style="skin_base|skin_webvr_menu_style" devices="webgl"
-		crop="64|128|64|64" ox="0" vr_timeout="750" onclick="jscall(reactKrpano.vrToggleSearch());"
-		visible="true" enabled="true" />
-	<hotspot name="react_vr_exitvr" keep="true" style="skin_base|skin_webvr_menu_style" devices="webgl"
-		crop="0|0|80|64" ox="58" vr_timeout="750" onclick="jscall(reactKrpano.vrToggleVr());"
-		visible="true" enabled="true" />
-	<hotspot name="react_vr_dock_next" keep="true" style="skin_base|skin_webvr_menu_style" devices="webgl"
-		crop="64|64|64|64" ox="155" vr_timeout="750" onclick="jscall(reactKrpano.vrDockNext());"
-		visible="true" enabled="true" />
+	<!-- Barre VR 3D : hotspots positionnés en espace-monde (ath/atv/depth) → courbure sphérique en VR -->
+	<include url="tour-vr-bottombar-generated.xml" />
+	<!-- Visibilité pilotée par JS (syncKrpanoVrNavbarVisibility) — uniquement en session WebXR -->
+	<action name="react_vr_navbar_set_visibility" scope="local" args="v">
+		if(v == 1,
+			set(hotspot[react_vr_bar_bg].visible, true);        set(hotspot[react_vr_bar_bg].enabled, true);
+			set(hotspot[react_vr_nav_menu_btn].visible, true);  set(hotspot[react_vr_nav_menu_btn].enabled, true);
+			set(hotspot[react_vr_nav_search_btn].visible, true); set(hotspot[react_vr_nav_search_btn].enabled, true);
+			set(hotspot[react_vr_nav_0].visible, true); set(hotspot[react_vr_nav_0].enabled, true);
+			set(hotspot[react_vr_nav_1].visible, true); set(hotspot[react_vr_nav_1].enabled, true);
+			set(hotspot[react_vr_nav_2].visible, true); set(hotspot[react_vr_nav_2].enabled, true);
+			set(hotspot[react_vr_nav_3].visible, true); set(hotspot[react_vr_nav_3].enabled, true);
+			set(hotspot[react_vr_nav_4].visible, true); set(hotspot[react_vr_nav_4].enabled, true);
+			set(hotspot[react_vr_nav_5].visible, true); set(hotspot[react_vr_nav_5].enabled, true);
+			set(hotspot[react_vr_nav_6].visible, true); set(hotspot[react_vr_nav_6].enabled, true);
+			set(hotspot[react_vr_nav_7].visible, true); set(hotspot[react_vr_nav_7].enabled, true);
+			set(hotspot[react_vr_nav_8].visible, true); set(hotspot[react_vr_nav_8].enabled, true);
+			set(hotspot[react_vr_nav_9].visible, true); set(hotspot[react_vr_nav_9].enabled, true);
+		  ,
+			set(hotspot[react_vr_bar_bg].visible, false);        set(hotspot[react_vr_bar_bg].enabled, false);
+			set(hotspot[react_vr_nav_menu_btn].visible, false);  set(hotspot[react_vr_nav_menu_btn].enabled, false);
+			set(hotspot[react_vr_nav_search_btn].visible, false); set(hotspot[react_vr_nav_search_btn].enabled, false);
+			set(hotspot[react_vr_nav_0].visible, false); set(hotspot[react_vr_nav_0].enabled, false);
+			set(hotspot[react_vr_nav_1].visible, false); set(hotspot[react_vr_nav_1].enabled, false);
+			set(hotspot[react_vr_nav_2].visible, false); set(hotspot[react_vr_nav_2].enabled, false);
+			set(hotspot[react_vr_nav_3].visible, false); set(hotspot[react_vr_nav_3].enabled, false);
+			set(hotspot[react_vr_nav_4].visible, false); set(hotspot[react_vr_nav_4].enabled, false);
+			set(hotspot[react_vr_nav_5].visible, false); set(hotspot[react_vr_nav_5].enabled, false);
+			set(hotspot[react_vr_nav_6].visible, false); set(hotspot[react_vr_nav_6].enabled, false);
+			set(hotspot[react_vr_nav_7].visible, false); set(hotspot[react_vr_nav_7].enabled, false);
+			set(hotspot[react_vr_nav_8].visible, false); set(hotspot[react_vr_nav_8].enabled, false);
+			set(hotspot[react_vr_nav_9].visible, false); set(hotspot[react_vr_nav_9].enabled, false);
+		);
+	</action>
 	<!-- Remplace webvr.xml : pas de bandeau « Simulated VR Mode » / lien Meta Quest / bouton X -->
 	<action name="webvr_show_infos" scope="local" args="show">
 		if(show == false,

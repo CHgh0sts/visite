@@ -548,6 +548,8 @@
 		onnewscene="jscall(reactKrpano.onSceneTransitionStart());"
 		onblendcomplete="jscall(calc('reactKrpano.onSceneChange(`' + get(xml.scene) + '`)'))"
 	/>
+	<!-- Menu VR 3D flottant (icônes + labels) — hotspots + action de visibilité auto-générés -->
+	<include url="tour-vr-bottombar-generated.xml" />
 	<!-- Remplace webvr.xml : pas de bandeau « Simulated VR Mode » / lien Meta Quest / bouton X -->
 	<action name="webvr_show_infos" scope="local" args="show">
 		if(show == false,

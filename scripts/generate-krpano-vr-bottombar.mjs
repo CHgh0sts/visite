@@ -1,7 +1,9 @@
 /**
  * Génère `public/krpano-patches/tour-vr-bottombar-generated.xml` depuis `src/data/scene-nav.json`.
- * Couches 2D (parent react_vr_nav_icons_row) : menu + recherche (sprites skin) + icônes zones (SVG).
- * À lancer après modification de scene-nav.json : `node scripts/generate-krpano-vr-bottombar.mjs`
+ * Un hotspot image par bouton (SVG dans public/images/navbar/vr/ — rendu type navbar 2D).
+ * Pas de segments blancs séparés : la courbure vient du placement sphérique (ath).
+ *
+ * Usage : `node scripts/generate-krpano-vr-bottombar.mjs`
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -24,10 +26,17 @@ function escapeXmlAttr(s) {
     .replace(/</g, "&lt;");
 }
 
-/** Espace → %20 uniquement */
-function encodeIconUrlForXml(url) {
+function iconUrlForVrHotspot(url) {
   const u = String(url).trim();
-  return escapeXmlAttr(u.replace(/ /g, "%20"));
+  const prefix = "/images/navbar/";
+  if (!u.startsWith(prefix)) return u;
+  const rest = u.slice(prefix.length);
+  if (rest.startsWith("vr/")) return u;
+  return prefix + "vr/" + rest;
+}
+
+function encodeIconUrlForXml(url) {
+  return escapeXmlAttr(String(url).trim().replace(/ /g, "%20"));
 }
 
 function escapeSceneIdForJscall(id) {
@@ -44,59 +53,61 @@ const items = (raw.items ?? []).filter(
 );
 
 const n = items.length;
-const menuW = 9;
-const searchW = 9;
-const gapAfterSearch = 2;
-const startNavPct = menuW + searchW + gapAfterSearch;
-const navW = n > 0 ? (100 - startNavPct) / n : 0;
+/** Écart angulaire entre chaque bouton (plus grand = plus d’espace). */
+const SPACING_DEG = 12;
+const totalSpan = (n - 1) * SPACING_DEG;
+const startAth = -totalSpan / 2;
 
-const lines = [];
-lines.push(`<!-- Généré par scripts/generate-krpano-vr-bottombar.mjs — ne pas éditer -->`);
-lines.push(`<krpano>`);
+const DEPTH = 1000;
+const ICON_ATV = 26;
 
-/** Même sprite que la barre bas VT (style skin_base + crop) */
-lines.push(
-  `\t<layer name="react_vr_nav_menu_btn" keep="true" parent="react_vr_nav_icons_row" type="image" devices="webgl"`,
-);
-lines.push(`\t\tstyle="skin_base" crop="0|128|64|64" align="lefttop" edge="left" x="0%" y="8%"`);
-lines.push(
-  `\t\twidth="${menuW}%" height="84%" scalechildren="true" bgalpha="0"`,
-);
-lines.push(
-  `\t\tonclick="jscall(reactKrpano.vrToggleMenu());" enabled="true" visible="true" />`,
-);
+const ICON_W = 100;
+const ICON_H = 132;
 
-lines.push(
-  `\t<layer name="react_vr_nav_search_btn" keep="true" parent="react_vr_nav_icons_row" type="image" devices="webgl"`,
-);
-lines.push(`\t\tstyle="skin_base" crop="64|128|64|64" align="lefttop" edge="left" x="${menuW}%" y="8%"`);
-lines.push(
-  `\t\twidth="${searchW}%" height="84%" scalechildren="true" bgalpha="0"`,
-);
-lines.push(
-  `\t\tonclick="jscall(reactKrpano.vrToggleSearch());" enabled="true" visible="true" />`,
-);
+const L = [];
+const allNames = [];
+
+L.push(`<!-- Généré par scripts/generate-krpano-vr-bottombar.mjs — ne pas éditer manuellement -->`);
+L.push(`<krpano>`);
 
 for (let i = 0; i < n; i++) {
-  const sceneId = items[i].sceneId.trim();
-  const iconUrl = encodeIconUrlForXml(items[i].iconUrl.trim());
-  const sid = escapeSceneIdForJscall(sceneId);
-  const left = startNavPct + i * navW;
-  const w = Math.max(4, navW - 0.8);
-  lines.push(
-    `\t<layer name="react_vr_nav_${i}" keep="true" parent="react_vr_nav_icons_row" type="image" devices="webgl"`,
-  );
-  lines.push(`\t\turl="${iconUrl}" align="lefttop" edge="left" x="${left.toFixed(2)}%" y="6%"`);
-  lines.push(
-    `\t\twidth="${w.toFixed(2)}%" height="88%" scalechildren="true" bgalpha="0"`,
-  );
-  lines.push(
-    `\t\tonclick="jscall(reactKrpano.vrNavigateToScene('${sid}'));" enabled="true" visible="true" />`,
-  );
+  const item = items[i];
+  const sid = escapeSceneIdForJscall(item.sceneId.trim());
+  const iconUrl = encodeIconUrlForXml(iconUrlForVrHotspot(item.iconUrl));
+  const label = escapeXmlAttr(item.label.trim());
+  const ath = (startAth + i * SPACING_DEG).toFixed(1);
+
+  const iconName = `react_vr_nav_${i}`;
+  allNames.push(iconName);
+
+  L.push(``);
+  L.push(`\t<!-- ${label} -->`);
+
+  L.push(`\t<hotspot name="${iconName}" keep="true" vr="true" devices="webgl"`);
+  L.push(`\t\ttype="image" ath="${ath}" atv="${ICON_ATV}" depth="${DEPTH}"`);
+  L.push(`\t\turl="${iconUrl}"`);
+  L.push(`\t\twidth="${ICON_W}" height="${ICON_H}" bgalpha="0"`);
+  L.push(`\t\tzorder="20"`);
+  L.push(`\t\tonclick="jscall(reactKrpano.vrNavigateToScene('${sid}'));"`);
+  L.push(`\t\tenabled="false" visible="false" />`);
 }
 
-lines.push(`</krpano>`);
-lines.push("");
+L.push(``);
+L.push(`\t<!-- ═══════ Visibilité (JS : syncKrpanoVrNavbarVisibility) ═══════ -->`);
+L.push(`\t<action name="react_vr_navbar_set_visibility" scope="local" args="v">`);
 
-fs.writeFileSync(outPath, lines.join("\n"), "utf8");
-console.log(`Wrote ${outPath} (menu+search + ${n} zones)`);
+const show = allNames.map((h) => `\t\t\tset(hotspot[${h}].visible, true); set(hotspot[${h}].enabled, true);`).join("\n");
+const hide = allNames.map((h) => `\t\t\tset(hotspot[${h}].visible, false); set(hotspot[${h}].enabled, false);`).join("\n");
+
+L.push(`\t\tif(v == 1,`);
+L.push(show);
+L.push(`\t\t  ,`);
+L.push(hide);
+L.push(`\t\t);`);
+L.push(`\t</action>`);
+
+L.push(`</krpano>`);
+L.push("");
+
+fs.writeFileSync(outPath, L.join("\n"), "utf8");
+console.log(`✓ ${outPath}\n  ${n} hotspots image (style navbar 2D, courbure ath)`);

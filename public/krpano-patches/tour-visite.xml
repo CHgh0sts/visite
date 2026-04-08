@@ -1,4 +1,4 @@
-<!-- Entrée visite : barre bas VR = scene-nav (généré) + menu/recherche/VR. tour.xml reste la copie de référence non utilisée par l’app. -->
+<!-- Alias / copie : l’app charge `tour.xml` — garder ce fichier aligné si l’URL `/micronique-assets/tour-visite.xml` est encore utilisée. -->
 <krpano version="1.23" title="Virtual Tour" startscene="scene_micronique_1" showerrors="false" onstart="jscall(reactKrpano.onStart())">
 	<include url="skin/vtourskin.xml" />
 	<!-- ############################################################## -->
@@ -29,7 +29,7 @@
                    gyro_keeplookingdirection="false"
                    webvr="true"
                    webvr_keeplookingdirection="true"
-                   webvr_prev_next_hotspots="true"
+                   webvr_prev_next_hotspots="false"
                    autotour="false"
                    littleplanetintro="false"
                    followmousecontrol="true"
@@ -549,26 +549,8 @@
 		onnewscene="jscall(reactKrpano.onSceneTransitionStart());"
 		onblendcomplete="jscall(calc('reactKrpano.onSceneChange(`' + get(xml.scene) + '`)'))"
 	/>
-	<!-- Barre VR 2D : fond blanc + ligne d’icônes (menu, recherche, zones) — généré dans tour-vr-bottombar-generated.xml -->
-	<layer name="react_vr_bottombar_panel" keep="true" type="container" devices="webgl"
-		vr="true" align="bottom" width="78%" height="12%" y="14%" x="0"
-		bgcolor="0xFFFFFF" bgalpha="0.97" bgroundedge="16"
-		bgshadow="0 6 20 0x000000 0.12"
-		zorder="3" enabled="false" bgcapture="true" visible="false">
-		<layer name="react_vr_nav_icons_row" keep="true" type="container" devices="webgl"
-			align="lefttop" width="100%" height="100%" bgalpha="0" />
-	</layer>
+	<!-- Menu VR 3D flottant (icônes + labels) — hotspots + action de visibilité auto-générés -->
 	<include url="tour-vr-bottombar-generated.xml" />
-	<!-- Visibilité pilotée par JS (syncKrpanoVrNavbarVisibility) — uniquement en session WebXR -->
-	<action name="react_vr_navbar_set_visibility" scope="local" args="v">
-		if(v == 1,
-			set(layer[react_vr_bottombar_panel].visible, true);
-			set(layer[react_vr_bottombar_panel].enabled, true);
-		  ,
-			set(layer[react_vr_bottombar_panel].visible, false);
-			set(layer[react_vr_bottombar_panel].enabled, false);
-		);
-	</action>
 	<!-- Remplace webvr.xml : pas de bandeau « Simulated VR Mode » / lien Meta Quest / bouton X -->
 	<action name="webvr_show_infos" scope="local" args="show">
 		if(show == false,

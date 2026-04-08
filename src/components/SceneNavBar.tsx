@@ -78,6 +78,7 @@ export function SceneNavBar({ krpano, currentSceneId }: SceneNavBarProps) {
           const isOnAlias = aliasIds.length > 0 && aliasIds.includes(cur);
           /** Style « actif » : scène cible ou une des scènes listées dans `otherSceneId` / `otherSceneIds`. */
           const looksActive = isOnTarget || isOnAlias;
+          /** Toujours les SVG classiques : les variantes vr/ (icône + texte) servent au menu Krpano 3D. */
           const src = item.iconUrl.trim();
           const rowKey = item.id?.trim() ?? `nav-${index}`;
           return (

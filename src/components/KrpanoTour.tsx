@@ -173,7 +173,7 @@ export function KrpanoTour({
           return;
         }
         embed({
-          xml: `${assetBase}/tour-visite.xml`,
+          xml: `${assetBase}/tour.xml`,
           target: targetId,
           id: viewerId,
           html5: "only",

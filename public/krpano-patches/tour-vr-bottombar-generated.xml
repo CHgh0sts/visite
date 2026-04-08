@@ -9,7 +9,7 @@
 		renderer="webgl"
 		depth="950"
 		zorder="2"
-		scale="0.42"
+		scale="0.524"
 		alpha="0.98"
 		enabled="false"
 		visible="false"
@@ -21,10 +21,10 @@
 		renderer="webgl"
 		depth="1000"
 		zorder="10"
-		scale="0.18"
+		scale="0.14"
 		vr_timeout="750"
-		onover="tween(scale,0.216);"
-		onout="tween(scale,0.18);"
+		onover="tween(scale,0.165);"
+		onout="tween(scale,0.14);"
 		visible="false"
 		devices="webgl"
 	/>
@@ -55,25 +55,25 @@
 			bg.atv = atv;
 
 			var hs0 = krpano.get("hotspot[vr_nav_icon_0]");
-			if (hs0) { hs0.ath = anchorH + -45.9000; hs0.atv = atv; }
+			if (hs0) { hs0.ath = anchorH + -27.0000; hs0.atv = atv; }
 			var hs1 = krpano.get("hotspot[vr_nav_icon_1]");
-			if (hs1) { hs1.ath = anchorH + -35.7000; hs1.atv = atv; }
+			if (hs1) { hs1.ath = anchorH + -21.0000; hs1.atv = atv; }
 			var hs2 = krpano.get("hotspot[vr_nav_icon_2]");
-			if (hs2) { hs2.ath = anchorH + -25.5000; hs2.atv = atv; }
+			if (hs2) { hs2.ath = anchorH + -15.0000; hs2.atv = atv; }
 			var hs3 = krpano.get("hotspot[vr_nav_icon_3]");
-			if (hs3) { hs3.ath = anchorH + -15.3000; hs3.atv = atv; }
+			if (hs3) { hs3.ath = anchorH + -9.0000; hs3.atv = atv; }
 			var hs4 = krpano.get("hotspot[vr_nav_icon_4]");
-			if (hs4) { hs4.ath = anchorH + -5.1000; hs4.atv = atv; }
+			if (hs4) { hs4.ath = anchorH + -3.0000; hs4.atv = atv; }
 			var hs5 = krpano.get("hotspot[vr_nav_icon_5]");
-			if (hs5) { hs5.ath = anchorH + 5.1000; hs5.atv = atv; }
+			if (hs5) { hs5.ath = anchorH + 3.0000; hs5.atv = atv; }
 			var hs6 = krpano.get("hotspot[vr_nav_icon_6]");
-			if (hs6) { hs6.ath = anchorH + 15.3000; hs6.atv = atv; }
+			if (hs6) { hs6.ath = anchorH + 9.0000; hs6.atv = atv; }
 			var hs7 = krpano.get("hotspot[vr_nav_icon_7]");
-			if (hs7) { hs7.ath = anchorH + 25.5000; hs7.atv = atv; }
+			if (hs7) { hs7.ath = anchorH + 15.0000; hs7.atv = atv; }
 			var hs8 = krpano.get("hotspot[vr_nav_icon_8]");
-			if (hs8) { hs8.ath = anchorH + 35.7000; hs8.atv = atv; }
+			if (hs8) { hs8.ath = anchorH + 21.0000; hs8.atv = atv; }
 			var hs9 = krpano.get("hotspot[vr_nav_icon_9]");
-			if (hs9) { hs9.ath = anchorH + 45.9000; hs9.atv = atv; }
+			if (hs9) { hs9.ath = anchorH + 27.0000; hs9.atv = atv; }
 		} catch (e) {}
 	]]></action>
 	<action name="vr_navbar_show">

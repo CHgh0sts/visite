@@ -36,10 +36,10 @@ function escapeSceneIdForKrpano(s) {
 }
 
 async function writeBarBgPng() {
-  const w = 640;
-  const h = 112;
+  const w = 1400;
+  const h = 140;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
-  <rect x="2" y="2" width="${w - 4}" height="${h - 4}" rx="28" ry="28" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
+  <rect x="3" y="3" width="${w - 6}" height="${h - 6}" rx="36" ry="36" fill="#ffffff" fill-opacity="0.95" stroke="#e2e8f0" stroke-width="3"/>
 </svg>`;
   const out = path.join(patchesDir, "vr-nav-bar-bg.png");
   await sharp(Buffer.from(svg)).png().toFile(out);
@@ -104,13 +104,17 @@ async function main() {
   }
 
   const n = items.length;
-  const barScale = 0.42;
-  const iconScale = 0.18;
   /**
-   * Espacement angulaire en degrés entre chaque icône (horizontal).
-   * Le fond et les icônes sont centrés sur l'ancre `hlookat` capturée au show.
+   * krpano distorted : 1000px effectifs = 90°.
+   * PNG 1400px * barScale → pixels effectifs → degrés couverts.
+   * Icônes : gap * (n-1). On cale le fond pour couvrir cette étendue + padding.
    */
-  const iconGapDeg = 10.2;
+  const iconGapDeg = 6;
+  const totalIconSpanDeg = (n - 1) * iconGapDeg;
+  const barCoverageDeg = totalIconSpanDeg + 12;
+  const barEffectivePx = (barCoverageDeg / 90) * 1000;
+  const barScale = +(barEffectivePx / 1400).toFixed(3);
+  const iconScale = 0.14;
   /** Position verticale de base de la barre (en ° sous l'axe de vue, positif = vers le bas). */
   const baseAtvOffset = 38;
   /** Facteur parallaxe vertical : 0 = fixe, 1 = suit parfaitement la caméra. ~0.3 = bonne parallaxe. */
@@ -146,7 +150,7 @@ async function main() {
   lines.push(`\t\tscale="${iconScale}"`);
   lines.push(`\t\tvr_timeout="750"`);
   lines.push(
-    `\t\tonover="tween(scale,${(iconScale * 1.2).toFixed(3)});"`,
+    `\t\tonover="tween(scale,${(iconScale * 1.18).toFixed(3)});"`,
   );
   lines.push(`\t\tonout="tween(scale,${iconScale});"`);
   lines.push(`\t\tvisible="false"`);

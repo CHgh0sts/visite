@@ -2,9 +2,10 @@
  * Génère `public/krpano-patches/tour-vr-bottombar-generated.xml` + assets PNG
  * depuis `src/data/scene-nav.json` (même logique que `SceneNavBar` : loadscene vers `sceneId`).
  *
- * Placement : **screentosphere(x,y)** (doc krpano) — pixels du stage → ath/atv monde.
- * Mis à jour à chaque `onviewchange` pour rester en bas de l’écran (desktop / stéréo WebXR),
- * sans `torigin="view"` ni réglages `atv` à la main.
+ * Placement VR :
+ *   - Horizontal **fixe** : capturé une seule fois (`view.hlookat` à l'entrée VR).
+ *   - Vertical **parallaxe** : suit `view.vlookat` avec un facteur < 1 → barre en bas
+ *     du champ mais qui bouge moins que la tête (pas collée, pas impossible à voir).
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -51,7 +52,10 @@ async function rasterizeNavIcon(svgAbsPath, outPngPath) {
     density: 120,
     limitInputPixels: false,
   })
-    .resize(96, 96, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .resize(96, 96, {
+      fit: "contain",
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    })
     .png()
     .toFile(outPngPath);
 }
@@ -102,19 +106,27 @@ async function main() {
   const n = items.length;
   const barScale = 0.42;
   const iconScale = 0.18;
-  /** Pixels depuis le **bas** du stage : bord bas de la pilule (screentosphere). */
-  const barBottomOffsetPx = 36;
-  /** Pixels depuis le bas : ligne des centres d’icônes (au-dessus du bord bas). */
-  const iconRowOffsetPx = 88;
+  /**
+   * Espacement angulaire en degrés entre chaque icône (horizontal).
+   * Le fond et les icônes sont centrés sur l'ancre `hlookat` capturée au show.
+   */
+  const iconGapDeg = 10.2;
+  /** Position verticale de base de la barre (en ° sous l'axe de vue, positif = vers le bas). */
+  const baseAtvOffset = 38;
+  /** Facteur parallaxe vertical : 0 = fixe, 1 = suit parfaitement la caméra. ~0.3 = bonne parallaxe. */
+  const vParallax = 0.3;
 
   const lines = [];
-  lines.push(`<!-- Généré par scripts/generate-krpano-vr-bottombar.mjs — ne pas éditer à la main -->`);
+  lines.push(
+    `<!-- Généré par scripts/generate-krpano-vr-bottombar.mjs — ne pas éditer à la main -->`,
+  );
   lines.push(`<krpano>`);
-  lines.push(`\t<set var="vr_nav_st_h" val="0" />`);
-  lines.push(`\t<set var="vr_nav_st_v" val="0" />`);
+  lines.push(`\t<!-- Ancre horizontale fixée à l'entrée VR -->`);
+  lines.push(`\t<set var="vr_nav_anchor_h" val="0" />`);
+
   lines.push(`\t<style name="vr_navbar_bg_style"`);
   lines.push(`\t\turl="${xmlEscapeAttr(bgUrl)}"`);
-  lines.push(`\t\tedge="bottom"`);
+  lines.push(`\t\tedge="center"`);
   lines.push(`\t\tdistorted="true"`);
   lines.push(`\t\trenderer="webgl"`);
   lines.push(`\t\tdepth="950"`);
@@ -145,7 +157,11 @@ async function main() {
     `\t<hotspot name="vr_nav_bg" keep="true" style="vr_navbar_bg_style" ath="0" atv="0" />`,
   );
 
+  const iconOffsets = [];
   for (let i = 0; i < n; i++) {
+    const offset =
+      n <= 1 ? 0 : (i - (n - 1) / 2) * iconGapDeg;
+    iconOffsets.push(offset);
     const sceneId = escapeSceneIdForKrpano(items[i].sceneId.trim());
     const onclick = `loadscene('${sceneId}', null, MERGE, BLEND(0.5));`;
     lines.push(
@@ -153,34 +169,46 @@ async function main() {
     );
   }
 
-  lines.push(`\t<events name="vr_navbar_events" keep="true" onviewchange="vr_navbar_follow_update();" />`);
+  lines.push(
+    `\t<events name="vr_navbar_events" keep="true" onviewchange="vr_navbar_follow_update();" />`,
+  );
 
-  lines.push(`\t<action name="vr_navbar_follow_update" type="Javascript"><![CDATA[`);
+  lines.push(
+    `\t<action name="vr_navbar_follow_update" type="Javascript"><![CDATA[`,
+  );
   lines.push(`\t\ttry {`);
-  lines.push(`\t\t\tif (!krpano || !krpano.get("webvr.isenabled")) return;`);
+  lines.push(
+    `\t\t\tif (!krpano || !krpano.get("webvr.isenabled")) return;`,
+  );
   lines.push(`\t\t\tvar bg = krpano.get("hotspot[vr_nav_bg]");`);
   lines.push(`\t\t\tif (!bg || !bg.visible) return;`);
-  lines.push(`\t\t\tvar sw = 1.0 * krpano.get("stagewidth");`);
-  lines.push(`\t\t\tvar sh = 1.0 * krpano.get("stageheight");`);
-  lines.push(`\t\t\tif (!sw || !sh || sw < 16 || sh < 16) return;`);
-  lines.push(`\t\t\tvar n = ${n};`);
-  lines.push(`\t\t\tvar barBottomY = sh - ${barBottomOffsetPx};`);
-  lines.push(`\t\t\tvar iconY = sh - ${iconRowOffsetPx};`);
-  lines.push(`\t\t\tkrpano.call("screentosphere(" + (sw * 0.5) + ", " + barBottomY + ", vr_nav_st_h, vr_nav_st_v);");`);
-  lines.push(`\t\t\tbg.ath = 1.0 * krpano.get("vr_nav_st_h");`);
-  lines.push(`\t\t\tbg.atv = 1.0 * krpano.get("vr_nav_st_v");`);
-  lines.push(`\t\t\tvar gapPx = n <= 1 ? 0 : Math.min(56, (sw * 0.82) / Math.max(1, n - 1));`);
-  lines.push(`\t\t\tvar startX = sw * 0.5 - gapPx * (n - 1) * 0.5;`);
-  lines.push(`\t\t\tfor (var ii = 0; ii < n; ii++) {`);
-  lines.push(`\t\t\t\tvar cx = startX + gapPx * ii;`);
-  lines.push(`\t\t\t\tkrpano.call("screentosphere(" + cx + ", " + iconY + ", vr_nav_st_h, vr_nav_st_v);");`);
-  lines.push(`\t\t\t\tvar hs = krpano.get("hotspot[vr_nav_icon_" + ii + "]");`);
-  lines.push(`\t\t\t\tif (hs) { hs.ath = 1.0 * krpano.get("vr_nav_st_h"); hs.atv = 1.0 * krpano.get("vr_nav_st_v"); }`);
-  lines.push(`\t\t\t}`);
+  lines.push(``);
+  lines.push(`\t\t\tvar anchorH = 1.0 * krpano.get("vr_nav_anchor_h");`);
+  lines.push(`\t\t\tvar camV = 1.0 * krpano.get("view.vlookat");`);
+  lines.push(``);
+  lines.push(
+    `\t\t\tvar atv = ${baseAtvOffset} + camV * ${vParallax};`,
+  );
+  lines.push(``);
+  lines.push(`\t\t\tbg.ath = anchorH;`);
+  lines.push(`\t\t\tbg.atv = atv;`);
+  lines.push(``);
+  for (let i = 0; i < n; i++) {
+    const off = iconOffsets[i];
+    lines.push(
+      `\t\t\tvar hs${i} = krpano.get("hotspot[vr_nav_icon_${i}]");`,
+    );
+    lines.push(
+      `\t\t\tif (hs${i}) { hs${i}.ath = anchorH + ${off.toFixed(4)}; hs${i}.atv = atv; }`,
+    );
+  }
   lines.push(`\t\t} catch (e) {}`);
   lines.push(`\t]]></action>`);
 
   lines.push(`\t<action name="vr_navbar_show">`);
+  lines.push(
+    `\t\tcopy(vr_nav_anchor_h, view.hlookat);`,
+  );
   lines.push(`\t\tset(hotspot[vr_nav_bg].visible, true);`);
   for (let i = 0; i < n; i++) {
     lines.push(`\t\tset(hotspot[vr_nav_icon_${i}].visible, true);`);
@@ -188,6 +216,7 @@ async function main() {
   lines.push(`\t\tvr_navbar_follow_update();`);
   lines.push(`\t\tdelayedcall(0, vr_navbar_follow_update());`);
   lines.push(`\t</action>`);
+
   lines.push(`\t<action name="vr_navbar_hide">`);
   lines.push(`\t\tset(hotspot[vr_nav_bg].visible, false);`);
   for (let i = 0; i < n; i++) {

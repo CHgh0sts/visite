@@ -5,9 +5,14 @@ import { useEffect, useId, useRef } from "react";
 import { KRPANO_START_SCENE } from "@/constants/krpano";
 import {
   clearPendingReactLookAt,
+  getKrpanoViewerForTour,
   hideKrpanoTourChrome,
+  loadKrpanoScene,
   onReactPanoLoadComplete,
+  resetKrpanoVrNavbarVisibilitySyncCache,
   setKrpanoViewerForLoadComplete,
+  setKrpanoVrNavbarVisibility,
+  syncKrpanoVrNavbarVisibility,
   tryApplyPendingLookAtForScene,
 } from "@/lib/krpanoNavigation";
 import type { KrpanoViewer } from "@/types/krpanoViewer";
@@ -98,6 +103,7 @@ export function KrpanoTour({
 
   useEffect(() => {
     let cancelled = false;
+    let vrNavSyncInterval: ReturnType<typeof setInterval> | null = null;
     const assetBase = `${window.location.origin}${MICRONIQUE_PROXY_PREFIX}`;
 
     window.reactKrpano = {
@@ -130,6 +136,8 @@ export function KrpanoTour({
       onEnterVR() {
         try {
           document.body.classList.add("kr-vr-mode");
+          const k = getKrpanoViewerForTour();
+          if (k) setKrpanoVrNavbarVisibility(k, true);
         } catch (e) {
           console.error("[krpano] onEnterVR", e);
         }
@@ -137,8 +145,18 @@ export function KrpanoTour({
       onExitVR() {
         try {
           document.body.classList.remove("kr-vr-mode");
+          const k = getKrpanoViewerForTour();
+          if (k) setKrpanoVrNavbarVisibility(k, false);
         } catch (e) {
           console.error("[krpano] onExitVR", e);
+        }
+      },
+      vrNavigateToScene(sceneId: string) {
+        try {
+          const k = getKrpanoViewerForTour();
+          if (k) loadKrpanoScene(k, sceneId);
+        } catch (e) {
+          console.error("[krpano] vrNavigateToScene", e);
         }
       },
     };
@@ -179,6 +197,11 @@ export function KrpanoTour({
             krpano.call(
               `delayedcall(0, loadscene('${KRPANO_START_SCENE}', null, MERGE, BLEND(0)));`,
             );
+            vrNavSyncInterval = setInterval(() => {
+              if (cancelled) return;
+              const k = getKrpanoViewerForTour();
+              if (k) syncKrpanoVrNavbarVisibility(k);
+            }, 250);
           },
         });
         if (cancelled) {
@@ -197,6 +220,11 @@ export function KrpanoTour({
 
     return () => {
       cancelled = true;
+      if (vrNavSyncInterval) {
+        clearInterval(vrNavSyncInterval);
+        vrNavSyncInterval = null;
+      }
+      resetKrpanoVrNavbarVisibilitySyncCache();
       document.body.classList.remove("kr-vr-mode");
       setKrpanoViewerForLoadComplete(null);
       clearPendingReactLookAt();

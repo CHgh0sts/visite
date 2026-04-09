@@ -1,10 +1,20 @@
 <!-- Alias / copie : l’app charge `tour.xml` — garder ce fichier aligné si l’URL `/micronique-assets/tour-visite.xml` est encore utilisée. -->
 <krpano version="1.23" title="Virtual Tour" startscene="scene_micronique_1" showerrors="false" onstart="jscall(reactKrpano.onStart())">
 	<include url="skin/vtourskin.xml" />
+	<hotspot name="react_vr_bottombar_panel" keep="true" type="image"
+		url="/krpano-patches/vr-bottombar-bg.svg"
+		distorted="true" renderer="webgl" depth="1000" depthbuffer="false"
+		torigin="world"
+		ath="0" atv="0" align="center" edge="bottom" ox="0" oy="0"
+		width="780" height="96"
+		enabled="false" visible="false" capture="true" zorder="100"
+		vr_timeout="750"
+	/>
 	<include url="tour-vr-bottombar-generated.xml" />
+	<!-- Pas d’onviewchange : barre ancrée une fois (monde fixe). -->
 	<plugin name="webvr" keep="true" devices="webgl"
-		onentervr="skin_showloading(false); webvr_onentervr(); skin_showskin(); skin_webvr_setup(); skin_reloadscene_webvr(); jscall(reactKrpano.onEnterVR()); vr_navbar_show();"
-		onexitvr="webvr_onexitvr(); skin_webvr_setup(); skin_reloadscene_webvr(); jscall(reactKrpano.onExitVR()); vr_navbar_hide();"
+		onentervr="skin_showloading(false); webvr_onentervr(); skin_showskin(); skin_webvr_setup(); skin_reloadscene_webvr(); jscall(reactKrpano.onEnterVR()); react_vr_navbar_set_visibility(1);"
+		onexitvr="webvr_onexitvr(); skin_webvr_setup(); skin_reloadscene_webvr(); jscall(reactKrpano.onExitVR()); react_vr_navbar_set_visibility(0);"
 	/>
 	<!-- ############################################################## -->
 	<!-- #############   Style commun à tous les Hotspot   ############# -->

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="96" viewBox="0 0 780 96">
+	<defs>
+		<linearGradient id="vrDockGlass" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#ffffff" stop-opacity="0.85" />
+			<stop offset="0.45" stop-color="#ffffff" stop-opacity="0.5" />
+			<stop offset="1" stop-color="#f0f0f0" stop-opacity="0.9" />
+		</linearGradient>
+		<filter id="vrDockFloat" x="-10%" y="-35%" width="120%" height="170%">
+			<feDropShadow dx="0" dy="10" stdDeviation="18" flood-color="#000000" flood-opacity="0.12" />
+		</filter>
+	</defs>
+	<!-- Pilule blanche, bord léger — positionnement inchangé (hotspot tour.xml). -->
+	<rect
+		x="0.5"
+		y="0.5"
+		width="779"
+		height="95"
+		rx="48"
+		ry="48"
+		fill="#ffffff"
+		stroke="rgba(0,0,0,0.08)"
+		stroke-width="1"
+		filter="url(#vrDockFloat)"
+	/>
+	<rect
+		x="1"
+		y="1"
+		width="778"
+		height="94"
+		rx="47"
+		ry="47"
+		fill="url(#vrDockGlass)"
+		pointer-events="none"
+	/>
+</svg>

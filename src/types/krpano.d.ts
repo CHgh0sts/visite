@@ -15,6 +15,8 @@ declare global {
       /** Entrée / sortie WebXR — `body.kr-vr-mode` + barre VR krpano (plugin webvr dans tour.xml). */
       onEnterVR: () => void;
       onExitVR: () => void;
+      /** Hotspots barre VR bas (tour-vr-bottombar-generated.xml). */
+      vrNavigateToScene: (sceneId: string) => void;
     };
   }
 }

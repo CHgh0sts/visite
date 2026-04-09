@@ -379,6 +379,39 @@ export function tweenKrpanoViewToSnapshot(
   }
 }
 
+/** Affiche / masque la barre VR krpano (`tour.xml` → `react_vr_navbar_set_visibility`). */
+export function setKrpanoVrNavbarVisibility(
+  krpano: KrpanoViewer,
+  visible: boolean,
+): void {
+  try {
+    krpano.call(`react_vr_navbar_set_visibility(${visible ? 1 : 0});`);
+  } catch {
+    /* ignore */
+  }
+}
+
+let lastVrNavbarSyncedToWebVr: boolean | null = null;
+
+export function syncKrpanoVrNavbarVisibility(krpano: KrpanoViewer): void {
+  const on = getKrpanoWebVrEnabled(krpano);
+  if (lastVrNavbarSyncedToWebVr === on) return;
+  lastVrNavbarSyncedToWebVr = on;
+  setKrpanoVrNavbarVisibility(krpano, on);
+}
+
+export function resetKrpanoVrNavbarVisibilitySyncCache(): void {
+  lastVrNavbarSyncedToWebVr = null;
+}
+
+export function syncKrpanoVrFollowBar(krpano: KrpanoViewer): void {
+  try {
+    krpano.call("react_vr_followbar_sync();");
+  } catch {
+    /* ignore */
+  }
+}
+
 /** Session WebXR active (plugin `webvr`). */
 export function getKrpanoWebVrEnabled(krpano: KrpanoViewer): boolean {
   const g = krpano.get;

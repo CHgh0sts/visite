@@ -7,9 +7,9 @@ const DEFAULT_FG = "#0e203d";
 const DEFAULT_HOVER_BG = "#0e203d";
 const DEFAULT_HOVER_FG = "#ffffff";
 
-/** Classes Tailwind du bouton par défaut (sans couleurs custom). */
+/** Classes Tailwind du bouton par défaut (sans couleurs custom) — style Micronique aligné sur la dock / SceneNavBar. */
 export const interactionBtnDefaultClass =
-  "bg-white text-[#0e203d] shadow-lg backdrop-blur-sm transition hover:bg-[#0e203d] hover:text-white hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0e203d]/35";
+  "border border-white/65 bg-white/[0.88] text-[#0e203d] shadow-[0_4px_18px_rgba(15,23,42,0.12)] backdrop-blur-md transition hover:border-[#0e203d]/35 hover:bg-[#0e203d] hover:text-white hover:shadow-[0_6px_22px_rgba(15,23,42,0.2)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0e203d]/35";
 
 export function hasCustomInteractionColors(b: SceneInteractionButton): boolean {
   return !!(
@@ -39,7 +39,7 @@ export function interactionButtonCustomStyle(
 }
 
 export const interactionBtnCustomClass =
-  "ix-interaction-btn shadow-lg backdrop-blur-sm transition hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0e203d]/40";
+  "ix-interaction-btn border border-black/[0.08] shadow-[0_4px_16px_rgba(15,23,42,0.1)] backdrop-blur-md transition hover:border-[#0e203d]/25 hover:shadow-[0_6px_20px_rgba(15,23,42,0.15)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0e203d]/40";
 
 const DEFAULT_BTN_BORDER_RGBA = "rgba(14, 32, 61, 0.2)";
 
@@ -88,7 +88,8 @@ export function sceneButtonBorderTailwindClass(
   if (explicitW && w === 0) return "border-0";
   if ((explicitW && w > 0) || (!explicitW && !!c)) return "border-0";
   if (isImageButton) return "border-0";
-  return "border border-[#0e203d]/20";
+  /* Bordure portée par interactionBtnDefaultClass / interactionBtnCustomClass (verre Micronique). */
+  return "";
 }
 
 /** Pour les boutons image : anneau par défaut ou désactivé si bordure personnalisée. */

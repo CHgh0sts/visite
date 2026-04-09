@@ -85,7 +85,7 @@ function ScreenPercentButtons({
             <div
               className={
                 hi
-                  ? "rounded-full ring-[3px] ring-sky-400 ring-offset-[3px] ring-offset-black/50 shadow-[0_0_22px_rgba(56,189,248,0.65)]"
+                  ? "rounded-xl ring-[3px] ring-sky-400 ring-offset-[3px] ring-offset-black/50 shadow-[0_0_22px_rgba(56,189,248,0.65)]"
                   : undefined
               }
             >
@@ -188,7 +188,7 @@ function SphereAnchoredButtons({
             <div
               className={
                 hi
-                  ? "rounded-full ring-[3px] ring-sky-400 ring-offset-[3px] ring-offset-black/50 shadow-[0_0_22px_rgba(56,189,248,0.65)]"
+                  ? "rounded-xl ring-[3px] ring-sky-400 ring-offset-[3px] ring-offset-black/50 shadow-[0_0_22px_rgba(56,189,248,0.65)]"
                   : undefined
               }
             >

@@ -1,1 +1,7 @@
-{}
+{
+  "map": {},
+  "krpanoNavigationHotspotStyle": {
+    "url": "krpano-patches/hotspot.svg"
+  },
+  "krpanoXmlHotspotOverrides": {}
+}

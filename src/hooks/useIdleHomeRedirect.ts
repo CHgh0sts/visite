@@ -21,6 +21,7 @@ const ACTIVITY_EVENTS = [
  * Le minuteur est mis en pause quand l’onglet n’est pas visible.
  * Si `blockIdle` est vrai (ex. vidéo en lecture), aucune redirection tant que ce n’est pas repassé à faux
  * (fin de lecture, pause, fermeture du lecteur) — le délai de 30 s repart alors à zéro.
+ * En WebXR / VR (`body.kr-vr-mode`, posé par krpano), aucune redirection : l’utilisateur n’a souvent pas de souris.
  */
 export function useIdleHomeRedirect(enabled = true, blockIdle = false) {
   const router = useRouter();
@@ -28,6 +29,8 @@ export function useIdleHomeRedirect(enabled = true, blockIdle = false) {
 
   useEffect(() => {
     if (!enabled) return;
+
+    const isVrMode = () => document.body.classList.contains("kr-vr-mode");
 
     const clearTimer = () => {
       if (timeoutRef.current !== null) {
@@ -39,7 +42,9 @@ export function useIdleHomeRedirect(enabled = true, blockIdle = false) {
     const scheduleRedirect = () => {
       clearTimer();
       if (blockIdle) return;
+      if (isVrMode()) return;
       timeoutRef.current = setTimeout(() => {
+        if (isVrMode()) return;
         router.replace("/");
       }, IDLE_MS);
     };
@@ -65,7 +70,21 @@ export function useIdleHomeRedirect(enabled = true, blockIdle = false) {
     };
     document.addEventListener("visibilitychange", onVisibility);
 
+    const onBodyClass = () => {
+      if (isVrMode()) {
+        clearTimer();
+      } else if (!document.hidden) {
+        scheduleRedirect();
+      }
+    };
+    const bodyClassObserver = new MutationObserver(onBodyClass);
+    bodyClassObserver.observe(document.body, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
     return () => {
+      bodyClassObserver.disconnect();
       clearTimer();
       for (const ev of ACTIVITY_EVENTS) {
         window.removeEventListener(ev, onActivity, { capture: true });

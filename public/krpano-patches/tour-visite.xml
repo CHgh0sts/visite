@@ -21,7 +21,7 @@
 	<!-- ############################################################## -->
 	<!-- WebGL + distorted : obligatoire en WebXR casque (HTML/css3d n’est pas rendu en VR). -->
 	<style name="hotspot_custom_style"
-		url="skin/vtourskin_hotspot.png"
+		url="krpano-patches/hotspot.svg"
 		edge="top"
 		distorted="true"
 		renderer="webgl"

@@ -168,6 +168,50 @@ export type SceneInteractionButton =
 /** Clé = nom de scène krpano (ex. scene_micronique_1) */
 export type SceneInteractionsMap = Record<string, SceneInteractionButton[]>;
 
+/**
+ * Paramètres des flèches / hotspots de navigation du tour XML (`style name="hotspot_custom_style"`).
+ * Stockés dans le JSON PostgreSQL à côté de `map`, appliqués au viewer au chargement.
+ */
+export type KrpanoNavigationHotspotStyle = {
+  /** Chemin relatif au basepath krpano (ex. `krpano-patches/hotspot.svg`). */
+  url?: string;
+  /** Échelle de base (le style XML utilise souvent une animation depuis 0). */
+  scale?: number;
+  /** Décalage vertical pixels (krpano `oy`). */
+  oy?: number;
+  /** `edge` du hotspot (ex. `top`). */
+  edge?: string;
+  zorder?: number;
+};
+
+/**
+ * Surcharges par hotspot XML (nom krpano tel que dans `data/tour.xml`), par scène.
+ * Appliquées après le style global `hotspot_custom_style`.
+ */
+export type KrpanoXmlHotspotOverride = {
+  /** Texture du hotspot (relatif au basepath krpano). */
+  url?: string;
+  scale?: number;
+  ox?: number;
+  oy?: number;
+  edge?: string;
+  zorder?: number;
+  /** Rotation dans le plan du hotspot (°) — krpano `rotate`. */
+  rotateDeg?: number;
+  ath?: number;
+  atv?: number;
+  /** Surcharge des actions (texte krpano), pour personnaliser hover / clic. */
+  onover?: string;
+  onout?: string;
+  onclick?: string;
+};
+
+/** sceneId → hotspotName → override */
+export type KrpanoXmlHotspotOverridesByScene = Record<
+  string,
+  Record<string, KrpanoXmlHotspotOverride>
+>;
+
 export function isLucideButton(
   b: SceneInteractionButton,
 ): b is SceneInteractionButtonLucide {

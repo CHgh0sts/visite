@@ -29,7 +29,9 @@ const BAR_W = 780;
 const BAR_H = 96;
 const PAD_X = 20;
 const GAP_NAV_ICONS = 8;
-const ICON_ROW_H = 60;
+/** Réduction légère vs 60 px (largeur des slots inchangée, hotspots plus petits, centrés). */
+const ICON_SIZE_MUL = 0.9;
+const ICON_ROW_H = Math.round(60 * ICON_SIZE_MUL);
 const BAR_ATH = 0;
 /** krpano : oy positif = vers le bas ; edge=bottom + même ath/atv que le fond → oy négatif pour remonter dans la pilule. */
 const oyIcon = -Math.round((BAR_H - ICON_ROW_H) / 2);
@@ -86,7 +88,7 @@ for (let i = 0; i < n; i++) {
   const sceneId = items[i].sceneId.trim();
   const iconUrl = encodeIconUrlForXml(items[i].iconUrl.trim());
   const sid = escapeSceneIdForJscall(sceneId);
-  const wi = navWpx;
+  const wi = Math.max(1, Math.floor(navWpx * ICON_SIZE_MUL));
   const oxi = oxIcons[i];
   hs.push(`\t<hotspot name="react_vr_nav_${i}" keep="true" type="image"`);
   hs.push(`\t\turl="${iconUrl}"`);

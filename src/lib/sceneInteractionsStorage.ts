@@ -3,6 +3,9 @@ import {
   hasModalContent,
   type InteractionHoverHintPlacement,
   type InteractionModalContent,
+  type KrpanoNavigationHotspotStyle,
+  type KrpanoXmlHotspotOverride,
+  type KrpanoXmlHotspotOverridesByScene,
   type SceneInteractionButton,
   type SceneInteractionsMap,
 } from "@/types/interactions";
@@ -15,6 +18,124 @@ import {
  *
  * Fusion : défauts puis base : pour un même `id` de bouton, la base remplace le défaut.
  */
+
+const RESERVED_PAYLOAD_KEYS = new Set([
+  "map",
+  "krpanoNavigationHotspotStyle",
+  "krpanoXmlHotspotOverrides",
+]);
+
+function rawMapFromPayload(parsed: unknown): unknown {
+  if (!parsed || typeof parsed !== "object") return {};
+  const o = parsed as Record<string, unknown>;
+  if (o.map && typeof o.map === "object" && !Array.isArray(o.map)) {
+    return o.map;
+  }
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(o)) {
+    if (!RESERVED_PAYLOAD_KEYS.has(k)) out[k] = v;
+  }
+  return out;
+}
+
+export function parseKrpanoNavigationHotspotStyle(
+  raw: unknown,
+): KrpanoNavigationHotspotStyle | undefined {
+  if (!raw || typeof raw !== "object") return undefined;
+  const o = raw as Record<string, unknown>;
+  const out: KrpanoNavigationHotspotStyle = {};
+  if (typeof o.url === "string" && o.url.trim()) out.url = o.url.trim();
+  if (typeof o.scale === "number" && Number.isFinite(o.scale)) out.scale = o.scale;
+  if (typeof o.oy === "number" && Number.isFinite(o.oy)) out.oy = o.oy;
+  if (typeof o.edge === "string" && o.edge.trim()) out.edge = o.edge.trim();
+  if (typeof o.zorder === "number" && Number.isFinite(o.zorder)) out.zorder = o.zorder;
+  return Object.keys(out).length > 0 ? out : undefined;
+}
+
+export function mergeKrpanoNavigationHotspotStyle(
+  base: KrpanoNavigationHotspotStyle | undefined,
+  overlay: KrpanoNavigationHotspotStyle | undefined,
+): KrpanoNavigationHotspotStyle | undefined {
+  if (!overlay || Object.keys(overlay).length === 0) return base;
+  if (!base || Object.keys(base).length === 0) return overlay;
+  return { ...base, ...overlay };
+}
+
+function parseOneHotspotOverrideFields(
+  o: Record<string, unknown>,
+): KrpanoXmlHotspotOverride {
+  const out: KrpanoXmlHotspotOverride = {};
+  if (typeof o.url === "string" && o.url.trim()) out.url = o.url.trim();
+  if (typeof o.edge === "string" && o.edge.trim()) out.edge = o.edge.trim();
+  if (typeof o.onover === "string") out.onover = o.onover;
+  if (typeof o.onout === "string") out.onout = o.onout;
+  if (typeof o.onclick === "string") out.onclick = o.onclick;
+  const n = (x: unknown) =>
+    typeof x === "number" && Number.isFinite(x) ? x : undefined;
+  const sc = n(o.scale);
+  if (sc !== undefined) out.scale = sc;
+  const ox = n(o.ox);
+  if (ox !== undefined) out.ox = ox;
+  const oy = n(o.oy);
+  if (oy !== undefined) out.oy = oy;
+  const zo = n(o.zorder);
+  if (zo !== undefined) out.zorder = zo;
+  const rd = n(o.rotateDeg);
+  if (rd !== undefined) out.rotateDeg = rd;
+  const ath = n(o.ath);
+  if (ath !== undefined) out.ath = ath;
+  const atv = n(o.atv);
+  if (atv !== undefined) out.atv = atv;
+  return out;
+}
+
+function migrateHotspotOverride(raw: unknown): KrpanoXmlHotspotOverride {
+  if (!raw || typeof raw !== "object") return {};
+  const o = raw as Record<string, unknown>;
+  const n = parseOneHotspotOverrideFields(o);
+  return { ...o, ...n } as KrpanoXmlHotspotOverride;
+}
+
+export function parseKrpanoXmlHotspotOverrides(
+  parsed: unknown,
+): KrpanoXmlHotspotOverridesByScene {
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+  const out: KrpanoXmlHotspotOverridesByScene = {};
+  for (const [sceneId, hmap] of Object.entries(
+    parsed as Record<string, unknown>,
+  )) {
+    if (!hmap || typeof hmap !== "object" || Array.isArray(hmap)) continue;
+    const hm: Record<string, KrpanoXmlHotspotOverride> = {};
+    for (const [hn, raw] of Object.entries(hmap)) {
+      hm[hn] = migrateHotspotOverride(raw);
+    }
+    if (Object.keys(hm).length > 0) out[sceneId] = hm;
+  }
+  return out;
+}
+
+export function mergeKrpanoXmlHotspotOverrides(
+  base: KrpanoXmlHotspotOverridesByScene | undefined,
+  overlay: KrpanoXmlHotspotOverridesByScene | undefined,
+): KrpanoXmlHotspotOverridesByScene {
+  if (!overlay || Object.keys(overlay).length === 0) {
+    return base ? { ...base } : {};
+  }
+  if (!base || Object.keys(base).length === 0) {
+    return { ...overlay };
+  }
+  const out: KrpanoXmlHotspotOverridesByScene = { ...base };
+  for (const [sceneId, hmap] of Object.entries(overlay)) {
+    out[sceneId] = { ...(base[sceneId] ?? {}) };
+    for (const [hn, o] of Object.entries(hmap)) {
+      out[sceneId][hn] = {
+        ...(base[sceneId]?.[hn] ?? {}),
+        ...o,
+      };
+    }
+  }
+  return out;
+}
 
 const COLOR_KEYS = [
   "bgColor",
@@ -88,8 +209,19 @@ function readModal(o: Record<string, unknown>): InteractionModalContent | undefi
   return hasModalContent(modal) ? modal : undefined;
 }
 
+/** Conserve toute clé JSON dans `modal` (futurs champs) tout en appliquant la lecture typée par-dessus. */
+function mergeModalPreserve(o: Record<string, unknown>): InteractionModalContent | undefined {
+  const raw = o.modal;
+  const parsed = readModal(o);
+  if (!raw || typeof raw !== "object") return parsed;
+  const m = raw as Record<string, unknown>;
+  const merged = { ...m, ...(parsed ?? {}) } as InteractionModalContent;
+  if (Object.keys(merged as object).length === 0) return undefined;
+  return merged;
+}
+
 function readIsEquipment(o: Record<string, unknown>): { isEquipment?: boolean } {
-  if (o.isEquipment === true) return { isEquipment: true };
+  if (typeof o.isEquipment === "boolean") return { isEquipment: o.isEquipment };
   return {};
 }
 
@@ -123,8 +255,8 @@ function readTargetSceneId(o: Record<string, unknown>): {
 function readPreserveCurrentViewOnSceneChange(o: Record<string, unknown>): {
   preserveCurrentViewOnSceneChange?: boolean;
 } {
-  if (o.preserveCurrentViewOnSceneChange === true) {
-    return { preserveCurrentViewOnSceneChange: true };
+  if (typeof o.preserveCurrentViewOnSceneChange === "boolean") {
+    return { preserveCurrentViewOnSceneChange: o.preserveCurrentViewOnSceneChange };
   }
   return {};
 }
@@ -150,6 +282,25 @@ function readTargetSceneLookAt(o: Record<string, unknown>): {
   const f = t.fov;
   if (typeof f === "number" && Number.isFinite(f)) out.fov = f;
   return { targetSceneLookAt: out };
+}
+
+/** Conserve les clés supplémentaires dans `targetSceneLookAt` tout en normalisant h/v/fov. */
+function mergeTargetSceneLookAtPreserve(
+  o: Record<string, unknown>,
+): SceneInteractionButton["targetSceneLookAt"] | undefined {
+  const raw = o.targetSceneLookAt;
+  const parsed = readTargetSceneLookAt(o).targetSceneLookAt;
+  if (!raw || typeof raw !== "object") return parsed;
+  const t = raw as Record<string, unknown>;
+  if (parsed) {
+    return { ...t, ...parsed } as NonNullable<
+      SceneInteractionButton["targetSceneLookAt"]
+    >;
+  }
+  if (Object.keys(t).length > 0) {
+    return t as NonNullable<SceneInteractionButton["targetSceneLookAt"]>;
+  }
+  return undefined;
 }
 
 function readSceneBtnFields(o: Record<string, unknown>): {
@@ -232,21 +383,24 @@ function migrateButton(raw: unknown): SceneInteractionButton {
   }
   const o = raw as Record<string, unknown>;
   const pos = readPos(o);
-  const modal = readModal(o);
-  const modalField = modal ? { modal } : {};
+  const modalMerged = mergeModalPreserve(o);
+  const modalField = modalMerged ? { modal: modalMerged } : {};
   const colorFields = readColors(o);
   const rotationFields = readIconRotation(o);
   const hoverFields = readHoverHintFields(o);
+  const targetLookAt = mergeTargetSceneLookAtPreserve(o);
   const targetSceneFields = {
     ...readTargetSceneId(o),
-    ...readTargetSceneLookAt(o),
+    ...(targetLookAt ? { targetSceneLookAt: targetLookAt } : {}),
     ...readPreserveCurrentViewOnSceneChange(o),
   };
   const sceneBtnFields = readSceneBtnFields(o);
   const equipmentField = readIsEquipment(o);
 
+  let normalized: SceneInteractionButton;
+
   if (o.contentType === "lucide" && typeof o.lucideIcon === "string") {
-    return {
+    normalized = {
       id: String(o.id),
       contentType: "lucide",
       lucideIcon: o.lucideIcon,
@@ -263,9 +417,8 @@ function migrateButton(raw: unknown): SceneInteractionButton {
         ? { ath: pos.ath, atv: pos.atv! }
         : { topPct: pos.topPct, leftPct: pos.leftPct }),
     };
-  }
-  if (o.contentType === "image" && typeof o.imageSrc === "string") {
-    return {
+  } else if (o.contentType === "image" && typeof o.imageSrc === "string") {
+    normalized = {
       id: String(o.id),
       contentType: "image",
       imageSrc: o.imageSrc,
@@ -282,13 +435,14 @@ function migrateButton(raw: unknown): SceneInteractionButton {
         ? { ath: pos.ath, atv: pos.atv! }
         : { topPct: pos.topPct, leftPct: pos.leftPct }),
     };
-  }
-  if (o.contentType === "svg") {
+  } else if (o.contentType === "svg") {
     const svgId =
-      o.svgId === "arrow" || o.svgId === "microniquePlay"
+      o.svgId === "arrow" ||
+      o.svgId === "microniquePlay" ||
+      o.svgId === "cross"
         ? o.svgId
         : "cross";
-    return {
+    normalized = {
       id: String(o.id),
       contentType: "svg",
       svgId,
@@ -305,27 +459,71 @@ function migrateButton(raw: unknown): SceneInteractionButton {
         ? { ath: pos.ath, atv: pos.atv! }
         : { topPct: pos.topPct, leftPct: pos.leftPct }),
     };
+  } else {
+    normalized = {
+      id: String(o.id),
+      label: typeof o.label === "string" ? o.label : "Bouton",
+      url: typeof o.url === "string" ? o.url : undefined,
+      contentType: "text",
+      ...modalField,
+      ...colorFields,
+      ...rotationFields,
+      ...hoverFields,
+      ...targetSceneFields,
+      ...sceneBtnFields,
+      ...equipmentField,
+      ...(pos.ath !== undefined
+        ? { ath: pos.ath, atv: pos.atv! }
+        : { topPct: pos.topPct, leftPct: pos.leftPct }),
+    };
   }
-  return {
-    id: String(o.id),
-    label: typeof o.label === "string" ? o.label : "Bouton",
-    url: typeof o.url === "string" ? o.url : undefined,
-    contentType: "text",
-    ...modalField,
-    ...colorFields,
-    ...rotationFields,
-    ...hoverFields,
-    ...targetSceneFields,
-    ...sceneBtnFields,
-    ...equipmentField,
-    ...(pos.ath !== undefined
-      ? { ath: pos.ath, atv: pos.atv! }
-      : { topPct: pos.topPct, leftPct: pos.leftPct }),
-  };
+
+  /** JSON brut d’abord, champs normalisés ensuite (icône, rotations, modal fusionné, etc.). */
+  return { ...o, ...normalized } as SceneInteractionButton;
 }
 
 export function parseSceneInteractionsPayload(parsed: unknown): SceneInteractionsMap {
-  return migrateMap(parsed);
+  return migrateMap(rawMapFromPayload(parsed));
+}
+
+/** Payload complet API / base : `map` + optionnel `krpanoNavigationHotspotStyle`. */
+export function parseSceneInteractionsDocument(parsed: unknown): {
+  map: SceneInteractionsMap;
+  krpanoNavigationHotspotStyle?: KrpanoNavigationHotspotStyle;
+  krpanoXmlHotspotOverrides?: KrpanoXmlHotspotOverridesByScene;
+} {
+  const map = migrateMap(rawMapFromPayload(parsed));
+  let krpanoNavigationHotspotStyle: KrpanoNavigationHotspotStyle | undefined;
+  let krpanoXmlHotspotOverrides: KrpanoXmlHotspotOverridesByScene | undefined;
+  if (parsed && typeof parsed === "object") {
+    const o = parsed as Record<string, unknown>;
+    const rawStyle = o.krpanoNavigationHotspotStyle;
+    const parsedStyle = parseKrpanoNavigationHotspotStyle(rawStyle);
+    if (rawStyle && typeof rawStyle === "object" && !Array.isArray(rawStyle)) {
+      const merged = {
+        ...(rawStyle as Record<string, unknown>),
+        ...(parsedStyle ?? {}),
+      };
+      if (Object.keys(merged).length > 0) {
+        krpanoNavigationHotspotStyle = merged as KrpanoNavigationHotspotStyle;
+      }
+    } else if (parsedStyle && Object.keys(parsedStyle).length > 0) {
+      krpanoNavigationHotspotStyle = parsedStyle;
+    }
+    const rawOv = o.krpanoXmlHotspotOverrides;
+    if (rawOv !== undefined && rawOv !== null && typeof rawOv === "object" && !Array.isArray(rawOv)) {
+      krpanoXmlHotspotOverrides = parseKrpanoXmlHotspotOverrides(rawOv);
+    }
+  }
+  return {
+    map,
+    ...(krpanoNavigationHotspotStyle
+      ? { krpanoNavigationHotspotStyle }
+      : {}),
+    ...(krpanoXmlHotspotOverrides !== undefined
+      ? { krpanoXmlHotspotOverrides }
+      : {}),
+  };
 }
 
 function migrateMap(parsed: unknown): SceneInteractionsMap {
@@ -366,28 +564,112 @@ export function mergeInteractionMaps(
 
 /** Données par défaut embarquées dans le build (fichier JSON). */
 export function getDefaultInteractions(): SceneInteractionsMap {
-  return migrateMap(defaultInteractionsJson as unknown);
+  return parseSceneInteractionsDocument(defaultInteractionsJson as unknown).map;
+}
+
+export function getDefaultKrpanoNavigationHotspotStyle():
+  | KrpanoNavigationHotspotStyle
+  | undefined {
+  return parseSceneInteractionsDocument(defaultInteractionsJson as unknown)
+    .krpanoNavigationHotspotStyle;
+}
+
+export function getDefaultKrpanoXmlHotspotOverrides(): KrpanoXmlHotspotOverridesByScene {
+  return (
+    parseSceneInteractionsDocument(defaultInteractionsJson as unknown)
+      .krpanoXmlHotspotOverrides ?? {}
+  );
 }
 
 /**
  * Charge défauts + carte en base (API). Côté serveur sans `fetch` : défauts seuls.
  */
-export async function loadSiteInteractions(): Promise<SceneInteractionsMap> {
-  const defaults = getDefaultInteractions();
-  if (typeof window === "undefined") return defaults;
+export async function loadSiteInteractionsDocument(): Promise<{
+  map: SceneInteractionsMap;
+  krpanoNavigationHotspotStyle?: KrpanoNavigationHotspotStyle;
+  krpanoXmlHotspotOverrides?: KrpanoXmlHotspotOverridesByScene;
+  /** true si l’API PostgreSQL est injoignable (503, réseau, etc.). */
+  dbUnavailable?: boolean;
+}> {
+  const def = parseSceneInteractionsDocument(defaultInteractionsJson as unknown);
+  const defReturn = {
+    map: def.map,
+    ...("krpanoNavigationHotspotStyle" in def &&
+    def.krpanoNavigationHotspotStyle
+      ? { krpanoNavigationHotspotStyle: def.krpanoNavigationHotspotStyle }
+      : {}),
+    ...(def.krpanoXmlHotspotOverrides !== undefined
+      ? { krpanoXmlHotspotOverrides: def.krpanoXmlHotspotOverrides }
+      : {}),
+  };
+  if (typeof window === "undefined") {
+    return defReturn;
+  }
   try {
     const res = await fetch("/api/scene-interactions", { cache: "no-store" });
-    if (!res.ok) return defaults;
-    const data = (await res.json()) as { map?: unknown };
-    const fromDb = data.map
-      ? parseSceneInteractionsPayload(data.map)
-      : {};
-    return mergeInteractionMaps(defaults, fromDb);
+    if (!res.ok) {
+      return { ...defReturn, dbUnavailable: true };
+    }
+    const data = (await res.json()) as {
+      map?: unknown;
+      krpanoNavigationHotspotStyle?: unknown;
+      krpanoXmlHotspotOverrides?: unknown;
+      error?: string;
+    };
+    if (data.error) {
+      return { ...defReturn, dbUnavailable: true };
+    }
+    const fromDb = parseSceneInteractionsDocument({
+      map: data.map ?? {},
+      krpanoNavigationHotspotStyle: data.krpanoNavigationHotspotStyle,
+      krpanoXmlHotspotOverrides: data.krpanoXmlHotspotOverrides,
+    });
+    const mergedStyle = mergeKrpanoNavigationHotspotStyle(
+      def.krpanoNavigationHotspotStyle,
+      fromDb.krpanoNavigationHotspotStyle,
+    );
+    const mergedOv = mergeKrpanoXmlHotspotOverrides(
+      def.krpanoXmlHotspotOverrides,
+      fromDb.krpanoXmlHotspotOverrides,
+    );
+    return {
+      map: mergeInteractionMaps(def.map, fromDb.map),
+      ...(mergedStyle ? { krpanoNavigationHotspotStyle: mergedStyle } : {}),
+      krpanoXmlHotspotOverrides: mergedOv,
+      dbUnavailable: false,
+    };
   } catch {
-    return defaults;
+    return { ...defReturn, dbUnavailable: true };
   }
+}
+
+/** @deprecated Préférer `loadSiteInteractionsDocument` pour le style hotspots XML. */
+export async function loadSiteInteractions(): Promise<SceneInteractionsMap> {
+  const d = await loadSiteInteractionsDocument();
+  return d.map;
 }
 
 export function exportInteractionsJson(map: SceneInteractionsMap): string {
   return JSON.stringify(map, null, 2);
+}
+
+export function exportInteractionsDocumentJson(
+  map: SceneInteractionsMap,
+  krpanoNavigationHotspotStyle?: KrpanoNavigationHotspotStyle,
+  krpanoXmlHotspotOverrides?: KrpanoXmlHotspotOverridesByScene,
+): string {
+  const o: Record<string, unknown> = { map };
+  if (
+    krpanoNavigationHotspotStyle &&
+    Object.keys(krpanoNavigationHotspotStyle).length > 0
+  ) {
+    o.krpanoNavigationHotspotStyle = krpanoNavigationHotspotStyle;
+  }
+  if (
+    krpanoXmlHotspotOverrides &&
+    Object.keys(krpanoXmlHotspotOverrides).length > 0
+  ) {
+    o.krpanoXmlHotspotOverrides = krpanoXmlHotspotOverrides;
+  }
+  return JSON.stringify(o, null, 2);
 }

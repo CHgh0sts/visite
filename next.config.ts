@@ -5,6 +5,8 @@ const MICRONIQUE_PUBLIC =
   "https://micronique-public.tech-47e.workers.dev";
 
 const nextConfig: NextConfig = {
+  /** Prisma : évite des erreurs de connexion / bundling avec Turbopack. */
+  serverExternalPackages: ["@prisma/client", "prisma"],
   async rewrites() {
     return [
       /* Carte : le worker n’a pas plugins/krpanomaps.xml (404) → tour local avec maps désactivé */

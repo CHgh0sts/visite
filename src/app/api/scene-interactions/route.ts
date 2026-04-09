@@ -1,7 +1,18 @@
 import { NextResponse } from "next/server";
+import type { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
-import { parseSceneInteractionsPayload } from "@/lib/sceneInteractionsStorage";
+import {
+  parseKrpanoNavigationHotspotStyle,
+  parseKrpanoXmlHotspotOverrides,
+  parseSceneInteractionsDocument,
+  parseSceneInteractionsPayload,
+} from "@/lib/sceneInteractionsStorage";
+
+/** JSON 100 % sérialisable pour la colonne Prisma (supprime undefined, NaN, etc.). */
+function toPrismaJson(value: unknown): Prisma.InputJsonValue {
+  return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
+}
 
 const SNAPSHOT_ID = "default";
 
@@ -10,15 +21,26 @@ export async function GET() {
     const row = await prisma.sceneInteractionsSnapshot.findUnique({
       where: { id: SNAPSHOT_ID },
     });
-    const map = row?.payload
-      ? parseSceneInteractionsPayload(row.payload)
-      : {};
-    return NextResponse.json({ map });
+    const doc = row?.payload
+      ? parseSceneInteractionsDocument(row.payload)
+      : { map: {} };
+    return NextResponse.json({
+      map: doc.map,
+      krpanoNavigationHotspotStyle: doc.krpanoNavigationHotspotStyle ?? null,
+      krpanoXmlHotspotOverrides: doc.krpanoXmlHotspotOverrides ?? null,
+    });
   } catch (e) {
     console.error("[scene-interactions GET]", e);
+    const msg = e instanceof Error ? e.message : String(e);
     return NextResponse.json(
-      { map: {}, error: "base_indisponible" },
-      { status: 200 },
+      {
+        map: {},
+        krpanoNavigationHotspotStyle: null,
+        krpanoXmlHotspotOverrides: null,
+        error: "base_indisponible",
+        details: msg,
+      },
+      { status: 503 },
     );
   }
 }
@@ -31,37 +53,69 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "JSON invalide" }, { status: 400 });
   }
 
-  const raw =
-    body &&
-    typeof body === "object" &&
-    "map" in body &&
-    (body as { map: unknown }).map != null
-      ? (body as { map: unknown }).map
-      : null;
+  if (!body || typeof body !== "object") {
+    return NextResponse.json({ error: "Corps JSON invalide" }, { status: 400 });
+  }
 
-  if (!raw || typeof raw !== "object") {
+  const b = body as Record<string, unknown>;
+  const mapRaw = b.map;
+  if (mapRaw == null || typeof mapRaw !== "object") {
     return NextResponse.json(
-      { error: "Corps attendu : { map : { [sceneId]: boutons[] } }" },
+      { error: "Corps attendu : { map : { [sceneId]: boutons[] }, krpanoNavigationHotspotStyle? }" },
       { status: 400 },
     );
   }
 
-  const map = parseSceneInteractionsPayload(raw);
+  const map = parseSceneInteractionsPayload(mapRaw);
+  const styleRaw = b.krpanoNavigationHotspotStyle;
+  const parsedStyle = parseKrpanoNavigationHotspotStyle(styleRaw);
+  const styleMerged =
+    styleRaw && typeof styleRaw === "object" && !Array.isArray(styleRaw)
+      ? ({
+          ...(styleRaw as Record<string, unknown>),
+          ...(parsedStyle ?? {}),
+        } as Record<string, unknown>)
+      : parsedStyle ?? {};
+  const overridesRaw = b.krpanoXmlHotspotOverrides;
+  const krpanoXmlHotspotOverrides =
+    overridesRaw !== undefined &&
+    overridesRaw !== null &&
+    typeof overridesRaw === "object" &&
+    !Array.isArray(overridesRaw)
+      ? parseKrpanoXmlHotspotOverrides(overridesRaw)
+      : {};
+
+  const payload = toPrismaJson({
+    map,
+    krpanoNavigationHotspotStyle: styleMerged,
+    krpanoXmlHotspotOverrides,
+  });
 
   try {
-    await prisma.sceneInteractionsSnapshot.upsert({
+    const row = await prisma.sceneInteractionsSnapshot.upsert({
       where: { id: SNAPSHOT_ID },
       create: {
         id: SNAPSHOT_ID,
-        payload: map as object,
+        payload,
       },
       update: {
-        payload: map as object,
+        payload,
       },
     });
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({
+      ok: true,
+      id: row.id,
+      updatedAt: row.updatedAt.toISOString(),
+    });
   } catch (e) {
     console.error("[scene-interactions POST]", e);
-    return NextResponse.json({ error: "Erreur base de données" }, { status: 500 });
+    const msg = e instanceof Error ? e.message : String(e);
+    return NextResponse.json(
+      {
+        error: "Erreur base de données",
+        details: msg,
+      },
+      { status: 503 },
+    );
   }
 }

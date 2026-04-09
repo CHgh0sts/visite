@@ -38,23 +38,24 @@ function parseSceneBlock(block) {
     };
   }
 
+  /** Tous les hotspots XML de la scène (navigation, points d’info, etc.). */
   const hotspots = [];
   const lines = block.split("\n");
   for (const line of lines) {
     if (!line.includes("<hotspot")) continue;
-    if (!line.includes('onclick="loadscene')) continue;
     const ath = getAttr(line, "ath");
     const atv = getAttr(line, "atv");
-    const linked = getAttr(line, "linkedscene");
     const hname = getAttr(line, "name");
-    if (!linked || !ath || !atv) continue;
-    if (!linked.startsWith("scene_micronique")) continue;
+    const linked = getAttr(line, "linkedscene");
+    if (!hname || ath == null || atv == null) continue;
+    const linkedOk =
+      linked && linked.startsWith("scene_micronique") ? linked : null;
     hotspots.push({
       id: `${id}__${hname}`,
       name: hname,
       ath: parseFloat(ath, 10),
       atv: parseFloat(atv, 10),
-      targetSceneId: linked,
+      targetSceneId: linkedOk,
     });
   }
 

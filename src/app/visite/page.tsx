@@ -1,4 +1,4 @@
-import { VisiteShell } from "@/components/InteractionEditor";
+import { VisiteShell } from "@/components/VisiteShell";
 
 import type { Metadata } from "next";
 

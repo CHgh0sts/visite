@@ -213,7 +213,7 @@ export function InteractionButtonView({
           type="button"
           onClick={onActivate}
           style={style}
-          className={`rounded-full px-4 py-2 text-sm font-medium ${borderTw} ${baseClasses(b)}`}
+          className={`rounded-xl px-4 py-2 text-sm font-medium ${borderTw} ${baseClasses(b)}`}
           aria-describedby={hintId}
         >
           {b.label}
@@ -231,7 +231,7 @@ export function InteractionButtonView({
           type="button"
           onClick={onActivate}
           style={style}
-          className={`flex size-11 shrink-0 items-center justify-center rounded-full ${borderTw} ${baseClasses(
+          className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${borderTw} ${baseClasses(
             b,
           )}`}
           aria-label={b.label?.trim() || b.lucideIcon}
@@ -265,7 +265,7 @@ export function InteractionButtonView({
           type="button"
           onClick={onActivate}
           style={style}
-          className={`flex size-11 shrink-0 items-center justify-center rounded-full ${borderTw} ${baseClasses(
+          className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${borderTw} ${baseClasses(
             b,
           )}`}
           aria-label={b.label?.trim() || "Icône"}
@@ -299,7 +299,7 @@ export function InteractionButtonView({
           type="button"
           onClick={onActivate}
           style={style}
-          className={`size-14 shrink-0 overflow-hidden rounded-full p-0 ${ringW} ${ringClass} ${borderTw} ${baseClasses(
+          className={`size-14 shrink-0 overflow-hidden rounded-xl p-0 ${ringW} ${ringClass} ${borderTw} ${baseClasses(
             b,
           )}`}
           aria-label={b.imageAlt?.trim() || "Image"}

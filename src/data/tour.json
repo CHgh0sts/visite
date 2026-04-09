@@ -31,6 +31,27 @@
           "ath": -17.506,
           "atv": 7.263,
           "targetSceneId": "scene_micronique_2"
+        },
+        {
+          "id": "scene_micronique_1__scene_micronique_1_hi_1",
+          "name": "scene_micronique_1_hi_1",
+          "ath": -56.154,
+          "atv": 18.653,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_1__scene_micronique_1_hi_2",
+          "name": "scene_micronique_1_hi_2",
+          "ath": -43.025,
+          "atv": 13.967,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_1__scene_micronique_1_hi_3",
+          "name": "scene_micronique_1_hi_3",
+          "ath": 11.038,
+          "atv": 4.543,
+          "targetSceneId": null
         }
       ]
     },
@@ -64,6 +85,27 @@
           "ath": 36.128,
           "atv": 6.276,
           "targetSceneId": "scene_micronique_3"
+        },
+        {
+          "id": "scene_micronique_2__scene_micronique_2_hi_1",
+          "name": "scene_micronique_2_hi_1",
+          "ath": -114.082,
+          "atv": 17.48,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_2__scene_micronique_2_hi_2",
+          "name": "scene_micronique_2_hi_2",
+          "ath": -71.073,
+          "atv": 21.538,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_2__scene_micronique_2_hi_3",
+          "name": "scene_micronique_2_hi_3",
+          "ath": 16.692,
+          "atv": 16.006,
+          "targetSceneId": null
         }
       ]
     },
@@ -111,6 +153,13 @@
           "ath": 31.899,
           "atv": 7.73,
           "targetSceneId": "scene_micronique_4"
+        },
+        {
+          "id": "scene_micronique_3__scene_micronique_3_hi_1",
+          "name": "scene_micronique_3_hi_1",
+          "ath": -116.707,
+          "atv": 18.695,
+          "targetSceneId": null
         }
       ]
     },
@@ -144,6 +193,34 @@
           "ath": 10.957,
           "atv": 18.94,
           "targetSceneId": "scene_micronique_32"
+        },
+        {
+          "id": "scene_micronique_4__scene_micronique_4_hi_1",
+          "name": "scene_micronique_4_hi_1",
+          "ath": -112.486,
+          "atv": 25.979,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_4__scene_micronique_4_hi_2",
+          "name": "scene_micronique_4_hi_2",
+          "ath": -75.018,
+          "atv": 27.96,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_4__scene_micronique_4_hi_3",
+          "name": "scene_micronique_4_hi_3",
+          "ath": -45.397,
+          "atv": 23.601,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_4__scene_micronique_4_hi_4",
+          "name": "scene_micronique_4_hi_4",
+          "ath": 80.605,
+          "atv": 26.72,
+          "targetSceneId": null
         }
       ]
     },
@@ -170,6 +247,27 @@
           "ath": -117.464,
           "atv": 14.335,
           "targetSceneId": "scene_micronique_32"
+        },
+        {
+          "id": "scene_micronique_5__scene_micronique_5_hi_1",
+          "name": "scene_micronique_5_hi_1",
+          "ath": -97.747,
+          "atv": 16.746,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_5__scene_micronique_5_hi_2",
+          "name": "scene_micronique_5_hi_2",
+          "ath": 6.186,
+          "atv": 16.789,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_5__scene_micronique_5_hi_3",
+          "name": "scene_micronique_5_hi_3",
+          "ath": 109.432,
+          "atv": 29.446,
+          "targetSceneId": null
         }
       ]
     },
@@ -210,6 +308,27 @@
           "ath": -163.064,
           "atv": 3.704,
           "targetSceneId": "scene_micronique_15"
+        },
+        {
+          "id": "scene_micronique_6__scene_micronique_6_hi_1",
+          "name": "scene_micronique_6_hi_1",
+          "ath": 6.39,
+          "atv": 20.134,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_6__scene_micronique_6_hi_2",
+          "name": "scene_micronique_6_hi_2",
+          "ath": 62.37,
+          "atv": 23.064,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_6__scene_micronique_6_hi_3",
+          "name": "scene_micronique_6_hi_3",
+          "ath": 97.322,
+          "atv": 20.665,
+          "targetSceneId": null
         },
         {
           "id": "scene_micronique_6__Micronique_7",
@@ -318,6 +437,13 @@
           "ath": -58.141,
           "atv": 18.705,
           "targetSceneId": "scene_micronique_7"
+        },
+        {
+          "id": "scene_micronique_8__scene_micronique_8_hi_1",
+          "name": "scene_micronique_8_hi_1",
+          "ath": 1.067,
+          "atv": 25.439,
+          "targetSceneId": null
         }
       ]
     },
@@ -344,6 +470,20 @@
           "ath": 120.246,
           "atv": 18.515,
           "targetSceneId": "scene_micronique_8"
+        },
+        {
+          "id": "scene_micronique_9__scene_micronique_9_hi_1",
+          "name": "scene_micronique_9_hi_1",
+          "ath": -16.61,
+          "atv": 18.589,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_9__scene_micronique_9_hi_2",
+          "name": "scene_micronique_9_hi_2",
+          "ath": 7.93,
+          "atv": 9.059,
+          "targetSceneId": null
         }
       ]
     },
@@ -377,6 +517,13 @@
           "ath": 131.479,
           "atv": 7.832,
           "targetSceneId": "scene_micronique_11"
+        },
+        {
+          "id": "scene_micronique_10__scene_micronique_10_hi_1",
+          "name": "scene_micronique_10_hi_1",
+          "ath": -4.903,
+          "atv": 31.494,
+          "targetSceneId": null
         }
       ]
     },
@@ -418,6 +565,13 @@
           "ath": 103.928,
           "atv": 1.547,
           "targetSceneId": "scene_micronique_16"
+        },
+        {
+          "id": "scene_micronique_11__scene_micronique_11_hi_1",
+          "name": "scene_micronique_11_hi_1",
+          "ath": -17.577,
+          "atv": 19.863,
+          "targetSceneId": null
         }
       ]
     },
@@ -524,6 +678,13 @@
           "ath": -92.403,
           "atv": 5.339,
           "targetSceneId": "scene_micronique_19"
+        },
+        {
+          "id": "scene_micronique_14__scene_micronique_14_hi_1",
+          "name": "scene_micronique_14_hi_1",
+          "ath": 4.237,
+          "atv": 32.811,
+          "targetSceneId": null
         }
       ]
     },
@@ -587,11 +748,25 @@
           "targetSceneId": "scene_micronique_14"
         },
         {
+          "id": "scene_micronique_15__scene_micronique_15_hi_1",
+          "name": "scene_micronique_15_hi_1",
+          "ath": 36.972,
+          "atv": 33.968,
+          "targetSceneId": null
+        },
+        {
           "id": "scene_micronique_15__Micronique_19",
           "name": "Micronique_19",
           "ath": -15.891,
           "atv": 6.293,
           "targetSceneId": "scene_micronique_19"
+        },
+        {
+          "id": "scene_micronique_15__scene_micronique_15_hi_2",
+          "name": "scene_micronique_15_hi_2",
+          "ath": -0.459,
+          "atv": 3.789,
+          "targetSceneId": null
         }
       ]
     },
@@ -625,6 +800,27 @@
           "ath": 37.083,
           "atv": 11.867,
           "targetSceneId": "scene_micronique_15c"
+        },
+        {
+          "id": "scene_micronique_15b__scene_micronique_15b_hi_1",
+          "name": "scene_micronique_15b_hi_1",
+          "ath": 14.894,
+          "atv": 18.024,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_15b__scene_micronique_15b_hi_2",
+          "name": "scene_micronique_15b_hi_2",
+          "ath": -100.062,
+          "atv": 18.328,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_15b__scene_micronique_15b_hi_3",
+          "name": "scene_micronique_15b_hi_3",
+          "ath": -71.357,
+          "atv": 10.827,
+          "targetSceneId": null
         }
       ]
     },
@@ -651,6 +847,13 @@
           "ath": -35.589,
           "atv": 11.497,
           "targetSceneId": "scene_micronique_15b"
+        },
+        {
+          "id": "scene_micronique_15c__scene_micronique_15c_hi_1",
+          "name": "scene_micronique_15c_hi_1",
+          "ath": -1.92,
+          "atv": 31.224,
+          "targetSceneId": null
         }
       ]
     },
@@ -698,6 +901,20 @@
           "ath": 109.974,
           "atv": 5.812,
           "targetSceneId": "scene_micronique_17"
+        },
+        {
+          "id": "scene_micronique_16__scene_micronique_16_hi_1",
+          "name": "scene_micronique_16_hi_1",
+          "ath": -3.557,
+          "atv": 24.912,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_16__scene_micronique_16_hi_2",
+          "name": "scene_micronique_16_hi_2",
+          "ath": -70.557,
+          "atv": 10.912,
+          "targetSceneId": null
         }
       ]
     },
@@ -738,6 +955,20 @@
           "ath": -122.156,
           "atv": 9.575,
           "targetSceneId": "scene_micronique_18"
+        },
+        {
+          "id": "scene_micronique_17__scene_micronique_17_hi_1",
+          "name": "scene_micronique_17_hi_1",
+          "ath": 6.879,
+          "atv": 24.513,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_17__scene_micronique_17_hi_2",
+          "name": "scene_micronique_17_hi_2",
+          "ath": -34.348,
+          "atv": 19.988,
+          "targetSceneId": null
         }
       ]
     },
@@ -764,6 +995,20 @@
           "ath": -62.655,
           "atv": 11.271,
           "targetSceneId": "scene_micronique_17"
+        },
+        {
+          "id": "scene_micronique_18__scene_micronique_18_hi_1",
+          "name": "scene_micronique_18_hi_1",
+          "ath": -178.904,
+          "atv": 21.824,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_18__scene_micronique_18_hi_2",
+          "name": "scene_micronique_18_hi_2",
+          "ath": 4.549,
+          "atv": 21.275,
+          "targetSceneId": null
         }
       ]
     },
@@ -818,6 +1063,20 @@
           "ath": -103.199,
           "atv": 3.774,
           "targetSceneId": "scene_micronique_15"
+        },
+        {
+          "id": "scene_micronique_19__scene_micronique_19_hi_1",
+          "name": "scene_micronique_19_hi_1",
+          "ath": -26.23,
+          "atv": 28.964,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_19__scene_micronique_19_hi_2",
+          "name": "scene_micronique_19_hi_2",
+          "ath": 165.786,
+          "atv": 24.099,
+          "targetSceneId": null
         }
       ]
     },
@@ -877,6 +1136,41 @@
           "ath": 148.705,
           "atv": 15.727,
           "targetSceneId": "scene_micronique_34"
+        },
+        {
+          "id": "scene_micronique_21__scene_micronique_21_hi_1",
+          "name": "scene_micronique_21_hi_1",
+          "ath": -150.906,
+          "atv": 31.946,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_21__scene_micronique_21_hi_2",
+          "name": "scene_micronique_21_hi_2",
+          "ath": -95.848,
+          "atv": 33.339,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_21__scene_micronique_21_hi_3",
+          "name": "scene_micronique_21_hi_3",
+          "ath": -31.081,
+          "atv": 13.819,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_21__scene_micronique_21_hi_4",
+          "name": "scene_micronique_21_hi_4",
+          "ath": 58.551,
+          "atv": 28.675,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_21__scene_micronique_21_hi_5",
+          "name": "scene_micronique_21_hi_5",
+          "ath": 107.621,
+          "atv": 18.229,
+          "targetSceneId": null
         }
       ]
     },
@@ -924,6 +1218,20 @@
           "ath": -95.471,
           "atv": 17.562,
           "targetSceneId": "scene_micronique_34"
+        },
+        {
+          "id": "scene_micronique_22__scene_micronique_22_hi_1",
+          "name": "scene_micronique_22_hi_1",
+          "ath": -7.405,
+          "atv": 26.734,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_22__scene_micronique_22_hi_2",
+          "name": "scene_micronique_22_hi_2",
+          "ath": 55.314,
+          "atv": 18.872,
+          "targetSceneId": null
         }
       ]
     },
@@ -964,6 +1272,13 @@
           "ath": -172.089,
           "atv": 13.339,
           "targetSceneId": "scene_micronique_34"
+        },
+        {
+          "id": "scene_micronique_23__scene_micronique_23_hi_1",
+          "name": "scene_micronique_23_hi_1",
+          "ath": 1.214,
+          "atv": 9.376,
+          "targetSceneId": null
         }
       ]
     },
@@ -1044,6 +1359,13 @@
           "ath": -127.64,
           "atv": 10.527,
           "targetSceneId": "scene_micronique_33"
+        },
+        {
+          "id": "scene_micronique_26__scene_micronique_26_hi_1",
+          "name": "scene_micronique_26_hi_1",
+          "ath": -19.122,
+          "atv": 26.79,
+          "targetSceneId": null
         }
       ]
     },
@@ -1070,6 +1392,20 @@
           "ath": 123.933,
           "atv": 9.734,
           "targetSceneId": "scene_micronique_29"
+        },
+        {
+          "id": "scene_micronique_27__scene_micronique_27_hi_1",
+          "name": "scene_micronique_27_hi_1",
+          "ath": -27.341,
+          "atv": 12.339,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_27__scene_micronique_27_hi_2",
+          "name": "scene_micronique_27_hi_2",
+          "ath": 14.641,
+          "atv": 17.895,
+          "targetSceneId": null
         },
         {
           "id": "scene_micronique_27__spot1965365941",
@@ -1138,6 +1474,13 @@
           "targetSceneId": "scene_micronique_27"
         },
         {
+          "id": "scene_micronique_29__scene_micronique_29_hi_1",
+          "name": "scene_micronique_29_hi_1",
+          "ath": -61.711,
+          "atv": 31.113,
+          "targetSceneId": null
+        },
+        {
           "id": "scene_micronique_29__spot1965347055",
           "name": "spot1965347055",
           "ath": 53.05,
@@ -1190,11 +1533,25 @@
       "panoramaFile": "scene_micronique_31.jpg",
       "hotspots": [
         {
+          "id": "scene_micronique_31__scene_micronique_31_hi_1",
+          "name": "scene_micronique_31_hi_1",
+          "ath": 69.414,
+          "atv": 26.778,
+          "targetSceneId": null
+        },
+        {
           "id": "scene_micronique_31__Micronique_29",
           "name": "Micronique_29",
           "ath": 11.574,
           "atv": 5.948,
           "targetSceneId": "scene_micronique_29"
+        },
+        {
+          "id": "scene_micronique_31__scene_micronique_31_hi_2",
+          "name": "scene_micronique_31_hi_2",
+          "ath": -172.042,
+          "atv": 2.934,
+          "targetSceneId": null
         }
       ]
     },
@@ -1228,6 +1585,34 @@
           "ath": 87.487,
           "atv": 19.468,
           "targetSceneId": "scene_micronique_4"
+        },
+        {
+          "id": "scene_micronique_32__scene_micronique_32_hi_1",
+          "name": "scene_micronique_32_hi_1",
+          "ath": -171.47,
+          "atv": 24.134,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_32__scene_micronique_32_hi_2",
+          "name": "scene_micronique_32_hi_2",
+          "ath": -121.15,
+          "atv": 19.963,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_32__scene_micronique_32_hi_3",
+          "name": "scene_micronique_32_hi_3",
+          "ath": -18.197,
+          "atv": 31.663,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_32__scene_micronique_32_hi_4",
+          "name": "scene_micronique_32_hi_4",
+          "ath": 50.197,
+          "atv": 19.663,
+          "targetSceneId": null
         }
       ]
     },
@@ -1261,6 +1646,20 @@
           "ath": 23.324,
           "atv": 19.718,
           "targetSceneId": "scene_micronique_26"
+        },
+        {
+          "id": "scene_micronique_33__scene_micronique_33_hi_1",
+          "name": "scene_micronique_33_hi_1",
+          "ath": 150.943,
+          "atv": 20.031,
+          "targetSceneId": null
+        },
+        {
+          "id": "scene_micronique_33__scene_micronique_33_hi_2",
+          "name": "scene_micronique_33_hi_2",
+          "ath": -82.743,
+          "atv": 25.091,
+          "targetSceneId": null
         }
       ]
     },
@@ -1289,11 +1688,25 @@
           "targetSceneId": "scene_micronique_23"
         },
         {
+          "id": "scene_micronique_34__scene_micronique_34_hi_1",
+          "name": "scene_micronique_34_hi_1",
+          "ath": 24.772,
+          "atv": 24.016,
+          "targetSceneId": null
+        },
+        {
           "id": "scene_micronique_34__Micronique_22",
           "name": "Micronique_22",
           "ath": 86.464,
           "atv": 21.399,
           "targetSceneId": "scene_micronique_22"
+        },
+        {
+          "id": "scene_micronique_34__scene_micronique_34_hi_2",
+          "name": "scene_micronique_34_hi_2",
+          "ath": 139.279,
+          "atv": 20.231,
+          "targetSceneId": null
         }
       ]
     },
@@ -1320,6 +1733,13 @@
           "ath": -108.719,
           "atv": 8.613,
           "targetSceneId": "scene_micronique_36"
+        },
+        {
+          "id": "scene_micronique_35__scene_micronique_35_hi_1",
+          "name": "scene_micronique_35_hi_1",
+          "ath": 11.199,
+          "atv": 27.938,
+          "targetSceneId": null
         },
         {
           "id": "scene_micronique_35__Micronique_27",

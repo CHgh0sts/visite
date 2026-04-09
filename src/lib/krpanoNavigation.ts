@@ -1,8 +1,126 @@
+import type {
+  KrpanoNavigationHotspotStyle,
+  KrpanoXmlHotspotOverride,
+  KrpanoXmlHotspotOverridesByScene,
+} from "@/types/interactions";
 import type { KrpanoViewer } from "@/types/krpanoViewer";
+
+const KRPANO_NAV_HOTSPOT_STYLE_XML = "hotspot_custom_style";
 
 /** Échappe une chaîne pour une action krpano entre guillemets simples. */
 export function escapeKrpanoSingleQuoted(s: string): string {
   return s.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+}
+
+/**
+ * Applique les paramètres persistés (JSON / base) au style XML `hotspot_custom_style` du tour.
+ */
+export function applyKrpanoNavigationHotspotStyle(
+  krpano: KrpanoViewer,
+  style: KrpanoNavigationHotspotStyle | undefined | null,
+): void {
+  if (!style || Object.keys(style).length === 0) return;
+  const g = krpano.get;
+  if (!g) return;
+  try {
+    const pref = `style[${KRPANO_NAV_HOTSPOT_STYLE_XML}]`;
+    if (style.url?.trim()) {
+      const u = escapeKrpanoSingleQuoted(style.url.trim());
+      krpano.call(`set(${pref}.url, '${u}');`);
+    }
+    if (typeof style.oy === "number" && Number.isFinite(style.oy)) {
+      krpano.call(`set(${pref}.oy, ${style.oy});`);
+    }
+    if (typeof style.scale === "number" && Number.isFinite(style.scale)) {
+      krpano.call(`set(${pref}.scale, ${style.scale});`);
+    }
+    if (style.edge?.trim()) {
+      const e = escapeKrpanoSingleQuoted(style.edge.trim());
+      krpano.call(`set(${pref}.edge, '${e}');`);
+    }
+    if (typeof style.zorder === "number" && Number.isFinite(style.zorder)) {
+      krpano.call(`set(${pref}.zorder, ${style.zorder});`);
+    }
+  } catch (e) {
+    console.warn("[krpano] applyKrpanoNavigationHotspotStyle", e);
+  }
+}
+
+function applyOneXmlHotspotOverride(
+  krpano: KrpanoViewer,
+  name: string,
+  o: KrpanoXmlHotspotOverride,
+): void {
+  if (!o || Object.keys(o).length === 0) return;
+  const hn = escapeKrpanoSingleQuoted(name.trim());
+  const pref = `hotspot['${hn}']`;
+  try {
+    if (o.url?.trim()) {
+      const u = escapeKrpanoSingleQuoted(o.url.trim());
+      krpano.call(`set(${pref}.url, '${u}');`);
+    }
+    if (typeof o.scale === "number" && Number.isFinite(o.scale)) {
+      krpano.call(`set(${pref}.scale, ${o.scale});`);
+    }
+    if (typeof o.ox === "number" && Number.isFinite(o.ox)) {
+      krpano.call(`set(${pref}.ox, ${o.ox});`);
+    }
+    if (typeof o.oy === "number" && Number.isFinite(o.oy)) {
+      krpano.call(`set(${pref}.oy, ${o.oy});`);
+    }
+    if (o.edge?.trim()) {
+      krpano.call(
+        `set(${pref}.edge, '${escapeKrpanoSingleQuoted(o.edge.trim())}');`,
+      );
+    }
+    if (typeof o.zorder === "number" && Number.isFinite(o.zorder)) {
+      krpano.call(`set(${pref}.zorder, ${o.zorder});`);
+    }
+    if (typeof o.rotateDeg === "number" && Number.isFinite(o.rotateDeg)) {
+      krpano.call(`set(${pref}.rotate, ${o.rotateDeg});`);
+    }
+    if (typeof o.ath === "number" && Number.isFinite(o.ath)) {
+      krpano.call(`set(${pref}.ath, ${o.ath});`);
+    }
+    if (typeof o.atv === "number" && Number.isFinite(o.atv)) {
+      krpano.call(`set(${pref}.atv, ${o.atv});`);
+    }
+    if (o.onover != null && String(o.onover).length > 0) {
+      krpano.call(
+        `set(${pref}.onover, '${escapeKrpanoSingleQuoted(String(o.onover))}');`,
+      );
+    }
+    if (o.onout != null && String(o.onout).length > 0) {
+      krpano.call(
+        `set(${pref}.onout, '${escapeKrpanoSingleQuoted(String(o.onout))}');`,
+      );
+    }
+    if (o.onclick != null && String(o.onclick).length > 0) {
+      krpano.call(
+        `set(${pref}.onclick, '${escapeKrpanoSingleQuoted(String(o.onclick))}');`,
+      );
+    }
+  } catch (e) {
+    console.warn("[krpano] applyOneXmlHotspotOverride", name, e);
+  }
+}
+
+/**
+ * Applique les surcharges JSON par hotspot pour la scène affichée (noms = tour XML).
+ */
+export function applyKrpanoXmlHotspotOverrides(
+  krpano: KrpanoViewer,
+  sceneId: string,
+  byScene: KrpanoXmlHotspotOverridesByScene | undefined | null,
+): void {
+  if (!byScene || !sceneId?.trim()) return;
+  const sceneOverrides = byScene[sceneId.trim()];
+  if (!sceneOverrides || Object.keys(sceneOverrides).length === 0) return;
+  const g = krpano.get;
+  if (!g) return;
+  for (const [rawName, o] of Object.entries(sceneOverrides)) {
+    applyOneXmlHotspotOverride(krpano, rawName, o);
+  }
 }
 
 export type KrpanoSceneLookAt = {
@@ -23,6 +141,13 @@ type PendingReactLookAt = {
 let pendingReactLookAt: PendingReactLookAt | null = null;
 
 let krpanoViewerRefForLoadComplete: KrpanoViewer | null = null;
+
+/** Après chaque `onloadcomplete` du panorama : réappliquer style + surcharges DB (hotspots XML). */
+let krpanoAfterPanoLoadCallback: (() => void) | null = null;
+
+export function setKrpanoAfterPanoLoadCallback(fn: (() => void) | null): void {
+  krpanoAfterPanoLoadCallback = fn;
+}
 
 /** Référence au viewer pour `onloadcomplete` (jscall depuis tour.xml). */
 export function setKrpanoViewerForLoadComplete(k: KrpanoViewer | null): void {
@@ -71,6 +196,11 @@ export function onReactPanoLoadComplete(): void {
   const scene = k.get?.("xml.scene");
   if (typeof scene !== "string") return;
   applyPendingIfSceneMatches(k, scene);
+  try {
+    krpanoAfterPanoLoadCallback?.();
+  } catch (e) {
+    console.warn("[krpano] krpanoAfterPanoLoadCallback", e);
+  }
 }
 
 function setPendingReactLookAt(next: PendingReactLookAt | null): void {

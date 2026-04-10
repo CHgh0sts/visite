@@ -6,6 +6,7 @@ import { KRPANO_START_SCENE } from "@/constants/krpano";
 import {
   clearPendingReactLookAt,
   getKrpanoViewerForTour,
+  getKrpanoViewerForTourOrWindow,
   hideKrpanoTourChrome,
   loadKrpanoScene,
   onReactPanoLoadComplete,
@@ -151,9 +152,10 @@ export function KrpanoTour({
           console.error("[krpano] onExitVR", e);
         }
       },
+      /** Barre VR / XML — inchangé ; navigation hotspot JSON utilise `loadscene` natif, pas cet appel. */
       vrNavigateToScene(sceneId: string) {
         try {
-          const k = getKrpanoViewerForTour();
+          const k = getKrpanoViewerForTourOrWindow();
           if (k) loadKrpanoScene(k, sceneId);
         } catch (e) {
           console.error("[krpano] vrNavigateToScene", e);

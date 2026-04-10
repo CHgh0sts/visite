@@ -3,13 +3,110 @@ import type {
   KrpanoXmlHotspotOverride,
   KrpanoXmlHotspotOverridesByScene,
 } from "@/types/interactions";
+import {
+  resolveEffectiveHotspotTextureUrl,
+  usesMicroniqueDualColors,
+} from "@/lib/microniqueHotspotSvg";
+import { tryHotspotOxOyFromKnownTexture } from "@/lib/krpanoHotspotTextureOxOy";
 import type { KrpanoViewer } from "@/types/krpanoViewer";
 
+import tour from "@/data/tour.json";
+
 const KRPANO_NAV_HOTSPOT_STYLE_XML = "hotspot_custom_style";
+
+/** Noms de hotspots déclarés dans le tour XML (data/tour.xml → tour.json) pour une scène. */
+function getTourHotspotNamesForScene(sceneId: string): Set<string> {
+  const s = tour.scenes.find((x) => x.id === sceneId.trim());
+  if (!s?.hotspots?.length) return new Set();
+  return new Set(s.hotspots.map((h) => h.name));
+}
+
+/**
+ * Hotspot absent du XML : création runtime (sinon les `set(hotspot[…])` n’ont pas d’effet).
+ */
+function ensureDynamicHotspot(
+  krpano: KrpanoViewer,
+  name: string,
+  definedInTourXml: boolean,
+): void {
+  if (definedInTourXml) return;
+  const g = krpano.get;
+  if (!g) return;
+  const trimmed = name.trim();
+  if (!trimmed) return;
+  const hn = escapeKrpanoSingleQuoted(trimmed);
+  const pref = `hotspot['${hn}']`;
+  try {
+    const existing = g(`${pref}.name`);
+    if (existing != null && String(existing) === trimmed) {
+      /* Anciens addhotspot : onloaded annulé mais scale resté à 0 → réparer au prochain passage. */
+      try {
+        const scRaw = g(`${pref}.scale`);
+        const sc =
+          typeof scRaw === "number"
+            ? scRaw
+            : parseFloat(String(scRaw ?? "NaN"));
+        if (!Number.isFinite(sc) || sc < 0.01) {
+          krpano.call(`set(${pref}.scale, 0.5);`);
+          krpano.call(`set(${pref}.oy, 0);`);
+        }
+      } catch {
+        /* ignore */
+      }
+      return;
+    }
+    krpano.call(`addhotspot('${hn}');`);
+    krpano.call(`set(${pref}.style, 'hotspot_custom_style');`);
+    /*
+     * Le style XML a scale=0 et tween dans onloaded. Pour un hotspot addhotspot(),
+     * onloaded peut ne pas jouer comme pour le XML → scale reste 0 = invisible.
+     * On retire l’animation et les actions héritées qui supposent linkedscene (XML).
+     */
+    krpano.call(`set(${pref}.onloaded, null);`);
+    krpano.call(`set(${pref}.onclick, null);`);
+    krpano.call(`set(${pref}.onover, null);`);
+    krpano.call(`set(${pref}.onout, null);`);
+    /*
+     * Le style a scale=0 puis tween → 0.5 dans onloaded. Sans onloaded, scale reste 0 :
+     * hotspot invisible et clics ignorés (mono + WebXR).
+     */
+    krpano.call(`set(${pref}.scale, 0.5);`);
+    krpano.call(`set(${pref}.oy, 0);`);
+    krpano.call(`set(${pref}.distorted, true);`);
+    krpano.call(`set(${pref}.renderer, 'webgl');`);
+    krpano.call(`set(${pref}.depth, 1000);`);
+    krpano.call(`set(${pref}.visible, true);`);
+    krpano.call(`set(${pref}.enabled, true);`);
+  } catch (e) {
+    console.warn("[krpano] ensureDynamicHotspot", name, e);
+  }
+}
 
 /** Échappe une chaîne pour une action krpano entre guillemets simples. */
 export function escapeKrpanoSingleQuoted(s: string): string {
   return s.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+}
+
+/** Identifiant de scène krpano (tour.xml / tour.json). */
+const KRPANO_SCENE_NAME_SAFE = /^[a-zA-Z0-9_]+$/;
+
+/** Même chaîne que `hotspot_custom_style` + hotspots du tour XML (aucun id en dur dans onclick). */
+const KRPANO_XML_NAV_ONCLICK = "loadscene(get(linkedscene), null, MERGE, BLEND(0.5));";
+
+/**
+ * Clic personnalisé (mode interaction uniquement). La navigation JSON est appliquée dans
+ * {@link applyOneXmlHotspotOverride} via `linkedscene` + {@link KRPANO_XML_NAV_ONCLICK}.
+ */
+export function effectiveKrpanoHotspotOnclick(
+  o: KrpanoXmlHotspotOverride,
+): string | undefined {
+  if (
+    o.hotspotMode === "navigation" ||
+    (!o.hotspotMode && o.navigationTargetSceneId?.trim())
+  ) {
+    return undefined;
+  }
+  return o.onclick?.trim() || undefined;
 }
 
 /**
@@ -55,18 +152,57 @@ function applyOneXmlHotspotOverride(
   const hn = escapeKrpanoSingleQuoted(name.trim());
   const pref = `hotspot['${hn}']`;
   try {
-    if (o.url?.trim()) {
-      const u = escapeKrpanoSingleQuoted(o.url.trim());
-      krpano.call(`set(${pref}.url, '${u}');`);
+    const g = krpano.get;
+    if (!g) return;
+    const effectiveUrl = resolveEffectiveHotspotTextureUrl(o).trim();
+    if (effectiveUrl) {
+      const cur = String(g(`${pref}.url`) ?? "").trim();
+      if (cur !== effectiveUrl) {
+        const u = escapeKrpanoSingleQuoted(effectiveUrl);
+        krpano.call(`set(${pref}.url, '${u}');`);
+      }
+    }
+    const dual = usesMicroniqueDualColors(o);
+    if (dual) {
+      /*
+       * SVG Micronique généré : pas de teinte globale. Réappliquer après chargement texture
+       * (même logique que colorize seul).
+       */
+      krpano.call(`set(${pref}.colorize, 0xffffff);`);
+      krpano.call(
+        `delayedcall(0.08, set(${pref}.colorize, 0xffffff));`,
+      );
+    } else if (o.colorize != null && String(o.colorize).trim() !== "") {
+      const c = String(o.colorize).trim();
+      if (/^0x[0-9A-Fa-f]{6}$/i.test(c)) {
+        const cl = c.toLowerCase();
+        krpano.call(`set(${pref}.colorize, ${cl});`);
+        /*
+         * Après set(url), krpano recharge la texture de façon asynchrone : la teinte peut être
+         * ignorée si elle est appliquée trop tôt — on la réapplique au frame suivant.
+         */
+        krpano.call(`delayedcall(0.08, set(${pref}.colorize, ${cl}));`);
+      }
     }
     if (typeof o.scale === "number" && Number.isFinite(o.scale)) {
       krpano.call(`set(${pref}.scale, ${o.scale});`);
     }
-    if (typeof o.ox === "number" && Number.isFinite(o.ox)) {
-      krpano.call(`set(${pref}.ox, ${o.ox});`);
+    let ox: number | null =
+      typeof o.ox === "number" && Number.isFinite(o.ox) ? o.ox : null;
+    let oy: number | null =
+      typeof o.oy === "number" && Number.isFinite(o.oy) ? o.oy : null;
+    if (ox == null || oy == null) {
+      const fb = tryHotspotOxOyFromKnownTexture(o.url);
+      if (fb) {
+        if (ox == null) ox = fb.ox;
+        if (oy == null) oy = fb.oy;
+      }
     }
-    if (typeof o.oy === "number" && Number.isFinite(o.oy)) {
-      krpano.call(`set(${pref}.oy, ${o.oy});`);
+    if (typeof ox === "number" && Number.isFinite(ox)) {
+      krpano.call(`set(${pref}.ox, ${ox});`);
+    }
+    if (typeof oy === "number" && Number.isFinite(oy)) {
+      krpano.call(`set(${pref}.oy, ${oy});`);
     }
     if (o.edge?.trim()) {
       krpano.call(
@@ -95,10 +231,52 @@ function applyOneXmlHotspotOverride(
         `set(${pref}.onout, '${escapeKrpanoSingleQuoted(String(o.onout))}');`,
       );
     }
-    if (o.onclick != null && String(o.onclick).length > 0) {
-      krpano.call(
-        `set(${pref}.onclick, '${escapeKrpanoSingleQuoted(String(o.onclick))}');`,
-      );
+
+    const navSid = (o.navigationTargetSceneId ?? "").trim();
+    const isNav =
+      o.hotspotMode === "navigation" ||
+      (!o.hotspotMode && !!navSid);
+
+    if (isNav && navSid) {
+      if (!KRPANO_SCENE_NAME_SAFE.test(navSid)) {
+        console.warn(
+          "[krpano] navigationTargetSceneId invalide (lettres, chiffres, _) :",
+          navSid,
+        );
+      } else {
+        /*
+         * Même mécanisme que les hotspots du tour.xml : attribut linkedscene + loadscene(get(linkedscene)).
+         * Ainsi aucun nom de scène n’est injecté dans set(onclick, '…') (échappement fragile).
+         */
+        krpano.call(
+          `set(${pref}.linkedscene, '${escapeKrpanoSingleQuoted(navSid)}');`,
+        );
+        krpano.call(`set(${pref}.linkedscene_spot, null);`);
+        krpano.call(`set(${pref}.linkedscene_hoffset, null);`);
+        krpano.call(`set(${pref}.linkedscene_lookat, null);`);
+        krpano.call(
+          `set(${pref}.onclick, '${escapeKrpanoSingleQuoted(KRPANO_XML_NAV_ONCLICK)}');`,
+        );
+      }
+    } else {
+      const click = effectiveKrpanoHotspotOnclick(o);
+      if (click != null && click.length > 0) {
+        if (o.hotspotMode === "interaction") {
+          try {
+            krpano.call(`set(${pref}.linkedscene, null);`);
+            krpano.call(`set(${pref}.linkedscene_spot, null);`);
+            krpano.call(`set(${pref}.linkedscene_hoffset, null);`);
+            krpano.call(`set(${pref}.linkedscene_lookat, null);`);
+          } catch {
+            /* ignore */
+          }
+        }
+        krpano.call(
+          `set(${pref}.onclick, '${escapeKrpanoSingleQuoted(click)}');`,
+        );
+      } else if (o.hotspotMode != null) {
+        krpano.call(`set(${pref}.onclick, null);`);
+      }
     }
   } catch (e) {
     console.warn("[krpano] applyOneXmlHotspotOverride", name, e);
@@ -118,8 +296,44 @@ export function applyKrpanoXmlHotspotOverrides(
   if (!sceneOverrides || Object.keys(sceneOverrides).length === 0) return;
   const g = krpano.get;
   if (!g) return;
+  const xmlNames = getTourHotspotNamesForScene(sceneId.trim());
   for (const [rawName, o] of Object.entries(sceneOverrides)) {
+    ensureDynamicHotspot(krpano, rawName, xmlNames.has(rawName.trim()));
     applyOneXmlHotspotOverride(krpano, rawName, o);
+  }
+}
+
+/**
+ * Masque tous les hotspots déclarés dans le tour XML pour cette scène sauf ceux listés
+ * (ex. noms présents dans HotspotInteraction). Les hotspots dynamiques (addhotspot) ne sont pas listés dans tour.json.
+ */
+export function applyHotspotVisibilityForScene(
+  krpano: KrpanoViewer,
+  sceneId: string,
+  allowedHotspotNames: Set<string>,
+): void {
+  const scene = tour.scenes.find((s) => s.id === sceneId.trim());
+  if (!scene?.hotspots?.length) return;
+  const g = krpano.get;
+  if (!g) return;
+  try {
+    for (const h of scene.hotspots) {
+      const name = h.name;
+      const hn = escapeKrpanoSingleQuoted(name);
+      const pref = `hotspot['${hn}']`;
+      const allowed = allowedHotspotNames.has(name);
+      if (allowed) {
+        krpano.call(`set(${pref}.visible, true);`);
+        krpano.call(`set(${pref}.enabled, true);`);
+        krpano.call(`set(${pref}.alpha, 1);`);
+      } else {
+        krpano.call(`set(${pref}.visible, false);`);
+        krpano.call(`set(${pref}.enabled, false);`);
+        krpano.call(`set(${pref}.alpha, 0);`);
+      }
+    }
+  } catch (e) {
+    console.warn("[krpano] applyHotspotVisibilityForScene", e);
   }
 }
 
@@ -152,11 +366,25 @@ export function setKrpanoAfterPanoLoadCallback(fn: (() => void) | null): void {
 /** Référence au viewer pour `onloadcomplete` (jscall depuis tour.xml). */
 export function setKrpanoViewerForLoadComplete(k: KrpanoViewer | null): void {
   krpanoViewerRefForLoadComplete = k;
+  if (typeof window !== "undefined") {
+    (window as unknown as { __krpanoViewer?: KrpanoViewer | null }).__krpanoViewer =
+      k;
+  }
 }
 
 /** Viewer krpano courant — entrée/sortie WebXR (`reactKrpano.onEnterVR` / `onExitVR`). */
 export function getKrpanoViewerForTour(): KrpanoViewer | null {
   return krpanoViewerRefForLoadComplete;
+}
+
+/** Comme {@link getKrpanoViewerForTour} + repli `window.__krpanoViewer` (certains `jscall` krpano). */
+export function getKrpanoViewerForTourOrWindow(): KrpanoViewer | null {
+  const a = krpanoViewerRefForLoadComplete;
+  if (a) return a;
+  if (typeof window === "undefined") return null;
+  const w = (window as unknown as { __krpanoViewer?: KrpanoViewer | null })
+    .__krpanoViewer;
+  return w ?? null;
 }
 
 /** N’applique que si `sceneName` est la scène attendue — évite de vider le pending sur un `onloadcomplete` obsolète. */
@@ -320,6 +548,51 @@ export function krpanoSpheretoscreenToOverlayLocalPx(
     x: (p.x / swSafe) * containerWidthPx,
     y: (p.y / shSafe) * containerHeightPx,
   };
+}
+
+/**
+ * Rectangle du rendu utile (canvas WebGL) pour aligner les clics avec `screentosphere`.
+ * Si le conteneur embed a du padding ou des barres, le div `#krpano-target-*` et le canvas diffèrent.
+ */
+export function getKrpanoViewerHitRect(
+  containerId: string,
+): DOMRectReadOnly | null {
+  if (typeof document === "undefined") return null;
+  const host = document.getElementById(containerId);
+  if (!host) return null;
+  const canvas = host.querySelector("canvas");
+  if (canvas) return canvas.getBoundingClientRect();
+  return host.getBoundingClientRect();
+}
+
+/**
+ * Clic dans le div conteneur d’embedpano (origine = coin haut-gauche du `#krpano-target-*`) → ath/atv.
+ * Préférer {@link getKrpanoViewerHitRect} comme `containerRect` (canvas) pour coller au clic visuel.
+ * Convertit les pixels du conteneur vers le repère **stage** (`stagewidth` / `stageheight`) avant
+ * `screentosphere` — inverse de {@link krpanoSpheretoscreenToOverlayLocalPx}. Sans ça, le clic
+ * peut tomber hors champ et `screentosphere` renvoie null.
+ */
+export function krpanoScreentosphereFromContainerClientPx(
+  krpano: KrpanoViewer,
+  containerRect: DOMRectReadOnly,
+  clientX: number,
+  clientY: number,
+): { x: number; y: number } | null {
+  const x = clientX - containerRect.left;
+  const y = clientY - containerRect.top;
+  const g = krpano.get;
+  if (typeof g !== "function") return null;
+  const sw =
+    parseKrpanoNumber(g("stagewidth")) ?? containerRect.width;
+  const sh =
+    parseKrpanoNumber(g("stageheight")) ?? containerRect.height;
+  const swSafe = Math.max(1, sw);
+  const shSafe = Math.max(1, sh);
+  const xStage = (x / Math.max(containerRect.width, 1)) * swSafe;
+  const yStage = (y / Math.max(containerRect.height, 1)) * shSafe;
+  const s = krpano.screentosphere(xStage, yStage);
+  if (!s || Number.isNaN(s.x) || Number.isNaN(s.y)) return null;
+  return { x: s.x, y: s.y };
 }
 
 /**

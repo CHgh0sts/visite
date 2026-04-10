@@ -39,3 +39,28 @@ export async function postSceneInteractionsToServer(
   }
   return { ok: true, updatedAt: data.updatedAt };
 }
+
+/** Supprime le hotspot persisté en base (tables Scene / HotspotInteraction). */
+export async function deleteHotspotInteractionFromServer(
+  sceneName: string,
+  hotspotId: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const q = new URLSearchParams({
+    sceneName: sceneName.trim(),
+    hotspotId: hotspotId.trim(),
+  });
+  const res = await fetch(`/api/hotspot-interactions?${q.toString()}`, {
+    method: "DELETE",
+  });
+  const data = (await res.json().catch(() => ({}))) as {
+    error?: string;
+    details?: string;
+  };
+  if (!res.ok) {
+    return {
+      ok: false,
+      error: data.error ?? `HTTP ${res.status}`,
+    };
+  }
+  return { ok: true };
+}

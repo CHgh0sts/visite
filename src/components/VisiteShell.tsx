@@ -1,15 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 
 import { HotspotXmlEditor } from "@/components/HotspotXmlEditor";
 import { KrpanoTour } from "@/components/KrpanoTour";
+import { SceneInteractionOverlay } from "@/components/SceneInteractionOverlay";
 import { KrpanoVrToggleButton } from "@/components/KrpanoVrToggleButton";
 import { KrpanoViewHud } from "@/components/KrpanoViewHud";
 import { SceneNavBar } from "@/components/SceneNavBar";
 import { KRPANO_START_SCENE } from "@/constants/krpano";
 import {
+  applyHotspotVisibilityForScene,
   applyKrpanoNavigationHotspotStyle,
   applyKrpanoXmlHotspotOverrides,
   getKrpanoViewerForTour,
@@ -64,6 +65,10 @@ export function VisiteShell() {
       if (typeof scene !== "string") return;
       applyKrpanoNavigationHotspotStyle(k, styleRef.current);
       applyKrpanoXmlHotspotOverrides(k, scene, overridesRef.current);
+      const allowed = new Set(
+        Object.keys(overridesRef.current?.[scene.trim()] ?? {}),
+      );
+      applyHotspotVisibilityForScene(k, scene, allowed);
     });
     return () => setKrpanoAfterPanoLoadCallback(null);
   }, []);
@@ -100,7 +105,7 @@ export function VisiteShell() {
           setDbUnavailable(true);
         }
       });
-    }, 400);
+    }, 0);
     return () => clearTimeout(t);
   }, [
     map,
@@ -114,6 +119,11 @@ export function VisiteShell() {
     if (!krpano) return;
     applyKrpanoNavigationHotspotStyle(krpano, krpanoNavigationHotspotStyle);
     applyKrpanoXmlHotspotOverrides(krpano, sceneName, krpanoXmlHotspotOverrides);
+    applyHotspotVisibilityForScene(
+      krpano,
+      sceneName,
+      new Set(Object.keys(krpanoXmlHotspotOverrides[sceneName] ?? {})),
+    );
   }, [krpano, krpanoNavigationHotspotStyle, sceneName, krpanoXmlHotspotOverrides]);
 
   const [shellPanelsVisible, setShellPanelsVisible] = useState(false);
@@ -143,30 +153,13 @@ export function VisiteShell() {
         }}
       />
       <div className="visite-react-ui pointer-events-none absolute inset-0 z-[1]">
-        {dbUnavailable ? (
-          <div
-            role="alert"
-            className="pointer-events-auto fixed left-3 right-3 top-14 z-[88] max-w-none rounded-lg border border-amber-700/80 bg-amber-950/90 px-3 py-2 text-xs text-amber-100 shadow-lg sm:left-auto sm:right-4 sm:max-w-md"
-          >
-            PostgreSQL injoignable : les réglages ne sont pas sauvegardés. Vérifiez{" "}
-            <code className="rounded bg-black/30 px-1">DATABASE_URL</code> et les logs du
-            serveur Next.
-          </div>
-        ) : null}
-        <Link
-          href="/"
-          className="pointer-events-auto fixed left-3 top-3 z-[85] block w-[min(48vw,9rem)] max-w-[10rem] outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-black/50 sm:left-4 sm:top-4 sm:w-[min(36vw,11rem)] sm:max-w-[11rem]"
-          aria-label="Micronique — retour à l’accueil"
-        >
-          <img
-            src="/images/global/micronique.webp"
-            alt="Micronique"
-            width={280}
-            height={93}
-            className="h-auto w-full object-contain drop-shadow-[0_2px_12px_rgba(0,0,0,0.45)]"
-            decoding="async"
-          />
-        </Link>
+        <SceneInteractionOverlay
+          sceneName={sceneName}
+          map={map}
+          krpano={krpano}
+          viewerContainerId={viewerContainerId}
+          scenePanoReady={!!krpano}
+        />
         <div className="pointer-events-auto fixed right-4 top-4 z-[90]">
           <KrpanoVrToggleButton krpano={krpano} />
         </div>
@@ -180,7 +173,6 @@ export function VisiteShell() {
           key={sceneName}
           sceneName={sceneName}
           map={map}
-          onMapChange={setMap}
           krpano={krpano}
           viewerContainerId={viewerContainerId}
           krpanoNavigationHotspotStyle={krpanoNavigationHotspotStyle}

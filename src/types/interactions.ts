@@ -107,10 +107,13 @@ export type SceneInteractionButtonBase = {
    * Échelle du bouton sur la scène (1 = taille de base du composant).
    */
   sceneBtnScale?: number;
-  /** Inclinaison 3D / rotation (degrés). X et Y nécessitent une perspective. */
+  /**
+   * Inclinaison 3D / rotation (degrés) du contenu (icône Lucide/SVG, image ou texte) — pas du cadre
+   * du bouton. X et Y nécessitent une perspective côté rendu.
+   */
   sceneBtnRotateXDeg?: number;
   sceneBtnRotateYDeg?: number;
-  /** Rotation dans le plan de l’écran (degrés). */
+  /** Rotation dans le plan de l’écran (degrés), contenu uniquement. */
   sceneBtnRotateZDeg?: number;
   /** Rayon des coins (CSS), ex. `9999px`, `12px`, `0`. Surcharge le arrondi par défaut. */
   sceneBtnBorderRadius?: string;
@@ -184,13 +187,37 @@ export type KrpanoNavigationHotspotStyle = {
   zorder?: number;
 };
 
+/** Comportement au clic du hotspot XML (surcharges krpano). */
+export type KrpanoXmlHotspotMode = "interaction" | "navigation";
+
 /**
  * Surcharges par hotspot XML (nom krpano tel que dans `data/tour.xml`), par scène.
  * Appliquées après le style global `hotspot_custom_style`.
  */
 export type KrpanoXmlHotspotOverride = {
+  /**
+   * `navigation` : clic = chargement d’une autre scène (`navigationTargetSceneId`).
+   * `interaction` : réservé à une action personnalisée (`onclick`) — détail à définir plus tard.
+   */
+  hotspotMode?: KrpanoXmlHotspotMode;
+  /** Si `hotspotMode === "navigation"` : id scène krpano cible (ex. `scene_micronique_2`). */
+  navigationTargetSceneId?: string;
   /** Texture du hotspot (relatif au basepath krpano). */
   url?: string;
+  /**
+   * Fond du disque (presets Micronique uniquement) — `0xRRGGBB`.
+   * Avec {@link iconFgColor}, un SVG est généré (data URL) : fond et pictogramme sont indépendants.
+   */
+  iconBgColor?: string;
+  /**
+   * Couleur du pictogramme / contour (presets Micronique) — `0xRRGGBB`.
+   */
+  iconFgColor?: string;
+  /**
+   * Teinte de la texture (SVG / image) — krpano `colorize`, ex. `0xff5533`.
+   * `0xffffff` = neutre (couleurs d’origine). Ignorée si {@link iconBgColor} + {@link iconFgColor} sont définis (Micronique).
+   */
+  colorize?: string;
   scale?: number;
   ox?: number;
   oy?: number;

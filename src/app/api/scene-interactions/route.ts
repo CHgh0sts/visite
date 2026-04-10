@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
-import type { Prisma } from "@prisma/client";
 
+import {
+  buildHotspotOverridesFromDb,
+  syncHotspotInteractionsFromPayload,
+  toPrismaJson,
+} from "@/lib/hotspotInteractionsDb";
 import { prisma } from "@/lib/prisma";
 import {
   parseKrpanoNavigationHotspotStyle,
@@ -9,25 +13,32 @@ import {
   parseSceneInteractionsPayload,
 } from "@/lib/sceneInteractionsStorage";
 
-/** JSON 100 % sérialisable pour la colonne Prisma (supprime undefined, NaN, etc.). */
-function toPrismaJson(value: unknown): Prisma.InputJsonValue {
-  return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue;
-}
-
 const SNAPSHOT_ID = "default";
+
+/** Prisma ferme les transactions interactives après 5 s par défaut — sync hotspots + JSON peut dépasser (DB distante, SSL). */
+const POST_TX_TIMEOUT_MS = 60_000;
+const POST_TX_MAX_WAIT_MS = 15_000;
 
 export async function GET() {
   try {
-    const row = await prisma.sceneInteractionsSnapshot.findUnique({
-      where: { id: SNAPSHOT_ID },
-    });
+    const [row, scenes] = await Promise.all([
+      prisma.sceneInteractionsSnapshot.findUnique({
+        where: { id: SNAPSHOT_ID },
+      }),
+      prisma.scene.findMany({
+        include: { interactions: true },
+        orderBy: { name: "asc" },
+      }),
+    ]);
     const doc = row?.payload
       ? parseSceneInteractionsDocument(row.payload)
       : { map: {} };
+    /** Affichage visite : uniquement les hotspots persistés (modèle HotspotInteraction). */
+    const krpanoXmlHotspotOverrides = buildHotspotOverridesFromDb(scenes);
     return NextResponse.json({
       map: doc.map,
       krpanoNavigationHotspotStyle: doc.krpanoNavigationHotspotStyle ?? null,
-      krpanoXmlHotspotOverrides: doc.krpanoXmlHotspotOverrides ?? null,
+      krpanoXmlHotspotOverrides,
     });
   } catch (e) {
     console.error("[scene-interactions GET]", e);
@@ -92,16 +103,26 @@ export async function POST(req: Request) {
   });
 
   try {
-    const row = await prisma.sceneInteractionsSnapshot.upsert({
-      where: { id: SNAPSHOT_ID },
-      create: {
-        id: SNAPSHOT_ID,
-        payload,
+    const row = await prisma.$transaction(
+      async (tx) => {
+        const snap = await tx.sceneInteractionsSnapshot.upsert({
+          where: { id: SNAPSHOT_ID },
+          create: {
+            id: SNAPSHOT_ID,
+            payload,
+          },
+          update: {
+            payload,
+          },
+        });
+        await syncHotspotInteractionsFromPayload(krpanoXmlHotspotOverrides, tx);
+        return snap;
       },
-      update: {
-        payload,
+      {
+        maxWait: POST_TX_MAX_WAIT_MS,
+        timeout: POST_TX_TIMEOUT_MS,
       },
-    });
+    );
     return NextResponse.json({
       ok: true,
       id: row.id,

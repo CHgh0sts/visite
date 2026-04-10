@@ -65,7 +65,7 @@ export function KrpanoViewHud({
 
   return (
     <div
-      className={`fixed left-4 z-[95] max-w-[14rem] cursor-default select-text rounded-xl border border-white/12 bg-zinc-950/85 px-3 py-2.5 font-mono text-[11px] leading-snug text-zinc-200 shadow-lg backdrop-blur-md ${sceneNavbarBottomAlignClass}`}
+      className={`pointer-events-none fixed left-4 z-[95] max-w-[14rem] cursor-default select-text rounded-xl border border-white/12 bg-zinc-950/85 px-3 py-2.5 font-mono text-[11px] leading-snug text-zinc-200 shadow-lg backdrop-blur-md ${sceneNavbarBottomAlignClass}`}
       aria-live="polite"
     >
       <p className="mb-1.5 border-b border-white/10 pb-1.5 text-[10px] font-semibold uppercase tracking-wide text-zinc-500">

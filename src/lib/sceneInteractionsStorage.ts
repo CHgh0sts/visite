@@ -65,7 +65,27 @@ function parseOneHotspotOverrideFields(
   o: Record<string, unknown>,
 ): KrpanoXmlHotspotOverride {
   const out: KrpanoXmlHotspotOverride = {};
+  if (o.hotspotMode === "interaction" || o.hotspotMode === "navigation") {
+    out.hotspotMode = o.hotspotMode;
+  }
+  if (
+    typeof o.navigationTargetSceneId === "string" &&
+    o.navigationTargetSceneId.trim()
+  ) {
+    out.navigationTargetSceneId = o.navigationTargetSceneId.trim();
+  }
   if (typeof o.url === "string" && o.url.trim()) out.url = o.url.trim();
+  for (const key of ["iconBgColor", "iconFgColor"] as const) {
+    const v = o[key];
+    if (typeof v === "string" && v.trim()) {
+      const c = v.trim();
+      if (/^0x[0-9A-Fa-f]{6}$/i.test(c)) out[key] = c.toLowerCase();
+    }
+  }
+  if (typeof o.colorize === "string" && o.colorize.trim()) {
+    const c = o.colorize.trim();
+    if (/^0x[0-9A-Fa-f]{6}$/i.test(c)) out.colorize = c.toLowerCase();
+  }
   if (typeof o.edge === "string" && o.edge.trim()) out.edge = o.edge.trim();
   if (typeof o.onover === "string") out.onover = o.onover;
   if (typeof o.onout === "string") out.onout = o.onout;
@@ -628,14 +648,12 @@ export async function loadSiteInteractionsDocument(): Promise<{
       def.krpanoNavigationHotspotStyle,
       fromDb.krpanoNavigationHotspotStyle,
     );
-    const mergedOv = mergeKrpanoXmlHotspotOverrides(
-      def.krpanoXmlHotspotOverrides,
-      fromDb.krpanoXmlHotspotOverrides,
-    );
+    /** API : surcharges hotspots = uniquement la base (HotspotInteraction), pas le JSON embarqué. */
+    const hotspotOv = fromDb.krpanoXmlHotspotOverrides ?? {};
     return {
       map: mergeInteractionMaps(def.map, fromDb.map),
       ...(mergedStyle ? { krpanoNavigationHotspotStyle: mergedStyle } : {}),
-      krpanoXmlHotspotOverrides: mergedOv,
+      krpanoXmlHotspotOverrides: hotspotOv,
       dbUnavailable: false,
     };
   } catch {

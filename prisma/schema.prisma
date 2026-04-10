@@ -13,3 +13,24 @@ model SceneInteractionsSnapshot {
   payload   Json
   updatedAt DateTime @updatedAt
 }
+
+/// `name` = identifiant scène krpano (ex. scene_micronique_1).
+model Scene {
+  id           String               @id @default(uuid())
+  name         String               @unique
+  interactions HotspotInteraction[]
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+}
+
+model HotspotInteraction {
+  id        String   @id @default(uuid())
+  sceneId   String
+  hotspotId String
+  settings  Json
+  scene     Scene    @relation(fields: [sceneId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([sceneId, hotspotId])
+}

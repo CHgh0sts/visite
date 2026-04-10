@@ -47,6 +47,8 @@ function hoverBubbleClass(placement: InteractionHoverHintPlacement): string {
 
 /**
  * Échelle, rotation 3D et rayon des coins — pour le bouton affiché sur le panorama (pas la modale).
+ * La rotation scène (sceneBtnRotate*) n’est pas appliquée ici : elle cible uniquement l’icône / le
+ * contenu (voir {@link SceneBtnRotationWrap}) pour ne pas faire pivoter le cadre du bouton.
  */
 function SceneButtonShell({
   b,
@@ -65,18 +67,10 @@ function SceneButtonShell({
     b.sceneBtnScale > 0
       ? b.sceneBtnScale
       : 1;
-  const rx = b.sceneBtnRotateXDeg ?? 0;
-  const ry = b.sceneBtnRotateYDeg ?? 0;
-  const rz = b.sceneBtnRotateZDeg ?? 0;
   const br = b.sceneBtnBorderRadius?.trim();
 
-  const needsTransform =
-    Math.abs(scale - 1) > 0.001 ||
-    rx !== 0 ||
-    ry !== 0 ||
-    rz !== 0;
-  const has3d = rx !== 0 || ry !== 0;
-  const t = `scale(${scale}) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg)`;
+  const needsScale = Math.abs(scale - 1) > 0.001;
+  const t = `scale(${scale})`;
 
   const child = children as ReactElement<{ style?: CSSProperties }>;
   const prevStyle = child.props.style;
@@ -91,22 +85,54 @@ function SceneButtonShell({
         })
       : child;
 
-  if (!needsTransform) {
+  if (!needsScale) {
     return <>{withRadius}</>;
   }
 
   return (
     <div
-      className="inline-flex"
-      style={has3d ? { perspective: "800px" } : undefined}
+      className="inline-flex origin-center will-change-transform"
+      style={{ transform: t }}
     >
-      <div
-        className="inline-flex origin-center will-change-transform"
-        style={{ transform: t }}
-      >
-        {withRadius}
-      </div>
+      {withRadius}
     </div>
+  );
+}
+
+/**
+ * Applique sceneBtnRotateX/Y/Z au contenu (icône, image, texte) — pas à la boîte du bouton.
+ */
+function SceneBtnRotationWrap({
+  b,
+  children,
+}: {
+  b: SceneInteractionButton;
+  children: ReactNode;
+}) {
+  const rx = b.sceneBtnRotateXDeg ?? 0;
+  const ry = b.sceneBtnRotateYDeg ?? 0;
+  const rz = b.sceneBtnRotateZDeg ?? 0;
+  if (rx === 0 && ry === 0 && rz === 0) {
+    return <>{children}</>;
+  }
+  const has3d = rx !== 0 || ry !== 0;
+  const inner = (
+    <span
+      className="inline-flex origin-center will-change-transform"
+      style={{
+        transform: `rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg)`,
+      }}
+    >
+      {children}
+    </span>
+  );
+  if (!has3d) {
+    return inner;
+  }
+  return (
+    <span className="inline-flex" style={{ perspective: "800px" }}>
+      {inner}
+    </span>
   );
 }
 
@@ -216,7 +242,9 @@ export function InteractionButtonView({
           className={`rounded-xl px-4 py-2 text-sm font-medium ${borderTw} ${baseClasses(b)}`}
           aria-describedby={hintId}
         >
-          {b.label}
+          <SceneBtnRotationWrap b={b}>
+            <span>{b.label}</span>
+          </SceneBtnRotationWrap>
         </button>
       </SceneButtonShell>,
     );
@@ -237,20 +265,22 @@ export function InteractionButtonView({
           aria-label={b.label?.trim() || b.lucideIcon}
           aria-describedby={hintId}
         >
-        <span
-          className={
-            rotVars
-              ? "ix-icon-rot inline-flex items-center justify-center"
-              : "inline-flex items-center justify-center"
-          }
-          style={rotVars}
-        >
-          <LucideIconByName
-            name={b.lucideIcon}
-            size={22}
-            className="text-current"
-          />
-        </span>
+          <SceneBtnRotationWrap b={b}>
+            <span
+              className={
+                rotVars
+                  ? "ix-icon-rot inline-flex items-center justify-center"
+                  : "inline-flex items-center justify-center"
+              }
+              style={rotVars}
+            >
+              <LucideIconByName
+                name={b.lucideIcon}
+                size={22}
+                className="text-current"
+              />
+            </span>
+          </SceneBtnRotationWrap>
       </button>
       </SceneButtonShell>,
     );
@@ -271,19 +301,21 @@ export function InteractionButtonView({
           aria-label={b.label?.trim() || "Icône"}
           aria-describedby={hintId}
         >
-        <span
-          className={
-            rotVars
-              ? "ix-icon-rot inline-flex items-center justify-center"
-              : "inline-flex items-center justify-center"
-          }
-          style={rotVars}
-        >
-          <InteractionSvgIcon
-            id={b.svgId}
-            className="size-[22px] text-current"
-          />
-        </span>
+          <SceneBtnRotationWrap b={b}>
+            <span
+              className={
+                rotVars
+                  ? "ix-icon-rot inline-flex items-center justify-center"
+                  : "inline-flex items-center justify-center"
+              }
+              style={rotVars}
+            >
+              <InteractionSvgIcon
+                id={b.svgId}
+                className="size-[22px] text-current"
+              />
+            </span>
+          </SceneBtnRotationWrap>
       </button>
       </SceneButtonShell>,
     );
@@ -305,13 +337,15 @@ export function InteractionButtonView({
           aria-label={b.imageAlt?.trim() || "Image"}
           aria-describedby={hintId}
         >
-        {/* eslint-disable-next-line @next/next/no-img-element -- URLs externes arbitraires */}
-        <img
-          src={b.imageSrc}
-          alt=""
-          className="size-full object-cover"
-          draggable={false}
-        />
+          <SceneBtnRotationWrap b={b}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- URLs externes arbitraires */}
+            <img
+              src={b.imageSrc}
+              alt=""
+              className="size-full object-cover"
+              draggable={false}
+            />
+          </SceneBtnRotationWrap>
       </button>
       </SceneButtonShell>,
     );

@@ -187,11 +187,24 @@ function applyOneXmlHotspotOverride(
     if (typeof o.scale === "number" && Number.isFinite(o.scale)) {
       krpano.call(`set(${pref}.scale, ${o.scale});`);
     }
+    if (o.edge?.trim()) {
+      krpano.call(
+        `set(${pref}.edge, '${escapeKrpanoSingleQuoted(o.edge.trim())}');`,
+      );
+    }
+    const edgeLower = o.edge?.trim().toLowerCase() ?? "";
     let ox: number | null =
       typeof o.ox === "number" && Number.isFinite(o.ox) ? o.ox : null;
     let oy: number | null =
       typeof o.oy === "number" && Number.isFinite(o.oy) ? o.oy : null;
-    if (ox == null || oy == null) {
+    if (edgeLower === "center") {
+      /*
+       * Avec edge=center, l’ancre (ath,atv) est le centre de la texture.
+       * ox/oy = moitié taille déplacent l’image vers le bas-droite (décalage curseur).
+       */
+      ox = 0;
+      oy = 0;
+    } else if (ox == null || oy == null) {
       const fb = tryHotspotOxOyFromKnownTexture(o.url);
       if (fb) {
         if (ox == null) ox = fb.ox;
@@ -204,16 +217,20 @@ function applyOneXmlHotspotOverride(
     if (typeof oy === "number" && Number.isFinite(oy)) {
       krpano.call(`set(${pref}.oy, ${oy});`);
     }
-    if (o.edge?.trim()) {
-      krpano.call(
-        `set(${pref}.edge, '${escapeKrpanoSingleQuoted(o.edge.trim())}');`,
-      );
-    }
     if (typeof o.zorder === "number" && Number.isFinite(o.zorder)) {
       krpano.call(`set(${pref}.zorder, ${o.zorder});`);
     }
     if (typeof o.rotateDeg === "number" && Number.isFinite(o.rotateDeg)) {
       krpano.call(`set(${pref}.rotate, ${o.rotateDeg});`);
+    }
+    if (typeof o.rxDeg === "number" && Number.isFinite(o.rxDeg)) {
+      krpano.call(`set(${pref}.rx, ${o.rxDeg});`);
+    }
+    if (typeof o.ryDeg === "number" && Number.isFinite(o.ryDeg)) {
+      krpano.call(`set(${pref}.ry, ${o.ryDeg});`);
+    }
+    if (typeof o.rzDeg === "number" && Number.isFinite(o.rzDeg)) {
+      krpano.call(`set(${pref}.rz, ${o.rzDeg});`);
     }
     if (typeof o.ath === "number" && Number.isFinite(o.ath)) {
       krpano.call(`set(${pref}.ath, ${o.ath});`);

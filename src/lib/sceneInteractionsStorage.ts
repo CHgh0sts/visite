@@ -102,6 +102,10 @@ function parseOneHotspotOverrideFields(
   if (zo !== undefined) out.zorder = zo;
   const rd = n(o.rotateDeg);
   if (rd !== undefined) out.rotateDeg = rd;
+  for (const key of ["rxDeg", "ryDeg", "rzDeg"] as const) {
+    const v = n(o[key]);
+    if (v !== undefined) out[key] = v;
+  }
   const ath = n(o.ath);
   if (ath !== undefined) out.ath = ath;
   const atv = n(o.atv);

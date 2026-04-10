@@ -26,8 +26,11 @@ import {
   krpanoColorizeToPickerHex,
   pickerHexToKrpanoColorize,
 } from "@/lib/krpanoHotspotColorize";
-import { isMicroniquePresetUrl } from "@/lib/microniqueHotspotSvg";
-import { resolveHotspotOxOyFromUrl } from "@/lib/krpanoHotspotTextureOxOy";
+import {
+  isMicroniquePresetUrl,
+  resolveEffectiveHotspotTextureUrl,
+} from "@/lib/microniqueHotspotSvg";
+import { resolveHotspotOxOyFromUrlAndEdge } from "@/lib/krpanoHotspotTextureOxOy";
 import { KRPANO_XML_HOTSPOT_PRESET_URLS } from "@/lib/krpanoXmlHotspotPresets";
 import {
   getDefaultInteractions,
@@ -97,17 +100,52 @@ export type HotspotXmlEditorProps = {
   dbUnavailable?: boolean;
 };
 
+type PlacementPhantomConfig = {
+  src: string;
+  scale: number;
+  rotateDeg: number;
+  rxDeg: number;
+  ryDeg: number;
+  rzDeg: number;
+};
+
 function PlacementLayer({
   krpano,
   containerId,
   onPlace,
   onCancel,
+  phantom,
 }: {
   krpano: KrpanoViewer;
   containerId: string;
   onPlace: (ath: number, atv: number) => void;
   onCancel: () => void;
+  phantom: PlacementPhantomConfig;
 }) {
+  const [pointerClient, setPointerClient] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+
+  const handlePointerMove = (e: PointerEvent<HTMLDivElement>) => {
+    const rect = getKrpanoViewerHitRect(containerId);
+    if (!rect) {
+      setPointerClient(null);
+      return;
+    }
+    const { clientX, clientY } = e;
+    if (
+      clientX < rect.left ||
+      clientX > rect.right ||
+      clientY < rect.top ||
+      clientY > rect.bottom
+    ) {
+      setPointerClient(null);
+      return;
+    }
+    setPointerClient({ x: clientX, y: clientY });
+  };
+
   const handlePointerDown = (e: PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0) return;
     const rect = getKrpanoViewerHitRect(containerId);
@@ -132,15 +170,50 @@ function PlacementLayer({
     onPlace(s.x, s.y);
   };
 
+  const basePx = 56;
+  const size = Math.max(24, Math.min(160, basePx * phantom.scale));
+  const transform3d = `perspective(480px) rotateX(${phantom.rxDeg}deg) rotateY(${phantom.ryDeg}deg) rotateZ(${phantom.rzDeg}deg) rotate(${phantom.rotateDeg}deg)`;
+
   const layer = (
     <div
       role="presentation"
       className="pointer-events-auto fixed inset-0 z-[200] cursor-crosshair bg-black/40 backdrop-blur-[1px]"
+      onPointerMove={handlePointerMove}
       onPointerDown={handlePointerDown}
+      onPointerLeave={() => setPointerClient(null)}
     >
+      {pointerClient ? (
+        <div
+          className="pointer-events-none fixed z-[210] -translate-x-1/2 -translate-y-1/2"
+          style={{ left: pointerClient.x, top: pointerClient.y }}
+          aria-hidden
+        >
+          <div
+            className="relative rounded-full shadow-[0_0_0_2px_rgba(56,189,248,0.85),0_8px_28px_rgba(0,0,0,0.45)]"
+            style={{
+              width: size,
+              height: size,
+              transform: transform3d,
+              transformOrigin: "center center",
+              opacity: 0.88,
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element -- URL dynamique (data ou /public/) */}
+            <img
+              src={phantom.src}
+              alt=""
+              width={size}
+              height={size}
+              className="size-full rounded-full object-contain select-none"
+              draggable={false}
+            />
+          </div>
+        </div>
+      ) : null}
       <div className="pointer-events-none absolute inset-x-0 top-20 flex justify-center">
         <p className="rounded-full bg-zinc-900/90 px-4 py-2 text-sm text-zinc-100 shadow-lg">
-          Cliquez sur le panorama pour positionner le hotspot — Échap pour annuler
+          Déplacez la souris sur le panorama : aperçu du hotspot — cliquez pour valider la
+          position — Échap pour annuler
         </p>
       </div>
       <button
@@ -295,6 +368,9 @@ export function HotspotXmlEditor({
   const [localUrl, setLocalUrl] = useState("");
   const [localScale, setLocalScale] = useState("");
   const [localRotate, setLocalRotate] = useState("");
+  const [localRx, setLocalRx] = useState("");
+  const [localRy, setLocalRy] = useState("");
+  const [localRz, setLocalRz] = useState("");
   const [localEdge, setLocalEdge] = useState("");
   const [localZ, setLocalZ] = useState("");
   const [localOnover, setLocalOnover] = useState("");
@@ -311,6 +387,9 @@ export function HotspotXmlEditor({
   const [newUrl, setNewUrl] = useState("");
   const [newScale, setNewScale] = useState("");
   const [newRotate, setNewRotate] = useState("");
+  const [newRx, setNewRx] = useState("");
+  const [newRy, setNewRy] = useState("");
+  const [newRz, setNewRz] = useState("");
   const [newEdge, setNewEdge] = useState("");
   const [newZ, setNewZ] = useState("");
   const [newOnover, setNewOnover] = useState("");
@@ -332,6 +411,9 @@ export function HotspotXmlEditor({
     setLocalUrl(o.url ?? "");
     setLocalScale(o.scale != null ? String(o.scale) : "");
     setLocalRotate(o.rotateDeg != null ? String(o.rotateDeg) : "");
+    setLocalRx(o.rxDeg != null ? String(o.rxDeg) : "");
+    setLocalRy(o.ryDeg != null ? String(o.ryDeg) : "");
+    setLocalRz(o.rzDeg != null ? String(o.rzDeg) : "");
     setLocalEdge(o.edge ?? "");
     setLocalZ(o.zorder != null ? String(o.zorder) : "");
     setLocalOnover(o.onover ?? "");
@@ -412,20 +494,23 @@ export function HotspotXmlEditor({
     ],
   );
 
-  /** ox / oy = moitié largeur / hauteur de la texture (centrage). */
+  /** ox / oy selon texture et `edge` (center → 0,0). */
   const patchSceneHotspotWithComputedOxOy = useCallback(
     async (patch: Partial<KrpanoXmlHotspotOverride>) => {
       if (!selectedName) return;
       const prev = krpanoXmlHotspotOverrides[sceneName]?.[selectedName] ?? {};
       const merged: KrpanoXmlHotspotOverride = { ...prev, ...patch };
       const url = merged.url?.trim() || styleDefaults.url;
-      const { ox, oy } = await resolveHotspotOxOyFromUrl(url);
+      const edge =
+        merged.edge?.trim() || styleDefaults.edge;
+      const { ox, oy } = await resolveHotspotOxOyFromUrlAndEdge(url, edge);
       patchSceneHotspot({ ...patch, ox, oy });
     },
     [
       selectedName,
       krpanoXmlHotspotOverrides,
       sceneName,
+      styleDefaults.edge,
       styleDefaults.url,
       patchSceneHotspot,
     ],
@@ -439,7 +524,8 @@ export function HotspotXmlEditor({
       return Number.isFinite(n) ? n : undefined;
     };
     const url = localUrl.trim() || styleDefaults.url;
-    const { ox, oy } = await resolveHotspotOxOyFromUrl(url);
+    const edgeEff = localEdge.trim() || styleDefaults.edge;
+    const { ox, oy } = await resolveHotspotOxOyFromUrlAndEdge(url, edgeEff);
     const micronique = isMicroniquePresetUrl(url);
     const dualMicronique =
       micronique &&
@@ -451,6 +537,9 @@ export function HotspotXmlEditor({
       ox,
       oy,
       rotateDeg: num(localRotate),
+      rxDeg: num(localRx),
+      ryDeg: num(localRy),
+      rzDeg: num(localRz),
       edge: localEdge.trim() || undefined,
       zorder: num(localZ) != null ? Math.round(num(localZ)!) : undefined,
       onover: localOnover.trim() || undefined,
@@ -492,10 +581,14 @@ export function HotspotXmlEditor({
     localOnout,
     localOnover,
     localRotate,
+    localRx,
+    localRy,
+    localRz,
     localScale,
     localUrl,
     localZ,
     patchSceneHotspot,
+    styleDefaults.edge,
     styleDefaults.url,
   ]);
 
@@ -580,7 +673,13 @@ export function HotspotXmlEditor({
         return;
       }
       const textureUrl = newUrl.trim() || styleDefaults.url;
-      const { ox, oy } = await resolveHotspotOxOyFromUrl(textureUrl);
+      const edgeForOx =
+        newEdge.trim() ||
+        (coords ? "center" : styleDefaults.edge);
+      const { ox, oy } = await resolveHotspotOxOyFromUrlAndEdge(
+        textureUrl,
+        edgeForOx,
+      );
       const z = num(newZ);
       const dualNew =
         isMicroniquePresetUrl(textureUrl) &&
@@ -597,9 +696,12 @@ export function HotspotXmlEditor({
         ox,
         oy,
         rotateDeg: num(newRotate),
+        rxDeg: num(newRx),
+        ryDeg: num(newRy),
+        rzDeg: num(newRz),
         ath,
         atv,
-        edge: newEdge.trim() || styleDefaults.edge,
+        edge: edgeForOx,
         zorder: z != null ? Math.round(z) : styleDefaults.zorder,
         onover: newOnover.trim() || undefined,
         onout: newOnout.trim() || undefined,
@@ -632,6 +734,9 @@ export function HotspotXmlEditor({
       setNewUrl("");
       setNewScale("");
       setNewRotate("");
+      setNewRx("");
+      setNewRy("");
+      setNewRz("");
       setNewEdge("");
       setNewZ("");
       setNewOnover("");
@@ -659,6 +764,9 @@ export function HotspotXmlEditor({
       newOnout,
       newOnover,
       newRotate,
+      newRx,
+      newRy,
+      newRz,
       newScale,
       newUrl,
       newZ,
@@ -695,6 +803,137 @@ export function HotspotXmlEditor({
     createIsMicronique &&
     newIconBg.trim() !== "" &&
     newIconFg.trim() !== "";
+
+  const parsePlacementNum = (s: string, fallback: number) => {
+    const t = s.trim();
+    if (t === "") return fallback;
+    const n = parseFloat(t);
+    return Number.isFinite(n) ? n : fallback;
+  };
+
+  const placementPhantomConfig = useMemo((): PlacementPhantomConfig | null => {
+    if (!placementMode) return null;
+    const path =
+      placementTarget === "new"
+        ? (newUrl.trim() || styleDefaults.url)
+        : (localUrl.trim() || styleDefaults.url);
+
+    const prev =
+      placementTarget === "edit" && selectedName
+        ? (krpanoXmlHotspotOverrides[sceneName]?.[selectedName] ?? {})
+        : {};
+
+    const dualNew =
+      placementTarget === "new" &&
+      isMicroniquePresetUrl(path) &&
+      newIconBg.trim() !== "" &&
+      newIconFg.trim() !== "";
+
+    const dualEdit =
+      placementTarget === "edit" &&
+      isMicroniquePresetUrl(path) &&
+      localIconBg.trim() !== "" &&
+      localIconFg.trim() !== "";
+
+    const merged: KrpanoXmlHotspotOverride = {
+      ...prev,
+      url: path,
+      ...(placementTarget === "new"
+        ? {
+            scale: parsePlacementNum(newScale, styleDefaults.scale),
+            rotateDeg: parsePlacementNum(newRotate, 0),
+            rxDeg: parsePlacementNum(newRx, 0),
+            ryDeg: parsePlacementNum(newRy, 0),
+            rzDeg: parsePlacementNum(newRz, 0),
+            ...(dualNew
+              ? {
+                  iconBgColor: pickerHexToKrpanoColorize(newIconBg.trim()),
+                  iconFgColor: pickerHexToKrpanoColorize(newIconFg.trim()),
+                }
+              : {}),
+          }
+        : {
+            scale: parsePlacementNum(
+              localScale,
+              typeof prev.scale === "number" && Number.isFinite(prev.scale)
+                ? prev.scale
+                : styleDefaults.scale,
+            ),
+            rotateDeg: parsePlacementNum(
+              localRotate,
+              typeof prev.rotateDeg === "number" && Number.isFinite(prev.rotateDeg)
+                ? prev.rotateDeg
+                : 0,
+            ),
+            rxDeg: parsePlacementNum(
+              localRx,
+              typeof prev.rxDeg === "number" && Number.isFinite(prev.rxDeg)
+                ? prev.rxDeg
+                : 0,
+            ),
+            ryDeg: parsePlacementNum(
+              localRy,
+              typeof prev.ryDeg === "number" && Number.isFinite(prev.ryDeg)
+                ? prev.ryDeg
+                : 0,
+            ),
+            rzDeg: parsePlacementNum(
+              localRz,
+              typeof prev.rzDeg === "number" && Number.isFinite(prev.rzDeg)
+                ? prev.rzDeg
+                : 0,
+            ),
+            ...(dualEdit
+              ? {
+                  iconBgColor: pickerHexToKrpanoColorize(localIconBg.trim()),
+                  iconFgColor: pickerHexToKrpanoColorize(localIconFg.trim()),
+                }
+              : {}),
+          }),
+    };
+
+    const effectiveUrl = resolveEffectiveHotspotTextureUrl(merged);
+    const src = effectiveUrl.startsWith("data:")
+      ? effectiveUrl
+      : `/${effectiveUrl.replace(/^\/+/, "")}`;
+
+    const scale =
+      typeof merged.scale === "number" && Number.isFinite(merged.scale)
+        ? merged.scale
+        : styleDefaults.scale;
+
+    return {
+      src,
+      scale,
+      rotateDeg: merged.rotateDeg ?? 0,
+      rxDeg: merged.rxDeg ?? 0,
+      ryDeg: merged.ryDeg ?? 0,
+      rzDeg: merged.rzDeg ?? 0,
+    };
+  }, [
+    placementMode,
+    placementTarget,
+    newUrl,
+    localUrl,
+    styleDefaults,
+    selectedName,
+    sceneName,
+    krpanoXmlHotspotOverrides,
+    newScale,
+    newRotate,
+    newRx,
+    newRy,
+    newRz,
+    newIconBg,
+    newIconFg,
+    localScale,
+    localRotate,
+    localRx,
+    localRy,
+    localRz,
+    localIconBg,
+    localIconFg,
+  ]);
 
   if (!shellPanelsVisible) return null;
 
@@ -944,12 +1183,56 @@ export function HotspotXmlEditor({
                 />
               </div>
               <div>
-                <label className="block text-[11px] text-zinc-400">rotate (°)</label>
+                <label className="block text-[11px] text-zinc-400">
+                  rotate plan (°)
+                </label>
                 <input
                   className={fieldClass}
                   value={newRotate}
                   onChange={(e) => setNewRotate(e.target.value)}
+                  title="Rotation 2D dans le plan de la texture (krpano rotate)"
                 />
+              </div>
+            </div>
+            <div className="rounded-lg border border-zinc-800/90 bg-zinc-900/40 p-2.5">
+              <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
+                Orientation 3D (krpano rx / ry / rz)
+              </p>
+              <p className="mb-2 text-[10px] leading-relaxed text-zinc-500">
+                Hotspot <span className="font-mono text-zinc-400">distorted</span> : rotations en degrés (axes X, Y, Z — ordre krpano par défaut Y-X-Z).
+                Champs vides : pas de valeur enregistrée ; utilisez <span className="font-mono text-zinc-400">0</span> pour forcer l’absence de rotation.
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <label className="block text-[11px] text-zinc-400">rx (°)</label>
+                  <input
+                    className={fieldClass}
+                    value={newRx}
+                    onChange={(e) => setNewRx(e.target.value)}
+                    placeholder="0"
+                    title="Rotation autour de l’axe X"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] text-zinc-400">ry (°)</label>
+                  <input
+                    className={fieldClass}
+                    value={newRy}
+                    onChange={(e) => setNewRy(e.target.value)}
+                    placeholder="0"
+                    title="Rotation autour de l’axe Y"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] text-zinc-400">rz (°)</label>
+                  <input
+                    className={fieldClass}
+                    value={newRz}
+                    onChange={(e) => setNewRz(e.target.value)}
+                    placeholder="0"
+                    title="Rotation autour de l’axe Z"
+                  />
+                </div>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
@@ -1304,14 +1587,59 @@ export function HotspotXmlEditor({
                   </div>
                   <div>
                     <label className="block text-[11px] text-zinc-400">
-                      rotate (°)
+                      rotate plan (°)
                     </label>
                     <input
                       className={fieldClass}
                       value={localRotate}
                       onChange={(e) => setLocalRotate(e.target.value)}
                       onBlur={() => void applyLocalFieldsToPatch()}
+                      title="Rotation 2D dans le plan de la texture (krpano rotate)"
                     />
+                  </div>
+                </div>
+                <div className="rounded-lg border border-zinc-800/90 bg-zinc-900/40 p-2.5">
+                  <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
+                    Orientation 3D (krpano rx / ry / rz)
+                  </p>
+                  <p className="mb-2 text-[10px] leading-relaxed text-zinc-500">
+                    Rotations en degrés (axes X, Y, Z). Pour remettre une valeur à zéro après une sauvegarde,
+                    saisissez <span className="font-mono text-zinc-400">0</span> puis validez (blur).
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="block text-[11px] text-zinc-400">rx (°)</label>
+                      <input
+                        className={fieldClass}
+                        value={localRx}
+                        onChange={(e) => setLocalRx(e.target.value)}
+                        onBlur={() => void applyLocalFieldsToPatch()}
+                        placeholder="0"
+                        title="Rotation autour de l’axe X"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] text-zinc-400">ry (°)</label>
+                      <input
+                        className={fieldClass}
+                        value={localRy}
+                        onChange={(e) => setLocalRy(e.target.value)}
+                        onBlur={() => void applyLocalFieldsToPatch()}
+                        placeholder="0"
+                        title="Rotation autour de l’axe Y"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] text-zinc-400">rz (°)</label>
+                      <input
+                        className={fieldClass}
+                        value={localRz}
+                        onChange={(e) => setLocalRz(e.target.value)}
+                        onBlur={() => void applyLocalFieldsToPatch()}
+                        placeholder="0"
+                        title="Rotation autour de l’axe Z"
+                      />
+                    </div>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
@@ -1458,19 +1786,32 @@ export function HotspotXmlEditor({
       {placementMode &&
       krpano &&
       viewerContainerId &&
+      placementPhantomConfig &&
       (placementTarget === "new"
         ? newName.trim().length > 0
         : Boolean(selectedName)) ? (
         <PlacementLayer
           krpano={krpano}
           containerId={viewerContainerId}
+          phantom={placementPhantomConfig}
           onPlace={(ath, atv) => {
             if (placementTarget === "new") {
               setPlacementMode(false);
               void commitNewHotspot({ ath, atv });
               return;
             }
-            patchSceneHotspot({ ath, atv });
+            patchSceneHotspot({
+              ath,
+              atv,
+              /*
+               * Le style tour utilise souvent edge=top : l’ancre est alors en haut de la texture,
+               * alors que le fantôme est centré sur le clic — on force center pour coïncider avec l’aperçu.
+               * Avec edge=center, ox/oy doivent être 0 (pas moitié texture — sinon décalage bas-droite).
+               */
+              edge: "center",
+              ox: 0,
+              oy: 0,
+            });
             setPlacementMode(false);
           }}
           onCancel={() => setPlacementMode(false)}

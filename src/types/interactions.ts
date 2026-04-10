@@ -223,8 +223,23 @@ export type KrpanoXmlHotspotOverride = {
   oy?: number;
   edge?: string;
   zorder?: number;
-  /** Rotation dans le plan du hotspot (°) — krpano `rotate`. */
+  /**
+   * Rotation dans le plan de la texture (°) — krpano `rotate` (2D).
+   * Distinct de {@link rxDeg} / {@link ryDeg} / {@link rzDeg} (espace 3D).
+   */
   rotateDeg?: number;
+  /**
+   * Rotation 3D autour de l’axe X (°) — krpano `rx` (hotspot `distorted="true"`).
+   */
+  rxDeg?: number;
+  /**
+   * Rotation 3D autour de l’axe Y (°) — krpano `ry`.
+   */
+  ryDeg?: number;
+  /**
+   * Rotation 3D autour de l’axe Z (°) — krpano `rz`.
+   */
+  rzDeg?: number;
   ath?: number;
   atv?: number;
   /** Surcharge des actions (texte krpano), pour personnaliser hover / clic. */

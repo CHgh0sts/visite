@@ -1,6 +1,8 @@
 /**
- * krpano `ox` / `oy` : décalage du hotspot en pixels — on les fixe au centre de la texture :
- * ox = largeur/2, oy = hauteur/2 (comportement attendu pour une ancre au centre).
+ * krpano `ox` / `oy` : décalage du hotspot en pixels.
+ * - **`edge="center"`** : le point (ath,atv) est le centre visuel — utiliser **`ox=0`, `oy=0`**.
+ *   (Des valeurs type largeur/2 décalent l’image en bas à droite par rapport au curseur.)
+ * - Autres `edge` : souvent moitié largeur / hauteur pour ancrer la texture selon le fichier.
  */
 
 /** Dimensions connues (fichiers dans `public/`, chemins relatifs au tour). */
@@ -58,6 +60,19 @@ const oxOyByUrlPromise = new Map<string, Promise<{ ox: number; oy: number }>>();
  * Charge la texture (navigateur) pour lire les dimensions, puis calcule ox/oy.
  * Textures connues : synchrone via {@link tryHotspotOxOyFromKnownTexture}.
  */
+/**
+ * `ox` / `oy` selon `edge` : pour `center`, toujours (0,0) — cohérent avec un clic / fantôme centrés.
+ */
+export async function resolveHotspotOxOyFromUrlAndEdge(
+  url: string,
+  edge: string | undefined,
+): Promise<{ ox: number; oy: number }> {
+  if (edge?.trim().toLowerCase() === "center") {
+    return { ox: 0, oy: 0 };
+  }
+  return resolveHotspotOxOyFromUrl(url);
+}
+
 export function resolveHotspotOxOyFromUrl(
   url: string,
 ): Promise<{ ox: number; oy: number }> {
